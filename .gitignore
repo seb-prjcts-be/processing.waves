@@ -1,0 +1,15 @@
+# Processing build/export output
+out/
+application.windows*/
+application.macosx*/
+application.linux*/
+*.class
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
