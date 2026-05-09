@@ -1,12 +1,13 @@
-# processing_waves (POC)
+# processing_waves
 
-Java/Processing port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves).
+Java/Processing port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0.
 
-## Status: Proof of Concept
+## Status
 
-- 10 representative waves (out of 34) covering all character types: sin/cos, abs, modulo, sin*cos, custom random, custom noise.
+- All 34 waves ported in original order (so seed-based wave selection is bit-identical to the JS version).
 - Full API surface of v3.3.0: `wave()`, `createSampler()`, shift, morph, wild, group, range.
 - Single-tab `Waves.pde` library, drop into any sketch.
+- Compile-validated against Processing 4.4.10.
 
 ## Run the demo
 
@@ -52,6 +53,6 @@ float v = s.sample(y, t);
 
 ## Next
 
-- Port the remaining 24 waves (mechanical, ~30 min).
-- Validate numerically: same `(seed, y, t, opts)` should produce visually-matching output between JS and Java (tolerance ~1e-3 due to float vs double).
+- Numerical validation harness: same `(seed, y, t, opts)` should produce matching output between JS and Java (tolerance ~1e-3 due to float vs double internally).
 - Decide on distribution: keep as drop-in `.pde` tab vs. build a contributed Processing library `.jar`.
+- Optional examples mirroring the p5.waves examples gallery (binary field, flow field, walker, terrain, etc).
