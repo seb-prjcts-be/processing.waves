@@ -1,6 +1,8 @@
-// processing_waves_demo
-// POC demo of the Java/Processing port of p5.waves.
+// basic_demo
+// 5-mode tour of processing.waves.
 // Press 1..5 to switch demo. Press SPACE to reseed.
+
+import waves.*;
 
 int demoMode = 1;
 int seed = 42;
@@ -54,7 +56,7 @@ void draw() {
   drawHud();
 }
 
-// 1) Each of the 10 waves drawn as its own row
+// 1) Each of the 34 waves drawn as its own row
 void drawAllWaves(float t) {
   int n = Waves.count();
   float rowH = (float)height / n;
@@ -72,8 +74,8 @@ void drawAllWaves(float t) {
     }
     endShape();
     fill(180); noStroke();
-    textSize(10);
-    text(Waves.WAVES[i].name, 6, yMid - rowH * 0.45f + 10);
+    textSize(9);
+    text(Waves.WAVES[i].name, 6, yMid + 3);
     noFill(); stroke(255);
   }
 }

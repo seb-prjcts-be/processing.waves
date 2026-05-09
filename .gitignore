@@ -3,7 +3,14 @@ out/
 application.windows*/
 application.macosx*/
 application.linux*/
+
+# Java compile output (jar in library/ is committed for distribution)
+bin/
+tests/bin/
 *.class
+
+# Validator generated output (regenerate with tests/run.ps1)
+tests/expected.tsv
 
 # IDE
 .idea/

@@ -1,0 +1,36 @@
+id	desc	y	t	seed	wave	amplitude	frequency	phase	mode	u	mix	rlo	rhi	group	waveB
+1	default classic sine	0	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+2	classic sine y=10	10	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+3	classic sine y=-50	-50	0	42	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+4	mountain peaks y=25	25	0	0	mountain peaks	100	1	0	stable	0	0.5	-	-	all	-
+5	square y=5	5	0	0	square	100	1	0	stable	0	0.5	-	-	all	-
+6	noise y=10	10	0	0	noise	100	1	0	stable	0	0.5	-	-	all	-
+7	grow random y=10	10	0	0	grow random	100	1	0	stable	0	0.5	-	-	all	-
+8	wobble sine y=15	15	0	0	wobble sine	100	1	0	stable	0	0.5	-	-	all	-
+9	triangle y=33	33	0	0	triangle	100	1	0	stable	0	0.5	-	-	all	-
+10	saw down y=20	20	0	0	saw down	100	1	0	stable	0	0.5	-	-	all	-
+11	pulse y=30	30	0	0	pulse	100	1	0	stable	0	0.5	-	-	all	-
+12	bumpy sine y=12	12	0	0	bumpy sine	100	1	0	stable	0	0.5	-	-	all	-
+13	meta sine y=8	8	0	0	meta sine	100	1	0	stable	0	0.5	-	-	all	-
+14	smooth solid sine y=2	2	0	0	smooth solid sine	100	1	0	stable	0	0.5	-	-	all	-
+15	amplitude 50	10	0	0	classic sine	50	1	0	stable	0	0.5	-	-	all	-
+16	amplitude 200	10	0	0	classic sine	200	1	0	stable	0	0.5	-	-	all	-
+17	frequency 0.5	10	0	0	classic sine	100	0.5	0	stable	0	0.5	-	-	all	-
+18	frequency 2	10	0	0	classic sine	100	2	0	stable	0	0.5	-	-	all	-
+19	phase pi	10	0	0	classic sine	100	1	3.14159	stable	0	0.5	-	-	all	-
+20	t=5	10	5	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+21	seed 42 (auto-pick)	10	0	42	-	100	1	0	stable	0	0.5	-	-	all	-
+22	seed 123 (auto-pick)	10	0	123	-	100	1	0	stable	0	0.5	-	-	all	-
+23	seed 999 group gentle	10	0	999	-	100	1	0	stable	0	0.5	-	-	gentle	-
+24	seed 999 group harsh	10	0	999	-	100	1	0	stable	0	0.5	-	-	harsh	-
+25	range 0-200	10	0	0	classic sine	100	1	0	stable	0	0.5	0	200	all	-
+26	range -50 to 50	10	0	0	mountain peaks	100	1	0	stable	0	0.5	-50	50	all	-
+27	morph 0.0 sine to peaks	10	0	0	classic sine	100	1	0	stable	0	0.0	-	-	all	mountain peaks
+28	morph 0.5 sine to peaks	10	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	mountain peaks
+29	morph 1.0 sine to peaks	10	0	0	classic sine	100	1	0	stable	0	1.0	-	-	all	mountain peaks
+30	wild u=0.5 classic sine	10	0	0	classic sine	100	1	0	wild	0.5	0.5	-	-	all	-
+31	wild u=1.0 mountain peaks	10	0	0	mountain peaks	100	1	0	wild	1.0	0.5	-	-	all	-
+32	large y=1000	1000	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+33	large negative y=-1000	-1000	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+34	t=100	10	100	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
+35	frequency 0	10	0	0	classic sine	100	0	0	stable	0	0.5	-	-	all	-

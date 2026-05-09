@@ -1,58 +1,102 @@
-# processing_waves
+# processing.waves
 
 Java/Processing port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0.
+34 wave shapes. Pass a number in, get a number back.
 
-## Status
+## Install
 
-- All 34 waves ported in original order (so seed-based wave selection is bit-identical to the JS version).
-- Full API surface of v3.3.0: `wave()`, `createSampler()`, shift, morph, wild, group, range.
-- Single-tab `Waves.pde` library, drop into any sketch.
-- Compile-validated against Processing 4.4.10.
+Drop the library folder into your Processing sketchbook libraries directory.
 
-## Run the demo
+1. Find your sketchbook in Processing 4: `File > Preferences > Sketchbook location`.
+2. Copy the contents of this repo into `<sketchbook>/libraries/waves/`. Result:
+   ```
+   <sketchbook>/libraries/waves/
+     library.properties
+     library/waves.jar
+     src/waves/*.java
+     examples/*/<sketch>.pde
+   ```
+3. Restart Processing. The library appears under `Sketch > Import Library > waves`.
 
-Open `processing_waves_demo/processing_waves_demo.pde` in Processing 4.
+Or, on Windows with the JDK on PATH and Processing 4 installed at the default location, run `./build.ps1 -Install` from the repo root. It rebuilds the jar and copies the library into your sketchbook automatically (reads `sketchbook.path.four` from Processing's preferences).
 
-Keys:
-- `1` all 10 waves stacked
-- `2` shift sampler
-- `3` morph (mouseX = mix)
-- `4` wild mode (mouseX = unpredictability)
-- `5` wave-as-velocity walker
-- `SPACE` reseed
-
-## API
+## Use
 
 ```java
-// Quick calls
-Waves.wave(y);
-Waves.wave(y, "classic sine");
-Waves.wave(y, 42);                       // seed
+import waves.*;
 
-// Full options
-WaveOpts o = new WaveOpts()
-  .wave("mountain peaks")
-  .t(millis() / 1000.0f)
-  .amplitude(80)
-  .frequency(1)
-  .seed(42);
-float v = Waves.wave(y, o);
+void setup() {
+  size(800, 400);
+}
 
-// Sampler (caches wave selection, faster in tight loops)
-Waves.WaveSampler s = Waves.createSampler(new WaveOpts()
-  .shift(true).group("gentle").amplitude(120));
-float v = s.sample(y, t);
+void draw() {
+  background(20);
+  stroke(255);
+  noFill();
+  WaveOpts o = new WaveOpts()
+    .wave("mountain peaks")
+    .t(millis() / 1000.0f)
+    .amplitude(120);
+  beginShape();
+  for (int x = 0; x < width; x += 3) {
+    float y = Waves.wave(x, o);
+    vertex(x, height / 2 + y);
+  }
+  endShape();
+}
 ```
+
+For caching wave selection across many calls (faster in tight loops):
+
+```java
+Waves.WaveSampler s = Waves.createSampler(new WaveOpts()
+  .shift(true)
+  .group("gentle")
+  .amplitude(120));
+
+float v = s.sample(x, t);
+```
+
+## Examples
+
+Six included in `examples/`:
+- `basic_demo` — 5-mode tour (all waves, shift, morph, wild, walker)
+- `binary_field` — two samplers summed and thresholded into a 2D pattern
+- `flow_fields` — ASCII flow field, direction comes from waves
+- `random_walker` — five trails where wave output IS the velocity
+- `wave_shift` — auto-shifting filled ribbons
+- `morph_wave` — horizontal lines blending two formulas with a sweeping morph
+
+Open any `examples/<name>/<name>.pde` in Processing.
+
+## Build
+
+Requires JDK 17+ and Processing 4.
+
+```
+./build.ps1            # builds library/waves.jar
+./build.ps1 -Install   # also installs to sketchbook
+```
+
+## Numerical validation
+
+The `tests/` folder validates that processing.waves produces the same output
+as the JS p5.waves reference for a fixed set of inputs.
+
+```
+./tests/run.ps1
+```
+
+Result: 35/35 pass. Tolerance 1e-3 for stable mode, 0.5 for wild mode (small
+float vs double differences amplify through wild mode's noise modulation).
 
 ## Port notes
 
-- The JS `new Function(algoString)` runtime evaluator is replaced by hand-translated Java lambdas, one per wave. Removes runtime eval and the `algo` string is now display-only.
-- Float instead of double internally (Processing convention). Numerical match is visually indistinguishable but not bit-exact with the JS version.
-- FNV-1a seed hash and mulberry32 PRNG ported 1:1 using `int *` (matches JS `Math.imul` semantics) and `>>>` unsigned shift.
-- `random()` and `noise()` calls inside formulas use the deterministic injected `EvalCtx`, not Processing's PApplet `random`/`noise`.
+- The JS `new Function(algoString)` runtime evaluator is replaced by hand-translated Java lambdas, one per wave. Loses runtime string evaluation; the API never exposed it anyway.
+- Internal math runs in `double` (matching JS Numbers) but the public API returns `float` (Processing convention). Result: visually identical to JS, with sub-pixel numerical match where deterministic.
+- FNV-1a seed and mulberry32 PRNG are ported 1:1. `seedFrom` returns the unsigned uint32 as a `long` so subsequent float math matches JS's unsigned-Number semantics.
+- Shift mode uses `Math.random()` for per-session entropy; outputs are non-deterministic across runs (same as JS).
 
-## Next
+## License
 
-- Numerical validation harness: same `(seed, y, t, opts)` should produce matching output between JS and Java (tolerance ~1e-3 due to float vs double internally).
-- Decide on distribution: keep as drop-in `.pde` tab vs. build a contributed Processing library `.jar`.
-- Optional examples mirroring the p5.waves examples gallery (binary field, flow field, walker, terrain, etc).
+MIT.
