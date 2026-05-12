@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>processing.waves &mdash; 34 wave shapes for Processing</title>
+  <meta name="description" content="processing.waves &mdash; 34 curated wave formulas for Processing 4. Java port of p5.waves. One function call, one number back.">
+  <meta property="og:title" content="processing.waves &mdash; 34 wave shapes for Processing">
+  <meta property="og:description" content="One function call, one number back. 34 wave formulas for Processing 4 with shift, morph, and wild mode.">
+  <meta property="og:url" content="https://seb-prjcts-be.github.io/processing.waves/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="processing.waves &mdash; 34 wave shapes for Processing">
+  <meta name="twitter:description" content="34 wave formulas for Processing 4. Java port of p5.waves.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/p5.waves@main/p5.waves.min.js"></script>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">processing.<span>waves</span></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#hero" class="active">Showcase</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div id="hero-canvas"></div>
+    <div class="hero-overlay">
+      <div class="hero-text">
+        <div class="hero-badge">Processing 4 library</div>
+        <h1>processing.<span class="accent">waves</span></h1>
+        <p class="hero-sub">34 wave shapes. One function call.<br>Pass a number in, get a number back. Java port of <a href="https://seb-prjcts-be.github.io/p5.waves/" style="color:inherit;text-decoration:underline;">p5.waves</a>.</p>
+        <a href="#gallery" class="cta-btn">See all 34 waves &#8595;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery" class="section">
+    <div class="section-header">
+      <div class="section-tag">Waves.wave(y, "name")</div>
+      <h2>All <span class="accent">34</span> Waves</h2>
+      <p class="section-desc">Each wave has its own character. Every shape is periodic &mdash; it repeats, but each one repeats differently.</p>
+      <p class="section-desc" style="font-size:.78rem;margin-top:1rem;font-style:italic;">Live previews on this page are rendered by the original <strong>p5.waves</strong> JS library; <strong>processing.waves</strong> (Java) produces byte-identical output, verified by a 35-case numerical validator.</p>
+    </div>
+    <div id="gallery-canvas"></div>
+    <div style="text-align:center; margin-top:2rem;">
+      <a href="waves.html" class="cta-btn">All 34 waves &rarr;</a>
+    </div>
+  </section>
+
+  <!-- GET STARTED -->
+  <section class="section section-dark" style="text-align:center;">
+    <div class="section-header">
+      <div class="section-tag">5 lines of code</div>
+      <h2>Get <span class="accent">Started</span></h2>
+      <p class="section-desc">Drop the jar in your Processing sketchbook. Import. Call the function.</p>
+    </div>
+    <div style="max-width:560px; margin:0 auto; text-align:left;">
+      <div class="code-preview" style="margin-bottom:1.5rem;"><code class="language-java">import waves.*;
+
+void setup() { size(800, 400); }
+
+void draw() {
+  background(20);
+  stroke(255);
+  noFill();
+  WaveOpts o = new WaveOpts()
+    .wave("mountain peaks")
+    .t(millis() / 1000.0f)
+    .amplitude(120);
+  beginShape();
+  for (int x = 0; x &lt; width; x += 3) {
+    float y = Waves.wave(x, o);
+    vertex(x, height / 2 + y);
+  }
+  endShape();
+}</code></div>
+    </div>
+    <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.5rem;">
+      <a href="guide.html" class="cta-btn">Full guide &rarr;</a>
+      <a href="examples.html" class="cta-btn" style="background:#444;">Examples &rarr;</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+  </footer>
+
+  <script src="sketch.js"></script>
+</body>
+</html>
