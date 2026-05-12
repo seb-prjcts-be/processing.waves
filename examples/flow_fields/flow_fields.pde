@@ -22,7 +22,8 @@ void setup() {
     .shift(true)
     .shiftInterval(4)
     .shiftDuration(2)
-    .frequency(2));
+    .frequency(2)
+    .range(-1, 1));
 }
 
 void draw() {

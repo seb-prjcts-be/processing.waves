@@ -5,7 +5,31 @@
    original p5.waves JS library (loaded from CDN). The Java
    port (processing.waves) produces numerically identical
    output, verified by a 35-case validator in /tests.
+
+   Every preview is lazy-mounted via IntersectionObserver:
+   the p5 instance is created only when its container scrolls
+   into view, and paused (noLoop) when it scrolls back out.
    ============================================================ */
+
+/* ------------------------------------------------------------
+   lazyMount — defer p5 creation until visible, pause off-screen.
+   mountFn(host) must return the p5 instance.
+   ------------------------------------------------------------ */
+function lazyMount(host, mountFn) {
+  if (!host) return;
+  let instance = null;
+  const obs = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      if (e.isIntersecting) {
+        if (!instance) instance = mountFn(host);
+        else instance.loop();
+      } else if (instance) {
+        instance.noLoop();
+      }
+    }
+  }, { rootMargin: "200px" });
+  obs.observe(host);
+}
 
 const WAVE_NAMES = [
   "classic sine", "sine", "sharp peaks", "square", "pulse",
@@ -22,11 +46,8 @@ const WAVE_NAMES = [
 /* ------------------------------------------------------------
    HERO — single drifting wave landscape
    ------------------------------------------------------------ */
-function mountHero() {
-  const host = document.getElementById("hero-canvas");
-  if (!host || typeof Waves === "undefined") return;
-
-  new p5((p) => {
+function mountHero(host) {
+  return new p5((p) => {
     let sampler;
     p.setup = () => {
       const w = host.clientWidth;
@@ -66,11 +87,34 @@ function mountHero() {
 /* ------------------------------------------------------------
    GALLERY — 34 mini waves in a responsive grid
    ------------------------------------------------------------ */
-function mountGallery() {
-  const host = document.getElementById("gallery-canvas");
-  if (!host || typeof Waves === "undefined") return;
+function mountGalleryCell(canvasHost, name) {
+  return new p5((p) => {
+    p.setup = () => {
+      p.createCanvas(canvasHost.clientWidth, canvasHost.clientHeight);
+      p.noLoop();
+    };
+    p.windowResized = () => {
+      p.resizeCanvas(canvasHost.clientWidth, canvasHost.clientHeight);
+      p.redraw();
+    };
+    p.draw = () => {
+      p.background(255);
+      p.stroke(0); p.strokeWeight(1.2); p.noFill();
+      const amp = p.height * 0.32;
+      p.beginShape();
+      for (let x = 0; x <= p.width; x += 1) {
+        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.06 });
+        p.vertex(x, p.height / 2 + y);
+      }
+      p.endShape();
+    };
+  }, canvasHost);
+}
 
-  // Build the grid markup.
+function buildGallery() {
+  const host = document.getElementById("gallery-canvas");
+  if (!host) return;
+
   host.style.display = "grid";
   host.style.gridTemplateColumns = "repeat(auto-fill, minmax(180px, 1fr))";
   host.style.gap = "0";
@@ -100,77 +144,38 @@ function mountGallery() {
     cell.appendChild(idx);
     host.appendChild(cell);
 
-    new p5((p) => {
-      p.setup = () => {
-        const w = canvasHost.clientWidth;
-        const h = canvasHost.clientHeight;
-        p.createCanvas(w, h);
-        p.noLoop();
-      };
-      p.windowResized = () => {
-        p.resizeCanvas(canvasHost.clientWidth, canvasHost.clientHeight);
-        p.redraw();
-      };
-      p.draw = () => {
-        p.background(255);
-        p.stroke(0);
-        p.strokeWeight(1.2);
-        p.noFill();
-        const amp = p.height * 0.32;
-        const freq = 0.06;
-        p.beginShape();
-        for (let x = 0; x <= p.width; x += 1) {
-          const y = Waves.wave(x, {
-            wave: name,
-            amplitude: amp,
-            frequency: freq
-          });
-          p.vertex(x, p.height / 2 + y);
-        }
-        p.endShape();
-      };
-    }, canvasHost);
+    lazyMount(canvasHost, (h) => mountGalleryCell(h, name));
   });
 }
 
 /* ------------------------------------------------------------
    WAVES PAGE — full-width single canvas per wave
    ------------------------------------------------------------ */
-function mountWavesPage() {
-  const containers = document.querySelectorAll("[data-wave]");
-  if (!containers.length || typeof Waves === "undefined") return;
+function mountWavePreview(host, name) {
+  return new p5((p) => {
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 120);
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 120);
+    p.draw = () => {
+      p.background(255);
+      p.stroke(0); p.strokeWeight(1.3); p.noFill();
+      const amp = p.height * 0.34;
+      const t = p.millis() / 1000;
+      p.beginShape();
+      for (let x = 0; x <= p.width; x += 1) {
+        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.055, t: t * 12 });
+        p.vertex(x, p.height / 2 + y);
+      }
+      p.endShape();
+    };
+  }, host);
+}
 
-  containers.forEach((host) => {
+function mountWavesPage() {
+  document.querySelectorAll("[data-wave]").forEach((host) => {
     const name = host.dataset.wave;
-    new p5((p) => {
-      p.setup = () => {
-        const w = host.clientWidth;
-        const h = host.clientHeight || 120;
-        p.createCanvas(w, h);
-      };
-      p.windowResized = () => {
-        p.resizeCanvas(host.clientWidth, host.clientHeight || 120);
-      };
-      p.draw = () => {
-        p.background(255);
-        p.stroke(0);
-        p.strokeWeight(1.3);
-        p.noFill();
-        const amp = p.height * 0.34;
-        const t = p.millis() / 1000;
-        p.beginShape();
-        for (let x = 0; x <= p.width; x += 1) {
-          const y = Waves.wave(x, {
-            wave: name,
-            amplitude: amp,
-            frequency: 0.055,
-            t: t * 12
-          });
-          p.vertex(x, p.height / 2 + y);
-        }
-        p.endShape();
-      };
-    }, host);
+    lazyMount(host, (h) => mountWavePreview(h, name));
   });
 }
 
@@ -181,7 +186,7 @@ function mountWavesPage() {
    ------------------------------------------------------------ */
 
 function mountWaveShift(host) {
-  new p5((p) => {
+  return new p5((p) => {
     let sampler;
     const STRIPS = 20;
     p.setup = () => {
@@ -210,7 +215,7 @@ function mountWaveShift(host) {
 }
 
 function mountMorphWave(host) {
-  new p5((p) => {
+  return new p5((p) => {
     const WAVE_A = "wobble sine";
     const WAVE_B = "meta sine";
     const ROW_COUNT = 50;
@@ -254,7 +259,7 @@ function mountMorphWave(host) {
 }
 
 function mountFlowFields(host) {
-  new p5((p) => {
+  return new p5((p) => {
     const COLS = 30, ROWS = 30;
     const DIRS = ["-", "/", "|", "\\"];
     let sampler;
@@ -262,7 +267,7 @@ function mountFlowFields(host) {
       p.createCanvas(host.clientWidth, host.clientHeight || 460);
       p.textFont("Consolas");
       p.textAlign(p.CENTER, p.CENTER);
-      sampler = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 2, frequency: 2 });
+      sampler = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 2, frequency: 2, range: [-1, 1] });
     };
     p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
     p.draw = () => {
@@ -283,7 +288,7 @@ function mountFlowFields(host) {
 }
 
 function mountBinaryField(host) {
-  new p5((p) => {
+  return new p5((p) => {
     const COLS = 30, ROWS = 20;
     let rowS, colS;
     p.setup = () => {
@@ -317,7 +322,7 @@ function mountBinaryField(host) {
 }
 
 function mountRandomWalker(host) {
-  new p5((p) => {
+  return new p5((p) => {
     const WALKERS = 5;
     const palette = [
       [255, 60, 60], [60, 220, 60], [60, 100, 255],
@@ -327,6 +332,31 @@ function mountRandomWalker(host) {
     let wx = [], wy = [], prevX = [], prevY = [];
     let t = 0;
     let trail;
+
+    function step() {
+      trail.noStroke();
+      trail.fill(15, 15, 15, 8);
+      trail.rect(0, 0, trail.width, trail.height);
+      t += 0.025;
+      for (let i = 0; i < WALKERS; i++) {
+        const phase = i * 6.7;
+        const vx = xWave.sample(t * 1.8 + phase, t);
+        const vy = yWave.sample(t * 2.1 + phase * 1.3, t);
+        prevX[i] = wx[i]; prevY[i] = wy[i];
+        wx[i] += vx; wy[i] += vy;
+        if (wx[i] < 0)        wx[i] += p.width;
+        if (wx[i] > p.width)  wx[i] -= p.width;
+        if (wy[i] < 0)        wy[i] += p.height;
+        if (wy[i] > p.height) wy[i] -= p.height;
+        if (Math.abs(wx[i] - prevX[i]) > p.width / 2)  continue;
+        if (Math.abs(wy[i] - prevY[i]) > p.height / 2) continue;
+        const col = palette[i];
+        trail.stroke(col[0], col[1], col[2], 200);
+        trail.strokeWeight(2.5);
+        trail.line(prevX[i], prevY[i], wx[i], wy[i]);
+      }
+    }
+
     p.setup = () => {
       const w = host.clientWidth, h = host.clientHeight || 460;
       p.createCanvas(w, h);
@@ -341,29 +371,12 @@ function mountRandomWalker(host) {
         wy[i] = h / 2 + Math.sin(a) * 40;
         prevX[i] = wx[i]; prevY[i] = wy[i];
       }
+      // Pre-bake ~10 seconds of motion so the trail is already rich
+      // when the visitor first sees the canvas.
+      for (let f = 0; f < 600; f++) step();
     };
     p.draw = () => {
-      trail.noStroke();
-      trail.fill(15, 15, 15, 8);
-      trail.rect(0, 0, trail.width, trail.height);
-      t += 0.025;
-      for (let i = 0; i < WALKERS; i++) {
-        const phase = i * 6.7;
-        const vx = xWave.sample(t * 1.8 + phase, t);
-        const vy = yWave.sample(t * 2.1 + phase * 1.3, t);
-        prevX[i] = wx[i]; prevY[i] = wy[i];
-        wx[i] += vx; wy[i] += vy;
-        if (wx[i] < 0)         wx[i] += p.width;
-        if (wx[i] > p.width)   wx[i] -= p.width;
-        if (wy[i] < 0)         wy[i] += p.height;
-        if (wy[i] > p.height)  wy[i] -= p.height;
-        if (Math.abs(wx[i] - prevX[i]) > p.width / 2)  continue;
-        if (Math.abs(wy[i] - prevY[i]) > p.height / 2) continue;
-        const col = palette[i];
-        trail.stroke(col[0], col[1], col[2], 200);
-        trail.strokeWeight(2.5);
-        trail.line(prevX[i], prevY[i], wx[i], wy[i]);
-      }
+      step();
       p.image(trail, 0, 0);
       p.noStroke(); p.fill(255, 255, 255, 120);
       p.textSize(10); p.textAlign(p.LEFT);
@@ -382,7 +395,7 @@ function mountExamples() {
   };
   document.querySelectorAll("[data-example]").forEach((host) => {
     const fn = handlers[host.dataset.example];
-    if (fn) fn(host);
+    if (fn) lazyMount(host, fn);
   });
 }
 
@@ -394,8 +407,9 @@ function bootstrap() {
     setTimeout(bootstrap, 80);
     return;
   }
-  mountHero();
-  mountGallery();
+  const hero = document.getElementById("hero-canvas");
+  if (hero) lazyMount(hero, mountHero);
+  buildGallery();
   mountWavesPage();
   mountExamples();
 }
