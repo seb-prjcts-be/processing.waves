@@ -1,14 +1,8 @@
 # processing.waves
 
-[![docs](https://img.shields.io/badge/docs-site-000)](https://seb-prjcts-be.github.io/processing.waves/)
-[![java](https://img.shields.io/badge/java-17%2B-blue)](https://adoptium.net/)
-[![processing](https://img.shields.io/badge/processing-4-006699)](https://processing.org)
-[![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+**[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)**
 
 Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
-
-> **Documentation site**: <https://seb-prjcts-be.github.io/processing.waves/>
-> Visual gallery of every wave, full API reference, copy-paste starters, port notes.
 
 ## Install
 
