@@ -4,6 +4,14 @@
 
 Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
 
+## About
+
+Behind that one promise lives a curated set of 34 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos. Each one is a tiny formula tuned to drive motion, color, shape, or pattern in a Processing sketch. The library hands you all of them through a single `Waves.wave(x, ...)` call, plus the controls to crossfade between them, auto-cycle on a tempo, or push any of them into wild mode.
+
+processing.waves is the Java sibling of p5.waves, originally built in JavaScript for the browser side of generative coding. The port carries the same vocabulary across to Processing 4: same names, same indices, same numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you. The challenge of the port was less about translating syntax and more about making the *output* of two implementations match bit-for-bit, despite signed-versus-unsigned int quirks and floating-point traps. FNV-1a hashing, the mulberry32 PRNG, and a double-precision internal math layer carry that weight.
+
+To prove the port works the repo ships a numerical validator that runs the JS reference via Node and compares its outputs against the Java port across 34 waves and 35 cases. Current status: 35 / 35 pass. Visually identical to JS, sub-pixel numerical match where deterministic. See the [site](https://seb-prjcts-be.github.io/processing.waves/) for live previews of every wave and every bundled sketch.
+
 ## Install
 
 ### Manual (any platform)
