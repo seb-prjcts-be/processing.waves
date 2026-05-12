@@ -12,7 +12,7 @@
    ============================================================ */
 
 /* ------------------------------------------------------------
-   lazyMount — defer p5 creation until visible, pause off-screen.
+   lazyMount - defer p5 creation until visible, pause off-screen.
    mountFn(host) must return the p5 instance.
    ------------------------------------------------------------ */
 function lazyMount(host, mountFn) {
@@ -44,7 +44,7 @@ const WAVE_NAMES = [
 ];
 
 /* ------------------------------------------------------------
-   HERO — single drifting wave landscape
+   HERO - single drifting wave landscape
    ------------------------------------------------------------ */
 function mountHero(host) {
   return new p5((p) => {
@@ -85,7 +85,7 @@ function mountHero(host) {
 }
 
 /* ------------------------------------------------------------
-   GALLERY — 34 mini waves in a responsive grid
+   GALLERY - 34 mini waves in a responsive grid
    ------------------------------------------------------------ */
 function mountGalleryCell(canvasHost, name) {
   return new p5((p) => {
@@ -150,7 +150,7 @@ function buildGallery() {
 }
 
 /* ------------------------------------------------------------
-   WAVES PAGE — full-width single canvas per wave
+   WAVES PAGE - full-width single canvas per wave
    ------------------------------------------------------------ */
 function mountWavePreview(host, name) {
   return new p5((p) => {
@@ -182,7 +182,7 @@ function mountWavesPage() {
 }
 
 /* ------------------------------------------------------------
-   EXAMPLES PAGE — five live previews
+   EXAMPLES PAGE - five live previews
    Each mirrors a bundled .pde so visitors see exactly what the
    Java sketch produces when they paste the code into Processing.
    ------------------------------------------------------------ */

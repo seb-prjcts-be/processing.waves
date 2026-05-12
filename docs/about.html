@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About &mdash; processing.waves</title>
+  <title>About - processing.waves</title>
   <meta name="description" content="Why a Java port of p5.waves? How it was built, validated, and what's different.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -28,7 +28,7 @@
 
   <main class="guide-wrap">
     <h1>About</h1>
-    <p class="guide-intro"><strong>processing.waves</strong> is a Java port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 for Processing 4. Same 34 waves, same API shape, same numerical output &mdash; just in Java instead of JavaScript.</p>
+    <p class="guide-intro"><strong>processing.waves</strong> is a Java port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 for Processing 4. Same 34 waves, same API shape, same numerical output, just in Java instead of JavaScript.</p>
 
     <h2>Why a Java port?</h2>
     <p>p5.waves lives in p5.js. Plenty of creative coders work in Processing (the Java IDE) for one of these reasons:</p>
@@ -41,7 +41,7 @@
     <p>The Java port hands those users the same building blocks, with no syntactic translation work each time they pick up a wave-based idea.</p>
 
     <h2>Building the library</h2>
-    <p>The challenge of porting wasn't the math &mdash; sine, cosine, log, tan, modulo all exist in Java. The challenge was making the output <em>numerically identical</em> to JS for a deterministic seed. Three things matter:</p>
+    <p>The challenge of porting wasn't the math: sine, cosine, log, tan, modulo all exist in Java. The challenge was making the output <em>numerically identical</em> to JS for a deterministic seed. Three things matter:</p>
     <ul class="step-list">
       <li><p><strong>FNV-1a 32-bit hash.</strong> JS treats the seed as an unsigned uint32 stored in a Number (double). Java's <code>int</code> is signed. <code>seedFrom()</code> returns an unsigned <code>long</code> (the uint32 promoted), so all downstream float math matches bit-for-bit.</p></li>
       <li><p><strong>Mulberry32 PRNG.</strong> Identical state transitions to the JS port. Same seed = same sequence on both sides.</p></li>
@@ -65,7 +65,7 @@
     <ul class="step-list">
       <li><p>All 34 wave shapes, names, and indices match.</p></li>
       <li><p>The "gentle / harsh / closing" group taxonomy.</p></li>
-      <li><p>Shift, morph, wild, range mapping &mdash; same semantics, same numerical output.</p></li>
+      <li><p>Shift, morph, wild, range mapping: same semantics, same numerical output.</p></li>
       <li><p><code>createSampler()</code> works the same way, including the <code>shift</code> entropy that randomises per session.</p></li>
     </ul>
 
@@ -73,7 +73,7 @@
     <ul class="step-list">
       <li><p><strong>Fluent builder instead of object literal.</strong> Java doesn't have JS-style options objects. <code>WaveOpts</code> uses chained setters: <code>new WaveOpts().wave("triangle").amplitude(80)</code>.</p></li>
       <li><p><strong>No runtime string evaluator.</strong> JS p5.waves uses <code>new Function(algoString)</code> internally. Java replaces this with hand-written lambdas, one per wave. The string-eval feature was never exposed via the public API, so there's no surface-level difference.</p></li>
-      <li><p><strong>No browser-only conveniences.</strong> No DOM, no canvas wrappers &mdash; the library is pure math. It plugs into Processing's draw loop just like any other math utility.</p></li>
+      <li><p><strong>No browser-only conveniences.</strong> No DOM, no canvas wrappers. The library is pure math. It plugs into Processing's draw loop just like any other math utility.</p></li>
     </ul>
 
     <h2>License &amp; credits</h2>
