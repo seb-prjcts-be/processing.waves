@@ -8,6 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/p5.waves@main/p5.waves.min.js"></script>
   <style>
     .ex-list { max-width: 980px; margin: 0 auto; padding: 0 2rem 4rem; }
     .ex-block { margin-bottom: 4rem; padding-bottom: 3rem; border-bottom: 1px solid var(--border); }
@@ -19,6 +21,9 @@
     .ex-block .ex-links { margin-top: 1rem; }
     .ex-block .ex-links a { font-family: 'Oswald', sans-serif; font-size: .75rem; letter-spacing: .08em; text-transform: uppercase; color: #000; text-decoration: none; border-bottom: 1px solid #000; padding-bottom: 1px; margin-right: 1rem; }
     .ex-block .ex-links a:hover { color: #555; border-color: #555; }
+    .ex-canvas-live { max-width: 460px; aspect-ratio: 1 / 1; margin: 0 auto 1.4rem; border: 1px solid var(--border-mid); overflow: hidden; background: #fff; }
+    .ex-canvas-live canvas { display: block !important; width: 100% !important; height: 100% !important; }
+    .ex-static-note { max-width: 460px; margin: 0 auto 1.4rem; padding: 1.4rem; text-align: center; background: #faf8f3; border: 1px dashed var(--border-mid); color: var(--text-muted); font-size: .85rem; font-style: italic; }
   </style>
 </head>
 <body>
@@ -53,6 +58,7 @@
         <span class="ex-tag">5-mode tour &middot; all features</span>
       </div>
       <p class="lead">The library tour. Press <kbd>1</kbd>&hellip;<kbd>5</kbd> to switch between five modes: (1) every wave drawn as its own row, (2) one sampler with shift, (3) morph swept by <code>mouseX</code>, (4) wild mode swept by <code>mouseX</code>, (5) a wave-as-velocity walker that lays a trail. <kbd>SPACE</kbd> reseeds.</p>
+      <div class="ex-static-note">No live preview &mdash; this sketch is interactive (keyboard + mouse switches between modes). Paste into Processing 4 to run.</div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/basic_demo/basic_demo.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -110,6 +116,7 @@ void draw() {
         <span class="ex-tag">shift &middot; one sampler &middot; range</span>
       </div>
       <p class="lead">Filled ribbons that auto-shift between random wave formulas. Colour flows from red to blue across the strips. The output of one shift-sampler drives the ribbon height per column.</p>
+      <div class="ex-canvas-live" data-example="wave_shift"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_shift/wave_shift.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -153,6 +160,7 @@ void draw() {
         <span class="ex-tag">morph &middot; two waves &middot; sweep</span>
       </div>
       <p class="lead">A field of horizontal lines where each row blends two wave formulas. Top rows = pure <em>wobble sine</em>, bottom rows = pure <em>meta sine</em>. The blend point sweeps up and down over time, so you see the shape transform mid-field.</p>
+      <div class="ex-canvas-live" data-example="morph_wave"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/morph_wave/morph_wave.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -203,6 +211,7 @@ void draw() {
         <span class="ex-tag">ASCII &middot; one sampler &middot; direction</span>
       </div>
       <p class="lead">A grid of ASCII characters forms a flow field. Each cell's direction comes from a single shift-sampler &mdash; like noise, but with structure. The wave shifts every few seconds, so the whole field's character keeps changing.</p>
+      <div class="ex-canvas-live" data-example="flow_fields"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/flow_fields/flow_fields.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -247,6 +256,7 @@ void draw() {
         <span class="ex-tag">two samplers &middot; sum &middot; threshold</span>
       </div>
       <p class="lead">Two independent shift-samplers, summed per cell, thresholded into a 2D pattern. Both samplers shift on their own schedule, so the field's character keeps evolving &mdash; sometimes interference, sometimes stripes, sometimes checker.</p>
+      <div class="ex-canvas-live" data-example="binary_field"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/binary_field/binary_field.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -298,6 +308,7 @@ void draw() {
         <span class="ex-tag">wave as velocity &middot; trails &middot; PGraphics</span>
       </div>
       <p class="lead">No angles, no steps &mdash; wave output IS the velocity. Five trails ride two shift-samplers as raw displacement. When the formulas shift, the movement character transforms entirely. Trails draw onto a <code>PGraphics</code> with low-alpha fade.</p>
+      <div class="ex-canvas-live" data-example="random_walker"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/random_walker/random_walker.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
@@ -367,5 +378,6 @@ void draw() {
     <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
+  <script src="sketch.js"></script>
 </body>
 </html>
