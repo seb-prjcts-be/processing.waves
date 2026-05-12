@@ -1,4 +1,4 @@
-# build.ps1 — compile src/ into library/processing.waves.jar
+# build.ps1 - compile src/ into library/processing.waves.jar
 #
 # Optional flag:
 #   -Install  also copy the library to the Processing sketchbook libraries

@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>processing.waves &mdash; 34 wave shapes for Processing</title>
-  <meta name="description" content="processing.waves &mdash; 34 curated wave formulas for Processing 4. Java port of p5.waves. One function call, one number back.">
-  <meta property="og:title" content="processing.waves &mdash; 34 wave shapes for Processing">
+  <title>processing.waves - 34 wave shapes for Processing</title>
+  <meta name="description" content="processing.waves - 34 curated wave formulas for Processing 4. Java port of p5.waves. One function call, one number back.">
+  <meta property="og:title" content="processing.waves - 34 wave shapes for Processing">
   <meta property="og:description" content="One function call, one number back. 34 wave formulas for Processing 4 with shift, morph, and wild mode.">
   <meta property="og:url" content="https://seb-prjcts-be.github.io/processing.waves/">
   <meta property="og:type" content="website">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="processing.waves &mdash; 34 wave shapes for Processing">
+  <meta name="twitter:title" content="processing.waves - 34 wave shapes for Processing">
   <meta name="twitter:description" content="34 wave formulas for Processing 4. Java port of p5.waves.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -54,7 +54,7 @@
     <div class="section-header">
       <div class="section-tag">Waves.wave(y, "name")</div>
       <h2>All <span class="accent">34</span> Waves</h2>
-      <p class="section-desc">Each wave has its own character. Every shape is periodic &mdash; it repeats, but each one repeats differently.</p>
+      <p class="section-desc">Each wave has its own character. Every shape is periodic: it repeats, but each one repeats differently.</p>
       <p class="section-desc" style="font-size:.78rem;margin-top:1rem;font-style:italic;">Live previews on this page are rendered by the original <strong>p5.waves</strong> JS library; <strong>processing.waves</strong> (Java) produces byte-identical output, verified by a 35-case numerical validator.</p>
     </div>
     <div id="gallery-canvas"></div>
@@ -68,7 +68,7 @@
     <div class="section-header">
       <div class="section-tag">examples/</div>
       <h2>See it in <span class="accent">action</span></h2>
-      <p class="section-desc">Six sketches that ship with the library. Each one demonstrates a different facet &mdash; shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
+      <p class="section-desc">Six sketches that ship with the library. Each one demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
     </div>
 
     <main class="ex-list">
@@ -80,11 +80,11 @@
           <span class="ex-tag">5-mode tour &middot; all features</span>
         </div>
         <p class="lead">The library tour. Press <kbd>1</kbd>&hellip;<kbd>5</kbd> to switch between five modes: (1) every wave drawn as its own row, (2) one sampler with shift, (3) morph swept by <code>mouseX</code>, (4) wild mode swept by <code>mouseX</code>, (5) a wave-as-velocity walker that lays a trail. <kbd>SPACE</kbd> reseeds.</p>
-        <div class="ex-static-note">No live preview &mdash; this sketch is interactive (keyboard + mouse switches between modes). Paste into Processing 4 to run.</div>
+        <div class="ex-static-note">No live preview: this sketch is interactive (keyboard + mouse switches between modes). Paste into Processing 4 to run.</div>
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/basic_demo/basic_demo.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// basic_demo &mdash; 5-mode tour of processing.waves.
+        <pre class="ex-code-block">// basic_demo - 5-mode tour of processing.waves.
 // Press 1..5 to switch demo. Press SPACE to reseed.
 
 import waves.*;
@@ -142,7 +142,7 @@ void draw() {
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_shift/wave_shift.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// Wave Shift &mdash; filled ribbons that auto-shift between waves.
+        <pre class="ex-code-block">// Wave Shift - filled ribbons that auto-shift between waves.
 import waves.*;
 
 final int STRIPS = 20;
@@ -186,7 +186,7 @@ void draw() {
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/morph_wave/morph_wave.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// Morph Wave &mdash; horizontal lines blending two waves with a sweeping morph.
+        <pre class="ex-code-block">// Morph Wave - horizontal lines blending two waves with a sweeping morph.
 import waves.*;
 
 final String WAVE_A = "wobble sine";
@@ -232,12 +232,12 @@ void draw() {
           <h2>flow_fields</h2>
           <span class="ex-tag">ASCII &middot; one sampler &middot; direction</span>
         </div>
-        <p class="lead">A grid of ASCII characters forms a flow field. Each cell's direction comes from a single shift-sampler &mdash; like noise, but with structure. The wave shifts every few seconds, so the whole field's character keeps changing.</p>
+        <p class="lead">A grid of ASCII characters forms a flow field. Each cell's direction comes from a single shift-sampler, like noise, but with structure. The wave shifts every few seconds, so the whole field's character keeps changing.</p>
         <div class="ex-canvas-live" data-example="flow_fields"></div>
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/flow_fields/flow_fields.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// Flow Fields &mdash; ASCII flow field driven by a shifting wave.
+        <pre class="ex-code-block">// Flow Fields - ASCII flow field driven by a shifting wave.
 import waves.*;
 
 final int COLS = 30;
@@ -277,12 +277,12 @@ void draw() {
           <h2>binary_field</h2>
           <span class="ex-tag">two samplers &middot; sum &middot; threshold</span>
         </div>
-        <p class="lead">Two independent shift-samplers, summed per cell, thresholded into a 2D pattern. Both samplers shift on their own schedule, so the field's character keeps evolving &mdash; sometimes interference, sometimes stripes, sometimes checker.</p>
+        <p class="lead">Two independent shift-samplers, summed per cell, thresholded into a 2D pattern. Both samplers shift on their own schedule, so the field's character keeps evolving: sometimes interference, sometimes stripes, sometimes checker.</p>
         <div class="ex-canvas-live" data-example="binary_field"></div>
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/binary_field/binary_field.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// Binary Field &mdash; two samplers summed and thresholded.
+        <pre class="ex-code-block">// Binary Field - two samplers summed and thresholded.
 import waves.*;
 
 final int COLS = 30;
@@ -329,12 +329,12 @@ void draw() {
           <h2>random_walker</h2>
           <span class="ex-tag">wave as velocity &middot; trails &middot; PGraphics</span>
         </div>
-        <p class="lead">No angles, no steps &mdash; wave output IS the velocity. Five trails ride two shift-samplers as raw displacement. When the formulas shift, the movement character transforms entirely. Trails draw onto a <code>PGraphics</code> with low-alpha fade.</p>
+        <p class="lead">No angles, no steps. Wave output IS the velocity. Five trails ride two shift-samplers as raw displacement. When the formulas shift, the movement character transforms entirely. Trails draw onto a <code>PGraphics</code> with low-alpha fade.</p>
         <div class="ex-canvas-live" data-example="random_walker"></div>
         <div class="ex-links">
           <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/random_walker/random_walker.pde" target="_blank">View on GitHub &rarr;</a>
         </div>
-        <pre class="ex-code-block">// Not So Random Walker &mdash; wave output IS the velocity.
+        <pre class="ex-code-block">// Not So Random Walker - wave output IS the velocity.
 import waves.*;
 
 final int WALKERS = 5;

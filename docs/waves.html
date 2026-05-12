@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All 34 Waves &mdash; processing.waves</title>
+  <title>All 34 Waves - processing.waves</title>
   <meta name="description" content="Every wave in processing.waves, with formula, character, and period. Click the name to copy.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -84,7 +84,7 @@
 
     <section class="waves-family">
       <h2>Stepped &amp; pulses</h2>
-      <p>Quantised waves &mdash; ceil/round/modulo carve smooth shapes into plateaus.</p>
+      <p>Quantised waves: ceil/round/modulo carve smooth shapes into plateaus.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wave="stepped sine"></div><div class="wave-meta"><div class="idx">05</div><div class="name">stepped sine</div><div class="formula">ceil(sin(x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
@@ -112,7 +112,7 @@
 
     <section class="waves-family">
       <h2>Linear &amp; saw</h2>
-      <p>No trig &mdash; just modulo and absolute value. Sharp, predictable.</p>
+      <p>No trig, just modulo and absolute value. Sharp, predictable.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wave="triangle"></div><div class="wave-meta"><div class="idx">18</div><div class="name">triangle</div><div class="formula">abs((x*.03) % 1 &minus; .5)</div><div class="tags"><span class="tag">gentle</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="ramp"></div><div class="wave-meta"><div class="idx">19</div><div class="name">ramp</div><div class="formula">&minus;(x*.02%1) + .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
@@ -123,7 +123,7 @@
 
     <section class="waves-family">
       <h2>Chaos &amp; special</h2>
-      <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em> &mdash; they use a seeded PRNG or a non-trig function with surprising spikes.</p>
+      <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em>: they use a seeded PRNG or a non-trig function with surprising spikes.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag">gentle</span></div></div></article>

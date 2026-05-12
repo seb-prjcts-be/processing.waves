@@ -1,4 +1,4 @@
-# release.ps1 — build dist/waves.zip and dist/waves.txt for Processing's
+# release.ps1 - build dist/waves.zip and dist/waves.txt for Processing's
 # Contribution Manager.
 #
 # Layout produced inside waves.zip (Processing's library guidelines):

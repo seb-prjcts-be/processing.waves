@@ -54,14 +54,14 @@ void draw() {
 ## API at a glance
 
 ```java
-// 1. Lazy — default seed, default everything
+// 1. Lazy - default seed, default everything
 Waves.wave(x);
 
-// 2. Quick — by name or by seed
+// 2. Quick - by name or by seed
 Waves.wave(x, "classic sine");
 Waves.wave(x, 42);
 
-// 3. Full control — fluent builder
+// 3. Full control - fluent builder
 WaveOpts o = new WaveOpts()
   .wave("bumpy sine")
   .amplitude(80).frequency(1).phase(0)
