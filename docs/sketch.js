@@ -175,6 +175,218 @@ function mountWavesPage() {
 }
 
 /* ------------------------------------------------------------
+   EXAMPLES PAGE — five live previews
+   Each mirrors a bundled .pde so visitors see exactly what the
+   Java sketch produces when they paste the code into Processing.
+   ------------------------------------------------------------ */
+
+function mountWaveShift(host) {
+  new p5((p) => {
+    let sampler;
+    const STRIPS = 20;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.textFont("Consolas");
+      sampler = Waves.createSampler({ shift: true, amplitude: 1, frequency: 0.5 });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(245);
+      const t = p.millis() / 1000;
+      const sw = p.width / STRIPS;
+      const cy = p.height / 2;
+      const rowH = p.height * 0.42;
+      p.noStroke();
+      for (let i = 0; i < STRIPS; i++) {
+        const frac = i / (STRIPS - 1);
+        p.fill(255 * (1 - frac), 0, 255 * frac);
+        const v = sampler.sample(i * 0.4, t + i * 0.1);
+        p.rect(i * sw, cy - v * rowH, sw - 1, v * rowH * 2);
+      }
+      p.fill(0); p.textSize(11);
+      p.text(sampler.waveName, 8, 16);
+    };
+  }, host);
+}
+
+function mountMorphWave(host) {
+  new p5((p) => {
+    const WAVE_A = "wobble sine";
+    const WAVE_B = "meta sine";
+    const ROW_COUNT = 50;
+    let t = 0;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.textFont("Consolas");
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(250);
+      t += 0.0375;
+      const centre = (Math.sin(t * 0.3) + 1) * 0.5;
+      const rowH = p.height / ROW_COUNT;
+      for (let row = 0; row < ROW_COUNT; row++) {
+        const rowFrac = row / (ROW_COUNT - 1);
+        const gap = Math.abs(rowFrac - centre);
+        const morphMix = p.constrain(1 - gap * 3, 0, 1);
+        const yBase = row * rowH + rowH * 0.5;
+        p.noFill();
+        p.stroke(p.lerp(0, 255, morphMix), 0, p.lerp(255, 0, morphMix));
+        p.strokeWeight(1.2 + morphMix * 1.8);
+        p.beginShape();
+        for (let x = 0; x < p.width; x += 3) {
+          const wy = Waves.wave(x, {
+            wave: [WAVE_A, WAVE_B], mix: morphMix,
+            t: t + row * 0.06, frequency: 0.08,
+            amplitude: rowH * 2.5
+          });
+          p.vertex(x, yBase + p.constrain(wy, -rowH * 0.7, rowH * 0.7));
+        }
+        p.endShape();
+      }
+      p.noStroke();
+      p.fill(0, 0, 255); p.textSize(10);
+      p.textAlign(p.LEFT); p.text(WAVE_A, 8, 16);
+      p.fill(255, 0, 0);
+      p.textAlign(p.RIGHT); p.text(WAVE_B, p.width - 8, p.height - 8);
+    };
+  }, host);
+}
+
+function mountFlowFields(host) {
+  new p5((p) => {
+    const COLS = 30, ROWS = 30;
+    const DIRS = ["-", "/", "|", "\\"];
+    let sampler;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.textFont("Consolas");
+      p.textAlign(p.CENTER, p.CENTER);
+      sampler = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 2, frequency: 2 });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(255);
+      const t = p.millis() / 1000;
+      const sz = p.width / COLS;
+      p.textSize(sz * 0.9);
+      p.fill(0); p.noStroke();
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const val = sampler.sample(col * 0.5, t + row * 0.4);
+          const idx = p.constrain(Math.floor(p.map(val, -1, 1.001, 0, 4)), 0, 3);
+          p.text(DIRS[idx], col * sz + sz / 2, row * sz + sz / 2);
+        }
+      }
+    };
+  }, host);
+}
+
+function mountBinaryField(host) {
+  new p5((p) => {
+    const COLS = 30, ROWS = 20;
+    let rowS, colS;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.textFont("Consolas");
+      p.noStroke();
+      rowS = Waves.createSampler({ shift: true, shiftInterval: 4,   shiftDuration: 1,   range: [-1, 1], seed: 1 });
+      colS = Waves.createSampler({ shift: true, shiftInterval: 4.5, shiftDuration: 1.2, range: [-1, 1], seed: 2 });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(245);
+      const t = p.millis() / 1000;
+      const labelH = 28;
+      const cw = p.width / COLS;
+      const ch = (p.height - labelH) / ROWS;
+      const offset = t * 0.4;
+      for (let row = 0; row < ROWS; row++) {
+        const rv = rowS.sample(row * 5 + offset, t);
+        for (let col = 0; col < COLS; col++) {
+          const cv = colS.sample(col * 2.5 - offset, t);
+          p.fill((rv + cv) > 0 ? 15 : 230);
+          p.rect(col * cw, labelH + row * ch, cw - 0.5, ch - 0.5);
+        }
+      }
+      p.fill(40); p.textSize(11);
+      p.textAlign(p.LEFT, p.CENTER);
+      p.text(rowS.waveName + "  x  " + colS.waveName, 8, labelH / 2);
+    };
+  }, host);
+}
+
+function mountRandomWalker(host) {
+  new p5((p) => {
+    const WALKERS = 5;
+    const palette = [
+      [255, 60, 60], [60, 220, 60], [60, 100, 255],
+      [255, 220, 40], [180, 60, 255]
+    ];
+    let xWave, yWave;
+    let wx = [], wy = [], prevX = [], prevY = [];
+    let t = 0;
+    let trail;
+    p.setup = () => {
+      const w = host.clientWidth, h = host.clientHeight || 460;
+      p.createCanvas(w, h);
+      p.textFont("Consolas");
+      trail = p.createGraphics(w, h);
+      trail.background(15);
+      xWave = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 1.5, amplitude: 2.5, frequency: 0.7,  seed: 0 });
+      yWave = Waves.createSampler({ shift: true, shiftInterval: 5, shiftDuration: 1.2, amplitude: 2.5, frequency: 0.55, seed: 77 });
+      for (let i = 0; i < WALKERS; i++) {
+        const a = p.TWO_PI * i / WALKERS;
+        wx[i] = w / 2 + Math.cos(a) * 40;
+        wy[i] = h / 2 + Math.sin(a) * 40;
+        prevX[i] = wx[i]; prevY[i] = wy[i];
+      }
+    };
+    p.draw = () => {
+      trail.noStroke();
+      trail.fill(15, 15, 15, 8);
+      trail.rect(0, 0, trail.width, trail.height);
+      t += 0.025;
+      for (let i = 0; i < WALKERS; i++) {
+        const phase = i * 6.7;
+        const vx = xWave.sample(t * 1.8 + phase, t);
+        const vy = yWave.sample(t * 2.1 + phase * 1.3, t);
+        prevX[i] = wx[i]; prevY[i] = wy[i];
+        wx[i] += vx; wy[i] += vy;
+        if (wx[i] < 0)         wx[i] += p.width;
+        if (wx[i] > p.width)   wx[i] -= p.width;
+        if (wy[i] < 0)         wy[i] += p.height;
+        if (wy[i] > p.height)  wy[i] -= p.height;
+        if (Math.abs(wx[i] - prevX[i]) > p.width / 2)  continue;
+        if (Math.abs(wy[i] - prevY[i]) > p.height / 2) continue;
+        const col = palette[i];
+        trail.stroke(col[0], col[1], col[2], 200);
+        trail.strokeWeight(2.5);
+        trail.line(prevX[i], prevY[i], wx[i], wy[i]);
+      }
+      p.image(trail, 0, 0);
+      p.noStroke(); p.fill(255, 255, 255, 120);
+      p.textSize(10); p.textAlign(p.LEFT);
+      p.text(xWave.waveName + " x " + yWave.waveName, 8, 16);
+    };
+  }, host);
+}
+
+function mountExamples() {
+  const handlers = {
+    wave_shift:    mountWaveShift,
+    morph_wave:    mountMorphWave,
+    flow_fields:   mountFlowFields,
+    binary_field:  mountBinaryField,
+    random_walker: mountRandomWalker
+  };
+  document.querySelectorAll("[data-example]").forEach((host) => {
+    const fn = handlers[host.dataset.example];
+    if (fn) fn(host);
+  });
+}
+
+/* ------------------------------------------------------------
    Entry point
    ------------------------------------------------------------ */
 function bootstrap() {
@@ -185,6 +397,7 @@ function bootstrap() {
   mountHero();
   mountGallery();
   mountWavesPage();
+  mountExamples();
 }
 
 if (document.readyState === "loading") {
