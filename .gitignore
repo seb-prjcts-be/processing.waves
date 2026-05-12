@@ -12,6 +12,9 @@ tests/bin/
 # Validator generated output (regenerate with tests/run.ps1)
 tests/expected.tsv
 
+# Release artifacts (regenerate with release.ps1)
+dist/
+
 # IDE
 .idea/
 .vscode/
