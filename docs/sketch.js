@@ -99,10 +99,12 @@ function mountGalleryCell(canvasHost, name) {
       p.background(255);
       p.stroke(0); p.strokeWeight(1.2); p.noFill();
       const amp = p.height * 0.32;
-      const t = p.millis() / 1000;
+      // Scroll the wave horizontally: most wave formulas are pure
+      // functions of x, so we shift the input to get visible motion.
+      const offsetX = p.millis() / 1000 * 40;
       p.beginShape();
       for (let x = 0; x <= p.width; x += 1) {
-        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.06, t: t * 12 });
+        const y = Waves.wave(x + offsetX, { wave: name, amplitude: amp, frequency: 0.06 });
         p.vertex(x, p.height / 2 + y);
       }
       p.endShape();
@@ -160,10 +162,11 @@ function mountWavePreview(host, name) {
       p.background(255);
       p.stroke(0); p.strokeWeight(1.3); p.noFill();
       const amp = p.height * 0.34;
-      const t = p.millis() / 1000;
+      // Scroll the wave horizontally for visible motion.
+      const offsetX = p.millis() / 1000 * 40;
       p.beginShape();
       for (let x = 0; x <= p.width; x += 1) {
-        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.055, t: t * 12 });
+        const y = Waves.wave(x + offsetX, { wave: name, amplitude: amp, frequency: 0.055 });
         p.vertex(x, p.height / 2 + y);
       }
       p.endShape();
