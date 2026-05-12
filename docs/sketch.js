@@ -91,19 +91,18 @@ function mountGalleryCell(canvasHost, name) {
   return new p5((p) => {
     p.setup = () => {
       p.createCanvas(canvasHost.clientWidth, canvasHost.clientHeight);
-      p.noLoop();
     };
     p.windowResized = () => {
       p.resizeCanvas(canvasHost.clientWidth, canvasHost.clientHeight);
-      p.redraw();
     };
     p.draw = () => {
       p.background(255);
       p.stroke(0); p.strokeWeight(1.2); p.noFill();
       const amp = p.height * 0.32;
+      const t = p.millis() / 1000;
       p.beginShape();
       for (let x = 0; x <= p.width; x += 1) {
-        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.06 });
+        const y = Waves.wave(x, { wave: name, amplitude: amp, frequency: 0.06, t: t * 12 });
         p.vertex(x, p.height / 2 + y);
       }
       p.endShape();
