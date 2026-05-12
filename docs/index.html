@@ -28,7 +28,7 @@
     </button>
     <ul class="nav-links">
       <li><a href="#hero" class="active">Showcase</a></li>
-      <li><a href="examples.html">Examples</a></li>
+      <li><a href="#examples">Examples</a></li>
       <li><a href="waves.html">Waves</a></li>
       <li><a href="guide.html">Guide</a></li>
       <li><a href="about.html">About</a></li>
@@ -63,6 +63,339 @@
     </div>
   </section>
 
+  <!-- EXAMPLES -->
+  <section id="examples" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">examples/</div>
+      <h2>See it in <span class="accent">action</span></h2>
+      <p class="section-desc">Six sketches that ship with the library. Each one demonstrates a different facet &mdash; shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
+    </div>
+
+    <main class="ex-list">
+
+      <!-- basic_demo -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>basic_demo</h2>
+          <span class="ex-tag">5-mode tour &middot; all features</span>
+        </div>
+        <p class="lead">The library tour. Press <kbd>1</kbd>&hellip;<kbd>5</kbd> to switch between five modes: (1) every wave drawn as its own row, (2) one sampler with shift, (3) morph swept by <code>mouseX</code>, (4) wild mode swept by <code>mouseX</code>, (5) a wave-as-velocity walker that lays a trail. <kbd>SPACE</kbd> reseeds.</p>
+        <div class="ex-static-note">No live preview &mdash; this sketch is interactive (keyboard + mouse switches between modes). Paste into Processing 4 to run.</div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/basic_demo/basic_demo.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// basic_demo &mdash; 5-mode tour of processing.waves.
+// Press 1..5 to switch demo. Press SPACE to reseed.
+
+import waves.*;
+
+int demoMode = 1;
+int seed = 42;
+
+Waves.WaveSampler shiftSamp, morphSamp, walkerX, walkerY;
+float walkerPx, walkerPy;
+
+void setup() {
+  size(900, 500);
+  rebuild();
+}
+
+void rebuild() {
+  shiftSamp = Waves.createSampler(new WaveOpts()
+    .shift(true).seed(seed).amplitude(150).frequency(1)
+    .shiftInterval(2.5f).shiftDuration(1.0f));
+
+  morphSamp = Waves.createSampler(new WaveOpts()
+    .wave("classic sine", "mountain peaks").seed(seed).amplitude(150));
+
+  walkerX = Waves.createSampler(new WaveOpts()
+    .shift(true).group("gentle").amplitude(5).frequency(0.4f).seed(seed));
+  walkerY = Waves.createSampler(new WaveOpts()
+    .shift(true).group("gentle").amplitude(5).frequency(0.3f).seed(seed + 77));
+  walkerPx = width / 2f;
+  walkerPy = height / 2f;
+}
+
+void draw() {
+  if (demoMode != 5) background(20);
+  float t = millis() / 1000.0f;
+  switch (demoMode) {
+    case 1: drawAllWaves(t); break;
+    case 2: drawShift(t);    break;
+    case 3: drawMorph(t);    break;
+    case 4: drawWild(t);     break;
+    case 5: drawWalker(t);   break;
+  }
+}
+
+// (See full source on GitHub for the per-mode draw methods.)</pre>
+      </section>
+
+      <!-- wave_shift -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>wave_shift</h2>
+          <span class="ex-tag">shift &middot; one sampler &middot; range</span>
+        </div>
+        <p class="lead">Filled ribbons that auto-shift between random wave formulas. Colour flows from red to blue across the strips. The output of one shift-sampler drives the ribbon height per column.</p>
+        <div class="ex-canvas-live" data-example="wave_shift"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_shift/wave_shift.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Wave Shift &mdash; filled ribbons that auto-shift between waves.
+import waves.*;
+
+final int STRIPS = 20;
+Waves.WaveSampler sampler;
+
+void setup() {
+  size(460, 460);
+  noStroke();
+  textFont(createFont("Consolas", 11));
+  sampler = Waves.createSampler(new WaveOpts()
+    .shift(true).amplitude(1).frequency(0.5f));
+}
+
+void draw() {
+  background(245);
+  float t = millis() / 1000.0f;
+  float sw = (float)width / STRIPS;
+  float cy = height / 2f;
+  float rowH = height * 0.42f;
+
+  for (int i = 0; i &lt; STRIPS; i++) {
+    float frac = i / (float)(STRIPS - 1);
+    fill(255 * (1 - frac), 0, 255 * frac);
+    float v = sampler.sample(i * 0.4f, t + i * 0.1f);
+    rect(i * sw, cy - v * rowH, sw - 1, v * rowH * 2);
+  }
+
+  fill(0); textSize(11);
+  text(sampler.waveName(), 8, 16);
+}</pre>
+      </section>
+
+      <!-- morph_wave -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>morph_wave</h2>
+          <span class="ex-tag">morph &middot; two waves &middot; sweep</span>
+        </div>
+        <p class="lead">A field of horizontal lines where each row blends two wave formulas. Top rows = pure <em>wobble sine</em>, bottom rows = pure <em>meta sine</em>. The blend point sweeps up and down over time, so you see the shape transform mid-field.</p>
+        <div class="ex-canvas-live" data-example="morph_wave"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/morph_wave/morph_wave.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Morph Wave &mdash; horizontal lines blending two waves with a sweeping morph.
+import waves.*;
+
+final String WAVE_A = "wobble sine";
+final String WAVE_B = "meta sine";
+final int ROW_COUNT = 50;
+float t = 0;
+
+void setup() { size(460, 460); }
+
+void draw() {
+  background(250);
+  t += 0.0375f;
+  float centre = (sin(t * 0.3f) + 1) * 0.5f;
+  float rowH = (float)height / ROW_COUNT;
+
+  for (int row = 0; row &lt; ROW_COUNT; row++) {
+    float rowFrac = row / (float)(ROW_COUNT - 1);
+    float gap = abs(rowFrac - centre);
+    float morphMix = constrain(1 - gap * 3, 0, 1);
+    float yBase = row * rowH + rowH * 0.5f;
+
+    noFill();
+    stroke(lerp(0, 255, morphMix), 0, lerp(255, 0, morphMix));
+    strokeWeight(1.2f + morphMix * 1.8f);
+
+    beginShape();
+    WaveOpts o = new WaveOpts()
+      .wave(WAVE_A, WAVE_B).mix(morphMix)
+      .t(t + row * 0.06f).frequency(0.08f)
+      .amplitude(rowH * 2.5f);
+    for (int x = 0; x &lt; width; x += 3) {
+      float waveY = Waves.wave(x, o);
+      vertex(x, yBase + constrain(waveY, -rowH * 0.7f, rowH * 0.7f));
+    }
+    endShape();
+  }
+}</pre>
+      </section>
+
+      <!-- flow_fields -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>flow_fields</h2>
+          <span class="ex-tag">ASCII &middot; one sampler &middot; direction</span>
+        </div>
+        <p class="lead">A grid of ASCII characters forms a flow field. Each cell's direction comes from a single shift-sampler &mdash; like noise, but with structure. The wave shifts every few seconds, so the whole field's character keeps changing.</p>
+        <div class="ex-canvas-live" data-example="flow_fields"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/flow_fields/flow_fields.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Flow Fields &mdash; ASCII flow field driven by a shifting wave.
+import waves.*;
+
+final int COLS = 30;
+final int ROWS = 30;
+final String[] DIRS = { "-", "/", "|", "\\" };
+
+Waves.WaveSampler sampler;
+
+void setup() {
+  size(460, 460);
+  textFont(createFont("Consolas", 14));
+  textAlign(CENTER, CENTER);
+  fill(0);
+  sampler = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(4).shiftDuration(2).frequency(2).range(-1, 1));
+}
+
+void draw() {
+  background(255);
+  float t = millis() / 1000.0f;
+  float sz = (float)width / COLS;
+  textSize(sz * 0.9f);
+
+  for (int row = 0; row &lt; ROWS; row++) {
+    for (int col = 0; col &lt; COLS; col++) {
+      float val = sampler.sample(col * 0.5f, t + row * 0.4f);
+      int idx = constrain((int)map(val, -1, 1.001f, 0, 4), 0, 3);
+      text(DIRS[idx], col * sz + sz / 2, row * sz + sz / 2);
+    }
+  }
+}</pre>
+      </section>
+
+      <!-- binary_field -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>binary_field</h2>
+          <span class="ex-tag">two samplers &middot; sum &middot; threshold</span>
+        </div>
+        <p class="lead">Two independent shift-samplers, summed per cell, thresholded into a 2D pattern. Both samplers shift on their own schedule, so the field's character keeps evolving &mdash; sometimes interference, sometimes stripes, sometimes checker.</p>
+        <div class="ex-canvas-live" data-example="binary_field"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/binary_field/binary_field.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Binary Field &mdash; two samplers summed and thresholded.
+import waves.*;
+
+final int COLS = 30;
+final int ROWS = 20;
+
+Waves.WaveSampler rowS, colS;
+
+void setup() {
+  size(460, 460);
+  noStroke();
+  textFont(createFont("Consolas", 11));
+
+  rowS = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(4).shiftDuration(1).range(-1, 1).seed(1));
+  colS = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(4.5f).shiftDuration(1.2f).range(-1, 1).seed(2));
+}
+
+void draw() {
+  background(245);
+  float t = millis() / 1000.0f;
+  float labelH = 28;
+  float cw = (float)width / COLS;
+  float ch = (height - labelH) / ROWS;
+  float offset = t * 0.4f;
+
+  for (int row = 0; row &lt; ROWS; row++) {
+    float rv = rowS.sample(row * 5 + offset, t);
+    for (int col = 0; col &lt; COLS; col++) {
+      float cv = colS.sample(col * 2.5f - offset, t);
+      fill((rv + cv) &gt; 0 ? 15 : 230);
+      rect(col * cw, labelH + row * ch, cw - 0.5f, ch - 0.5f);
+    }
+  }
+
+  fill(40); textSize(11);
+  text(rowS.waveName() + "  x  " + colS.waveName(), 8, labelH / 2);
+}</pre>
+      </section>
+
+      <!-- random_walker -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>random_walker</h2>
+          <span class="ex-tag">wave as velocity &middot; trails &middot; PGraphics</span>
+        </div>
+        <p class="lead">No angles, no steps &mdash; wave output IS the velocity. Five trails ride two shift-samplers as raw displacement. When the formulas shift, the movement character transforms entirely. Trails draw onto a <code>PGraphics</code> with low-alpha fade.</p>
+        <div class="ex-canvas-live" data-example="random_walker"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/random_walker/random_walker.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Not So Random Walker &mdash; wave output IS the velocity.
+import waves.*;
+
+final int WALKERS = 5;
+Waves.WaveSampler xWave, yWave;
+float[] wx = new float[WALKERS], wy = new float[WALKERS];
+float[] prevX = new float[WALKERS], prevY = new float[WALKERS];
+float t = 0;
+PGraphics trail;
+
+final int[][] palette = {
+  {255, 60, 60}, {60, 220, 60}, {60, 100, 255},
+  {255, 220, 40}, {180, 60, 255}
+};
+
+void setup() {
+  size(460, 460);
+  trail = createGraphics(460, 460);
+  trail.beginDraw(); trail.background(15); trail.endDraw();
+
+  xWave = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(4).shiftDuration(1.5f)
+    .amplitude(2.5f).frequency(0.7f).seed(0));
+  yWave = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(5).shiftDuration(1.2f)
+    .amplitude(2.5f).frequency(0.55f).seed(77));
+
+  for (int i = 0; i &lt; WALKERS; i++) {
+    float a = TWO_PI * i / WALKERS;
+    wx[i] = width / 2f + cos(a) * 40;
+    wy[i] = height / 2f + sin(a) * 40;
+    prevX[i] = wx[i]; prevY[i] = wy[i];
+  }
+}
+
+void draw() {
+  trail.beginDraw();
+  trail.noStroke();
+  trail.fill(15, 15, 15, 8);
+  trail.rect(0, 0, trail.width, trail.height);
+
+  t += 0.025f;
+  for (int i = 0; i &lt; WALKERS; i++) {
+    float phase = i * 6.7f;
+    float vx = xWave.sample(t * 1.8f + phase, t);
+    float vy = yWave.sample(t * 2.1f + phase * 1.3f, t);
+    prevX[i] = wx[i]; prevY[i] = wy[i];
+    wx[i] += vx; wy[i] += vy;
+    // wrap edges...
+    int[] col = palette[i];
+    trail.stroke(col[0], col[1], col[2], 200);
+    trail.strokeWeight(2.5f);
+    trail.line(prevX[i], prevY[i], wx[i], wy[i]);
+  }
+  trail.endDraw();
+  image(trail, 0, 0);
+}</pre>
+      </section>
+
+    </main>
+  </section>
+
   <!-- GET STARTED -->
   <section class="section section-dark" style="text-align:center;">
     <div class="section-header">
@@ -93,7 +426,7 @@ void draw() {
     </div>
     <div style="display:flex; gap:1rem; justify-content:center; flex-wrap:wrap; margin-top:1.5rem;">
       <a href="guide.html" class="cta-btn">Full guide &rarr;</a>
-      <a href="examples.html" class="cta-btn" style="background:#444;">Examples &rarr;</a>
+      <a href="#examples" class="cta-btn" style="background:#444;">Examples &rarr;</a>
     </div>
   </section>
 
