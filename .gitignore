@@ -26,3 +26,6 @@ Thumbs.db
 
 # Claude Code worktree state
 .claude/
+
+# Internal submission checklist (maintainer-only)
+SUBMITTING.md
