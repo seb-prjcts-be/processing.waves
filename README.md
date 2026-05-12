@@ -31,6 +31,8 @@ cd processing.waves
 
 `build.ps1` reads `sketchbook.path.four` from Processing's preferences and copies the library where Processing expects it. Drop `-Install` to just build the jar into `library/`.
 
+> **Platform support**: tested on Windows. The compiled jar is pure Java with no native dependencies, so it should run on macOS and Linux without changes - but neither has been tested yet. If you hit a platform-specific issue, please [open an issue](https://github.com/seb-prjcts-be/processing.waves/issues).
+>
 > A future release will be available via Processing 4's Contribution Manager.
 
 ## Quickstart
