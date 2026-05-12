@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guide &mdash; processing.waves</title>
+  <meta name="description" content="Install, API reference, port notes, and copy-paste starters for processing.waves.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html" style="text-decoration:none;color:inherit;">processing.<span>waves</span></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html" class="active">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="guide-wrap">
+    <h1>Guide</h1>
+    <p class="guide-intro">Everything you need to use <strong>processing.waves</strong> in Processing 4. The API mirrors <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> v3.3.0 &mdash; with Java fluent builders in place of JS object literals.</p>
+
+    <div class="guide-quicklinks">
+      <a class="guide-chip" href="#install">Install</a>
+      <a class="guide-chip" href="#first">First sketch</a>
+      <a class="guide-chip" href="#three-ways">Three ways</a>
+      <a class="guide-chip" href="#options">Options</a>
+      <a class="guide-chip" href="#sampler">Sampler</a>
+      <a class="guide-chip" href="#shift">Shift</a>
+      <a class="guide-chip" href="#morph">Morph</a>
+      <a class="guide-chip" href="#wild">Wild</a>
+      <a class="guide-chip" href="#port-notes">Port notes</a>
+      <a class="guide-chip" href="#starters">Starters</a>
+    </div>
+
+    <!-- ── INSTALL ── -->
+    <h2 id="install">Install</h2>
+    <p>processing.waves is a single jar with no runtime dependencies. Two routes today; a third (Contribution Manager) will be added in a future release.</p>
+
+    <h3>Route A &mdash; Manual copy</h3>
+    <ol class="step-list">
+      <li><p>Find your sketchbook in Processing 4: <code>File &gt; Preferences &gt; Sketchbook location</code>.</p></li>
+      <li><p>Download <code>waves.zip</code> from the latest <a href="https://github.com/seb-prjcts-be/processing.waves/releases" target="_blank">GitHub release</a>.</p></li>
+      <li><p>Unzip into <code>&lt;sketchbook&gt;/libraries/</code>. You should end up with:</p>
+        <pre class="code-block">&lt;sketchbook&gt;/libraries/waves/
+  library.properties
+  library/waves.jar
+  src/waves/*.java
+  examples/*/<sketch>.pde</pre>
+      </li>
+      <li><p>Restart Processing. Verify with <code>Sketch &gt; Import Library &gt; waves</code>.</p></li>
+    </ol>
+
+    <h3>Route B &mdash; Build from source (Windows)</h3>
+    <p>With JDK 17+ on PATH and Processing 4 installed at the default location:</p>
+    <pre class="code-block"># Clone, build, and install in one shot
+git clone https://github.com/seb-prjcts-be/processing.waves
+cd processing.waves
+./build.ps1 -Install</pre>
+    <p><code>build.ps1</code> reads <code>sketchbook.path.four</code> from Processing's preferences file and copies the library where Processing expects it.</p>
+
+    <div class="callout">
+      <p><strong>Java version</strong>: requires JDK 17+ at build time. The compiled jar uses <code>--release 17</code> which is compatible with Processing 4's bundled JVM.</p>
+    </div>
+
+    <!-- ── FIRST SKETCH ── -->
+    <h2 id="first">Your first sketch</h2>
+    <p>Open Processing 4, paste, run.</p>
+    <pre class="code-block">import waves.*;
+
+void setup() {
+  size(800, 400);
+}
+
+void draw() {
+  background(20);
+  stroke(255);
+  noFill();
+  WaveOpts o = new WaveOpts()
+    .wave("mountain peaks")
+    .t(millis() / 1000.0f)
+    .amplitude(120);
+  beginShape();
+  for (int x = 0; x &lt; width; x += 3) {
+    float y = Waves.wave(x, o);
+    vertex(x, height / 2 + y);
+  }
+  endShape();
+}</pre>
+
+    <!-- ── THREE WAYS ── -->
+    <h2 id="three-ways">Three ways to call it</h2>
+
+    <h3>1. Lazy &mdash; <code>Waves.wave(y)</code></h3>
+    <p>One argument. You get back a deterministic wave value from seed 0 with default amplitude 100. Same input, same output, every run.</p>
+    <pre class="code-block">float v = Waves.wave(x);   // amplitude 100, wave picked by seed 0</pre>
+
+    <h3>2. Quick &mdash; by name or seed</h3>
+    <pre class="code-block">float a = Waves.wave(x, "mountain peaks");  // by name
+float b = Waves.wave(x, 42);                // by seed (deterministic pick)</pre>
+
+    <h3>3. Full control &mdash; <code>WaveOpts</code></h3>
+    <p>The fluent builder. Every option is chainable.</p>
+    <pre class="code-block">WaveOpts o = new WaveOpts()
+  .wave("bumpy sine")
+  .amplitude(80)
+  .frequency(1.0f)
+  .t(millis() / 1000.0f)
+  .phase(0)
+  .seed(7);
+
+float y = Waves.wave(x, o);</pre>
+
+    <!-- ── OPTIONS TABLE ── -->
+    <h2 id="options">Options</h2>
+    <p>Every field on <code>WaveOpts</code>, with its type, default, and what it does.</p>
+
+    <h3>Start here</h3>
+    <table class="opts-table">
+      <thead><tr><th>Method</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>.wave(name)</td><td>String</td><td>null</td><td>One of the 34 names. <code>null</code> &rarr; pick by seed.</td></tr>
+        <tr><td>.wave(idx)</td><td>int</td><td>&mdash;</td><td>Pick by index (0&hellip;33).</td></tr>
+        <tr><td>.amplitude(v)</td><td>float</td><td>100</td><td>Output is scaled to <code>[&minus;amp/2, +amp/2]</code>.</td></tr>
+        <tr><td>.frequency(v)</td><td>float</td><td>1</td><td>Multiplier on x. Higher = faster cycles.</td></tr>
+        <tr><td>.t(v)</td><td>float</td><td>0</td><td>Time. Anything that produces motion uses this.</td></tr>
+        <tr><td>.seed(v)</td><td>int</td><td>0</td><td>Picks the wave when <code>.wave()</code> is null, and seeds the PRNG for harsh waves.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Level up</h3>
+    <table class="opts-table">
+      <thead><tr><th>Method</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>.phase(v)</td><td>float</td><td>0</td><td>Added to x before evaluation. Shifts the wave horizontally.</td></tr>
+        <tr><td>.range(lo, hi)</td><td>float,float</td><td>null</td><td>Map output to <code>[lo, hi]</code> instead of amplitude scaling. Useful for opacity 0&ndash;255, etc.</td></tr>
+        <tr><td>.wave(a, b)</td><td>String,String</td><td>&mdash;</td><td>Set two waves for morphing.</td></tr>
+        <tr><td>.mix(v)</td><td>float 0&ndash;1</td><td>0.5</td><td>Morph position when two waves are set.</td></tr>
+        <tr><td>.group(g)</td><td>String</td><td>null</td><td><code>"gentle"</code>, <code>"harsh"</code>, <code>"closing"</code>, <code>"all"</code>, or <code>String[]</code> of names. Restricts which waves seed/shift can pick.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Go deeper</h3>
+    <table class="opts-table">
+      <thead><tr><th>Method</th><th>Type</th><th>Default</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td>.shift(true)</td><td>boolean</td><td>false</td><td>Auto-cycle through waves in the group, smoothly morphing between them.</td></tr>
+        <tr><td>.shiftInterval(s)</td><td>float (sec)</td><td>3</td><td>How long each wave is held.</td></tr>
+        <tr><td>.shiftDuration(s)</td><td>float (sec)</td><td>1</td><td>Morph time between consecutive waves.</td></tr>
+        <tr><td>.mode("wild")</td><td>String</td><td>"stable"</td><td>Enables wild mode &mdash; noise modulation on top of the wave.</td></tr>
+        <tr><td>.unpredictability(v)</td><td>float 0&ndash;1</td><td>0</td><td>How strong the wild modulation is. 0 = stable, 1 = chaotic.</td></tr>
+      </tbody>
+    </table>
+
+    <!-- ── SAMPLER ── -->
+    <h2 id="sampler">createSampler() &mdash; cache for tight loops</h2>
+    <p>If you call <code>Waves.wave(x, opts)</code> thousands of times per frame, the cost of resolving the wave + reading group + computing stats adds up. <code>createSampler()</code> resolves all of that once and gives you a small object with a fast <code>sample()</code> method.</p>
+    <pre class="code-block">Waves.WaveSampler s = Waves.createSampler(new WaveOpts()
+  .shift(true)
+  .group("gentle")
+  .amplitude(120));
+
+void draw() {
+  float t = millis() / 1000.0f;
+  for (int x = 0; x &lt; width; x += 3) {
+    float y = s.sample(x, t);
+    point(x, height / 2 + y);
+  }
+}</pre>
+    <p>Use <code>sample(x, t)</code> when shift or t-dependent motion is on; <code>sample(x)</code> when t doesn't matter.</p>
+
+    <!-- ── SHIFT ── -->
+    <h2 id="shift">Wave Shift</h2>
+    <p>The killer feature: set <code>.shift(true)</code> and processing.waves picks a random wave, holds it for <code>shiftInterval</code> seconds, then smoothly morphs into the next one over <code>shiftDuration</code> seconds. Forever.</p>
+    <pre class="code-block">Waves.WaveSampler s = Waves.createSampler(new WaveOpts()
+  .shift(true)
+  .shiftInterval(2.0f)   // hold each wave 2s
+  .shiftDuration(1.5f)   // morph between waves over 1.5s
+  .group("gentle")       // restrict the pool
+  .amplitude(80));</pre>
+    <div class="callout">
+      <p>The shift sequence is non-deterministic across runs (uses <code>Math.random()</code> for per-session entropy) &mdash; same as JS p5.waves.</p>
+    </div>
+
+    <!-- ── MORPH ── -->
+    <h2 id="morph">Morph between two waves</h2>
+    <p>Pass two names, control the blend with <code>mix</code> from 0 to 1.</p>
+    <pre class="code-block">WaveOpts o = new WaveOpts()
+  .wave("classic sine", "mountain peaks")
+  .mix(0.5f);            // 0 = first wave, 1 = second
+
+float y = Waves.wave(x, o);</pre>
+    <p>Sweep <code>mix</code> over time and you get a smooth crossfade between two specific shapes &mdash; useful when shift is too wild for the look you want.</p>
+
+    <!-- ── WILD ── -->
+    <h2 id="wild">Wild mode</h2>
+    <p>One dial &mdash; <code>.unpredictability(0..1)</code> &mdash; adds noise modulation on top of any wave. At 0 you get the clean wave; at 1 you get chaos that still respects the wave's overall envelope.</p>
+    <pre class="code-block">WaveOpts wild = new WaveOpts()
+  .wave("mountain peaks")
+  .mode("wild")
+  .unpredictability(0.7f);
+
+float y = Waves.wave(x, wild);</pre>
+
+    <!-- ── TIME ── -->
+    <h2 id="time">Time is just a number</h2>
+    <p>You pass <code>t</code> in seconds &mdash; processing.waves never calls a clock itself. That means you can <strong>scrub time</strong>: map <code>mouseX</code> to <code>t</code>, run faster than real-time, run backwards, freeze at a moment.</p>
+    <pre class="code-block">float t = map(mouseX, 0, width, 0, 10);   // 10 seconds across the canvas
+float y = sampler.sample(x, t);</pre>
+
+    <!-- ── SEED vs GROUP ── -->
+    <h2 id="seed">Seed, group, and the wave pool</h2>
+    <p>When you <em>don't</em> specify <code>.wave()</code>, processing.waves picks one from a pool. Three things control which:</p>
+    <ul class="step-list">
+      <li><p><strong><code>.seed(n)</code></strong> &mdash; hashes the seed and picks <code>floor(rng(seed) * pool.size)</code>. Same seed = same wave.</p></li>
+      <li><p><strong><code>.group(name)</code></strong> &mdash; restricts the pool. <code>"gentle"</code> (no PRNG / pure math), <code>"harsh"</code> (uses noise/random), <code>"closing"</code> (period divides 2&pi;&middot;n &mdash; safe for closing shapes), or <code>"all"</code>.</p></li>
+      <li><p><strong>Custom pool</strong> &mdash; pass a <code>String[]</code> of names: <code>.group(new String[]{"classic sine","mountain peaks","triangle"})</code>.</p></li>
+    </ul>
+
+    <!-- ── RANGE ── -->
+    <h2 id="range">Map directly to a range</h2>
+    <p>Skip the amplitude scaling and map the wave's output to your own range.</p>
+    <pre class="code-block">// Use as opacity (0-255):
+float alpha = Waves.wave(t, new WaveOpts().wave("classic sine").range(0, 255));
+fill(255, alpha);
+
+// Use as hue (0-360):
+colorMode(HSB, 360, 100, 100);
+float hue = Waves.wave(x, new WaveOpts().wave("noise").range(0, 360));</pre>
+
+    <!-- ── 34 WAVES OVERVIEW ── -->
+    <h2 id="all-waves">All 34 waves</h2>
+    <p>Each name is also accessible by its index. <a href="waves.html">See the visual gallery &rarr;</a></p>
+    <div class="wave-grid">
+      <div class="wave-item"><span class="wi">00</span>classic sine</div>
+      <div class="wave-item"><span class="wi">01</span>sine</div>
+      <div class="wave-item"><span class="wi">02</span>sharp peaks</div>
+      <div class="wave-item"><span class="wi">03</span>square</div>
+      <div class="wave-item"><span class="wi">04</span>pulse</div>
+      <div class="wave-item"><span class="wi">05</span>stepped sine</div>
+      <div class="wave-item"><span class="wi">06</span>mountain peaks</div>
+      <div class="wave-item"><span class="wi">07</span>valleys</div>
+      <div class="wave-item"><span class="wi">08</span>zig-zag sine</div>
+      <div class="wave-item"><span class="wi">09</span>batman</div>
+      <div class="wave-item"><span class="wi">10</span>offset sine</div>
+      <div class="wave-item"><span class="wi">11</span>steps down</div>
+      <div class="wave-item"><span class="wi">12</span>steps</div>
+      <div class="wave-item"><span class="wi">13</span>squared sine</div>
+      <div class="wave-item"><span class="wi">14</span>bumpy sine</div>
+      <div class="wave-item"><span class="wi">15</span>wobble sine</div>
+      <div class="wave-item"><span class="wi">16</span>up down noise</div>
+      <div class="wave-item"><span class="wi">17</span>meta sine</div>
+      <div class="wave-item"><span class="wi">18</span>triangle</div>
+      <div class="wave-item"><span class="wi">19</span>ramp</div>
+      <div class="wave-item"><span class="wi">20</span>saw down</div>
+      <div class="wave-item"><span class="wi">21</span>saw up</div>
+      <div class="wave-item"><span class="wi">22</span>fade out</div>
+      <div class="wave-item"><span class="wi">23</span>grow random</div>
+      <div class="wave-item"><span class="wi">24</span>noise</div>
+      <div class="wave-item"><span class="wi">25</span>fuzzy pulse</div>
+      <div class="wave-item"><span class="wi">26</span>up down pulse</div>
+      <div class="wave-item"><span class="wi">27</span>bald patch</div>
+      <div class="wave-item"><span class="wi">28</span>fuzzy peak sine</div>
+      <div class="wave-item"><span class="wi">29</span>ramp up sine</div>
+      <div class="wave-item"><span class="wi">30</span>triangle sine</div>
+      <div class="wave-item"><span class="wi">31</span>round linked sine</div>
+      <div class="wave-item"><span class="wi">32</span>half sine</div>
+      <div class="wave-item"><span class="wi">33</span>smooth solid sine</div>
+    </div>
+
+    <!-- ── PORT NOTES ── -->
+    <h2 id="port-notes">Port notes &mdash; Java vs JS</h2>
+    <p>The library is a byte-for-byte numerical port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0. Where the languages differ, we kept the semantics. Differences worth knowing:</p>
+    <ul class="step-list">
+      <li><p><strong>No runtime string evaluator.</strong> JS uses <code>new Function(algoString)</code> to evaluate wave formulas at runtime. Java replaces this with hand-translated lambdas, one per wave. The string-eval feature was never exposed via the public API, so no functional difference.</p></li>
+      <li><p><strong>Internal math runs in <code>double</code></strong> (matching JS Numbers) but the public API returns <code>float</code> (Processing convention). Result: visually identical to JS, with sub-pixel match where deterministic.</p></li>
+      <li><p><strong>FNV-1a seed + mulberry32 PRNG ported 1:1.</strong> <code>seedFrom()</code> returns the unsigned uint32 as a <code>long</code> so subsequent float math matches JS's unsigned-Number semantics.</p></li>
+      <li><p><strong>Shift entropy.</strong> <code>shift(true)</code> uses <code>Math.random()</code> for per-session entropy &mdash; outputs are non-deterministic across runs, same as JS.</p></li>
+      <li><p><strong>Validated.</strong> A 35-case validator in <code>/tests</code> runs the JS reference via Node and compares against the Java output. Tolerance: <code>1e-3</code> for stable mode, <code>0.5</code> for wild mode (small float vs double differences amplify through noise modulation).</p></li>
+    </ul>
+
+    <!-- ── STARTERS ── -->
+    <h2 id="starters">Copy-paste starters</h2>
+
+    <h3>One wave, no time</h3>
+    <pre class="code-block">import waves.*;
+void setup() { size(800, 400); noStroke(); fill(255); }
+void draw() {
+  background(20);
+  for (int x = 0; x &lt; width; x += 6) {
+    float y = Waves.wave(x, "classic sine");
+    rect(x, height/2 + y, 4, 4);
+  }
+}</pre>
+
+    <h3>Animated wave (uses t)</h3>
+    <pre class="code-block">import waves.*;
+WaveOpts o;
+void setup() {
+  size(800, 400); stroke(255); noFill();
+  o = new WaveOpts().wave("mountain peaks").amplitude(120);
+}
+void draw() {
+  background(20);
+  o.t(millis() / 1000.0f);
+  beginShape();
+  for (int x = 0; x &lt; width; x += 2) vertex(x, height/2 + Waves.wave(x, o));
+  endShape();
+}</pre>
+
+    <h3>Auto-shifting ribbons</h3>
+    <pre class="code-block">import waves.*;
+Waves.WaveSampler s;
+void setup() {
+  size(800, 400); noStroke();
+  s = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(2.5f).shiftDuration(1.5f)
+    .group("gentle").amplitude(140));
+}
+void draw() {
+  background(20);
+  float t = millis() / 1000.0f;
+  for (int row = 0; row &lt; 12; row++) {
+    fill(255, 30 + row*15);
+    beginShape();
+    for (int x = 0; x &lt; width; x += 2) {
+      float y = s.sample(x + row * 12, t);
+      vertex(x, height/2 + y + row * 6);
+    }
+    endShape();
+  }
+}</pre>
+
+    <h3>Morph between two waves</h3>
+    <pre class="code-block">import waves.*;
+void setup() { size(800, 400); stroke(255); noFill(); }
+void draw() {
+  background(20);
+  float mix = (sin(millis() * 0.0005f) * 0.5f) + 0.5f;
+  WaveOpts o = new WaveOpts()
+    .wave("classic sine", "triangle")
+    .mix(mix).amplitude(120);
+  beginShape();
+  for (int x = 0; x &lt; width; x += 2) vertex(x, height/2 + Waves.wave(x, o));
+  endShape();
+}</pre>
+
+    <h3>Use a wave as colour</h3>
+    <pre class="code-block">import waves.*;
+void setup() { size(800, 400); colorMode(HSB, 360, 100, 100); noStroke(); }
+void draw() {
+  for (int x = 0; x &lt; width; x += 4) {
+    float h = Waves.wave(x + frameCount, new WaveOpts()
+      .wave("bumpy sine").range(0, 360));
+    fill(h, 80, 95);
+    rect(x, 0, 4, height);
+  }
+}</pre>
+
+    <h3>Wild mode (chaos dial)</h3>
+    <pre class="code-block">import waves.*;
+void setup() { size(800, 400); stroke(255); noFill(); }
+void draw() {
+  background(20);
+  float u = map(mouseX, 0, width, 0, 1);   // 0 = stable, 1 = chaos
+  WaveOpts o = new WaveOpts()
+    .wave("mountain peaks")
+    .mode("wild").unpredictability(u)
+    .amplitude(120).t(millis()/1000.0f);
+  beginShape();
+  for (int x = 0; x &lt; width; x += 2) vertex(x, height/2 + Waves.wave(x, o));
+  endShape();
+}</pre>
+
+  </main>
+
+  <footer>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+  </footer>
+
+</body>
+</html>

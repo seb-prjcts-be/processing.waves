@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All 34 Waves &mdash; processing.waves</title>
+  <meta name="description" content="Every wave in processing.waves, with formula, character, and period. Click the name to copy.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/p5.waves@main/p5.waves.min.js"></script>
+  <style>
+    .waves-page { max-width: 1200px; margin: 0 auto; padding: 6.5rem 2rem 4rem; }
+    .waves-intro { max-width: 720px; margin: 0 auto 1.4rem; text-align: center; color: var(--text-muted); line-height: 1.7; }
+    .waves-legend { display: flex; flex-wrap: wrap; gap: .6rem; justify-content: center; margin: .8rem 0 2.4rem; font-family: 'Consolas', monospace; font-size: .76rem; color: var(--text-muted); }
+    .waves-legend span { display: inline-block; padding: .2rem .55rem; border: 1px solid var(--border-mid); background: var(--surface); }
+    .waves-family { margin: 3rem 0 .9rem; }
+    .waves-family h2 { font-family: 'Oswald', sans-serif; font-size: 1.35rem; text-transform: uppercase; letter-spacing: .05em; border-bottom: 2px solid #000; padding-bottom: .35rem; margin-bottom: .35rem; }
+    .waves-family p { color: var(--text-muted); font-size: .92rem; margin-bottom: 1rem; }
+    .wave-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 0; border: 1px solid var(--border-mid); background: var(--surface); }
+    .wave-card { padding: 0; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; flex-direction: column; }
+    .wave-canvas { width: 100%; height: 120px; background: #fff; border-bottom: 1px solid var(--border); }
+    .wave-canvas canvas { display: block !important; width: 100% !important; height: 100% !important; }
+    .wave-meta { padding: .85rem 1rem 1rem; }
+    .wave-meta .idx { font-family: 'Consolas', monospace; font-size: .7rem; color: var(--text-faint); letter-spacing: .05em; }
+    .wave-meta .name { font-family: 'Oswald', sans-serif; font-size: 1.05rem; text-transform: uppercase; letter-spacing: .04em; margin: .1rem 0 .4rem; color: #000; }
+    .wave-meta .formula { font-family: 'Consolas', monospace; font-size: .78rem; background: #f3f1ec; padding: .25em .5em; color: #111; display: inline-block; margin-bottom: .55rem; }
+    .wave-meta .tags { display: flex; gap: .35rem; flex-wrap: wrap; font-family: 'Consolas', monospace; font-size: .68rem; color: var(--text-muted); }
+    .wave-meta .tag { padding: .1rem .45rem; border: 1px solid var(--border-mid); }
+    .wave-meta .tag.harsh { border-color: #000; color: #000; }
+    .wave-meta .tag.closing { background: #000; color: #fff; border-color: #000; }
+  </style>
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo"><a href="index.html" style="text-decoration:none;color:inherit;">processing.<span>waves</span></a></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="examples.html">Examples</a></li>
+      <li><a href="waves.html" class="active">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <main class="waves-page">
+    <h1 style="font-family:'Oswald',sans-serif;font-size:2.8rem;text-align:center;margin-bottom:.5rem;">All 34 Waves</h1>
+    <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Live previews use the JS port; <strong>processing.waves</strong> (Java) produces numerically identical output.</p>
+    <div class="waves-legend">
+      <span>idx</span>
+      <span>name</span>
+      <span>formula</span>
+      <span style="border-color:#000;color:#000;">harsh = uses randomness</span>
+      <span style="background:#000;color:#fff;border-color:#000;">closing = periodic at 2&pi;&middot;n</span>
+    </div>
+
+    <section class="waves-family">
+      <h2>Pure sine</h2>
+      <p>The reference shapes. Smooth, periodic, easy to predict.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="classic sine"></div><div class="wave-meta"><div class="idx">00</div><div class="name">classic sine</div><div class="formula">sin(x*.1)*.4</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="sine"></div><div class="wave-meta"><div class="idx">01</div><div class="name">sine</div><div class="formula">sin(x*.2)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="sharp peaks"></div><div class="wave-meta"><div class="idx">02</div><div class="name">sharp peaks</div><div class="formula">abs(sin(x*.1))*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="smooth solid sine"></div><div class="wave-meta"><div class="idx">33</div><div class="name">smooth solid sine</div><div class="formula">sin(x*3.1)*.25</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="waves-family">
+      <h2>Peaks &amp; valleys</h2>
+      <p>Modulated sines that emphasise crests or troughs.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="mountain peaks"></div><div class="wave-meta"><div class="idx">06</div><div class="name">mountain peaks</div><div class="formula">abs(cos(x*.1))*.35 + sin(x*.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="valleys"></div><div class="wave-meta"><div class="idx">07</div><div class="name">valleys</div><div class="formula">abs(cos(x*.1))*-.35 + sin(x*.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="batman"></div><div class="wave-meta"><div class="idx">09</div><div class="name">batman</div><div class="formula">sin(x*.1)*.7 % .4</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="offset sine"></div><div class="wave-meta"><div class="idx">10</div><div class="name">offset sine</div><div class="formula">ceil(cos(x*.1))*.25 &minus; sin(x*.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="waves-family">
+      <h2>Stepped &amp; pulses</h2>
+      <p>Quantised waves &mdash; ceil/round/modulo carve smooth shapes into plateaus.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="stepped sine"></div><div class="wave-meta"><div class="idx">05</div><div class="name">stepped sine</div><div class="formula">ceil(sin(x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="steps"></div><div class="wave-meta"><div class="idx">12</div><div class="name">steps</div><div class="formula">round(sin(&minus;x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="zig-zag sine"></div><div class="wave-meta"><div class="idx">08</div><div class="name">zig-zag sine</div><div class="formula">sin(x*.2)*.4 % .12</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="square"></div><div class="wave-meta"><div class="idx">03</div><div class="name">square</div><div class="formula">(x*.025)%1 &lt; .5 ? &minus;.5 : .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="pulse"></div><div class="wave-meta"><div class="idx">04</div><div class="name">pulse</div><div class="formula">(x*.5)%20 &lt; 1 ? &minus;.5 : .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="waves-family">
+      <h2>Layered &amp; modulated</h2>
+      <p>Two or more sines multiplied, added, or modulated. More personality, still smooth.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="squared sine"></div><div class="wave-meta"><div class="idx">13</div><div class="name">squared sine</div><div class="formula">sq(sin(x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="bumpy sine"></div><div class="wave-meta"><div class="idx">14</div><div class="name">bumpy sine</div><div class="formula">sin(x*.1)*.25 + sin(x*.5)*.1</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="wobble sine"></div><div class="wave-meta"><div class="idx">15</div><div class="name">wobble sine</div><div class="formula">sin(x*.1)*cos(x*.2)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="meta sine"></div><div class="wave-meta"><div class="idx">17</div><div class="name">meta sine</div><div class="formula">sin(x*.45 + radians(x))*cos(x*.4)*.5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="round linked sine"></div><div class="wave-meta"><div class="idx">31</div><div class="name">round linked sine</div><div class="formula">sin(x*.1)*cos(x*1)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="ramp up sine"></div><div class="wave-meta"><div class="idx">29</div><div class="name">ramp up sine</div><div class="formula">sin(x)*(x*.01%.5)</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="triangle sine"></div><div class="wave-meta"><div class="idx">30</div><div class="name">triangle sine</div><div class="formula">sin(x)*(x*.01%1&minus;.5)</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="half sine"></div><div class="wave-meta"><div class="idx">32</div><div class="name">half sine</div><div class="formula">sin(x*.05)*(x*.1%.5)</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="waves-family">
+      <h2>Linear &amp; saw</h2>
+      <p>No trig &mdash; just modulo and absolute value. Sharp, predictable.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="triangle"></div><div class="wave-meta"><div class="idx">18</div><div class="name">triangle</div><div class="formula">abs((x*.03) % 1 &minus; .5)</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="ramp"></div><div class="wave-meta"><div class="idx">19</div><div class="name">ramp</div><div class="formula">&minus;(x*.02%1) + .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="saw down"></div><div class="wave-meta"><div class="idx">20</div><div class="name">saw down</div><div class="formula">x*.03 % .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="saw up"></div><div class="wave-meta"><div class="idx">21</div><div class="name">saw up</div><div class="formula">&minus;x*.03 % .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+      </div>
+    </section>
+
+    <section class="waves-family">
+      <h2>Chaos &amp; special</h2>
+      <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em> &mdash; they use a seeded PRNG or a non-trig function with surprising spikes.</p>
+      <div class="wave-cards">
+        <article class="wave-card"><div class="wave-canvas" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="grow random"></div><div class="wave-meta"><div class="idx">23</div><div class="name">grow random</div><div class="formula">random(x*.003)</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="noise"></div><div class="wave-meta"><div class="idx">24</div><div class="name">noise</div><div class="formula">noise(x*.1) &minus; .5</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="fuzzy pulse"></div><div class="wave-meta"><div class="idx">25</div><div class="name">fuzzy pulse</div><div class="formula">tan(x*20)*.05</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="up down pulse"></div><div class="wave-meta"><div class="idx">26</div><div class="name">up down pulse</div><div class="formula">tan(x*.1)*.05</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="bald patch"></div><div class="wave-meta"><div class="idx">27</div><div class="name">bald patch</div><div class="formula">sq(x*.05) % .5</div><div class="tags"><span class="tag">gentle</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="fuzzy peak sine"></div><div class="wave-meta"><div class="idx">28</div><div class="name">fuzzy peak sine</div><div class="formula">sin(x*.1) &lt; 0 ? random(&minus;.2, .2) : sin(x*.1)*.5</div><div class="tags"><span class="tag harsh">harsh</span></div></div></article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+  </footer>
+
+  <script src="sketch.js"></script>
+</body>
+</html>
