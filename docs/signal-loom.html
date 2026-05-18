@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Loom - curation engine for processing.waves</title>
+  <meta name="description" content="Signal Loom - a full curation built from processing.waves. One machine, two runtimes: Processing is the instruction, p5 is the live rehearsal.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <nav id="navbar">
+    <div class="nav-logo">processing.<span>waves</span></div>
+    <button class="nav-hamburger" aria-label="Toggle menu" onclick="this.closest('nav').classList.toggle('nav-open')">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="index.html">Showcase</a></li>
+      <li><a href="signal-loom.html" class="active">Signal Loom</a></li>
+      <li><a href="waves.html">Waves</a></li>
+      <li><a href="guide.html">Guide</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></li>
+    </ul>
+  </nav>
+
+  <div class="ex-page-header">
+    <div class="section-tag" style="margin-bottom:0.6rem">Curation engine · processing.waves</div>
+    <h1>Signal Loom <span class="accent">Guide</span></h1>
+    <p>One machine, two runtimes. <strong>The instruction is Processing</strong> — each copyable block is a <strong>verbatim excerpt from <code>SignalLoom.pde</code></strong> (whole functions and classes; the complete runnable sketch is the <a href="downloads/SignalLoom_processing.zip" download>download</a>). <strong>The working part is simulated online with p5</strong> — every preview is a live p5.waves sketch running the <strong>identical sampler settings</strong> (the Processing sketch runs ~10% slower by design via <code>TIME_SCALE</code>), so you can watch the decision before you compile it.</p>
+    <div class="guide-quicklinks">
+      <a class="guide-chip" href="#overview">Overview</a>
+      <a class="guide-chip" href="#pool-curation">Pools</a>
+      <a class="guide-chip" href="#warp-threads">Warp</a>
+      <a class="guide-chip" href="#weft-passes">Weft</a>
+      <a class="guide-chip" href="#pattern-card">Pattern Card</a>
+      <a class="guide-chip" href="#kinetic-title">Title</a>
+      <a class="guide-chip" href="#machine-readout">Readout</a>
+      <a class="guide-chip" href="#glyph-field">Glyphs</a>
+      <a class="guide-chip" href="#full-loom">Full Loom</a>
+    </div>
+  </div>
+
+  <section id="overview" class="section">
+    <div class="section-header">
+      <div class="section-tag">system / assembly</div>
+      <h2>From One Wave To A <span class="accent">Loom</span></h2>
+      <p class="section-desc">Signal Loom is not a list of effects. Pools become tension, samplers move the shuttle, and the pattern card turns phase into woven output — the same five stations in Processing and in the browser.</p>
+    </div>
+    <div class="guide-wide-shell">
+      <div class="origin-label">Live assembly preview · warp + weft + pattern card + readout (p5)</div>
+      <div class="origin-grid-wrap">
+        <div id="guide-system" class="guide-canvas-wide"></div>
+        <div class="origin-grid-info">
+          <div>start: <span>pool -&gt; tension -&gt; shuttle</span></div>
+          <div>end product: <span>one loom, woven output</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>One source, five stations</strong>
+        <p>SOURCE, TENSION, SHUTTLE, PATTERN, OUTPUT. Every layer answers one question: what job does this wave behaviour perform in the loom?</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Processing is the instruction</strong>
+        <p>The <code>.pde</code> sketch is the deliverable. <code>setup()</code> sizes the canvas, <code>rebuildSystem()</code> builds the samplers, <code>draw()</code> stacks the modules in order.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>p5 is the rehearsal</strong>
+        <p>The browser runs the identical wave logic via p5.waves so the loom is legible before Processing 4 ever compiles it.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">SignalLoom.pde — paste into Processing 4 + waves library</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-system">import waves.*;
+
+final int PAPER  = color(247, 242, 232);
+final int INK    = color(9, 9, 8);
+final int SIGNAL = color(255, 61, 46);
+final int DEEP   = color(6, 71, 255);
+final int LIME   = color(199, 255, 45);
+final int VIOLET = color(142, 81, 255);
+final int AQUA   = color(0, 189, 214);
+final float TIME_SCALE = 0.9;
+
+String[] curated = {
+  "classic sine",
+  "mountain peaks",
+  "wobble sine",
+  "triangle sine",
+  "meta sine"
+};
+
+void setup() {
+  size(1200, 760);
+  smooth(4);
+  displayFont = createFont("SansSerif.bold", 64);
+  monoFont = createFont("Monospaced", 12);
+  textFont(displayFont);
+  rebuildSystem();
+}
+
+void draw() {
+  float t = millis() / 1000.0 * TIME_SCALE;
+  background(PAPER);
+  drawBackplane(t);
+  drawLoomFrame(t);
+  drawWarpThreads(t);
+  drawWeftPasses(t);
+  drawPatternCard(t);
+  drawGlyphField(t);
+  drawTitle(t);
+  drawMachineReadout(t);
+  drawTicker(t);
+  drawGrain();
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="system">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pool-curation" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">01 / pool curation</div>
+      <h2>Curate The <span class="accent">Tension</span></h2>
+      <p class="section-desc">This is the editorial backbone. Four named pools — <code>gentle</code>, <code>harsh</code>, <code>all</code>, and a hand-picked <code>curated</code> array — each become one tension voice with its own colour.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Name the voices</strong>
+        <p><code>gentle</code> stays readable, <code>harsh</code> ruptures with <code>wild</code> mode, <code>all</code> stays broad, the array is taste.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Bind colour to character</strong>
+        <p>Each pool gets a sampler with its own seed and frequency. <code>activeIndex(t)</code> rotates which voice drives the loom.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Rotation without chaos</strong>
+        <p>The active pool changes over time, but every layer stays in its family so the loom keeps one controlled voice.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">four curated families as live tension rows</span>
+      </div>
+      <div id="guide-pools" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>pool -&gt; one tension voice</span></div>
+        <div>result: <span>variation with authorship</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">the pool table + per-pool sampler</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-pools">// inside rebuildSystem() — each pool is a named wave family / one tension voice
+pools = new Pool[] {
+  new Pool("gentle", "gentle", DEEP),
+  new Pool("harsh", "harsh", SIGNAL),
+  new Pool("all", "all", AQUA),
+  new Pool("curated", curated, VIOLET)
+};
+
+threadSamplers = new Waves.WaveSampler[pools.length];
+looms = new LoomGrid[pools.length];
+for (int i = 0; i &lt; pools.length; i++) {
+  threadSamplers[i] = Waves.createSampler(new WaveOpts()
+    .group(pools[i].group)
+    .shift(true)
+    .shiftInterval(3.8f + i * 0.45f)
+    .shiftDuration(1.1f)
+    .range(-1, 1)
+    .frequency(0.5f + i * 0.08f)
+    .mode(i == 1 ? "wild" : "stable")
+    .unpredictability(i == 1 ? 0.33f : 0f)
+    .seed(500 + i * 61));
+  looms[i] = new LoomGrid(18, 13, pools[i].group, 800 + i * 101, i);
+}
+
+int activeIndex(float t) {
+  return floor(t / 5.2) % pools.length;
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="pools">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="warp-threads" class="section">
+    <div class="section-header">
+      <div class="section-tag">02 / warp threads</div>
+      <h2>Hang The <span class="accent">Warp</span></h2>
+      <p class="section-desc">The warp is the vertical structure of the loom. One thread per pool, each bent by <code>Waves.wave()</code> plus a slow sampler drift. The active pool is thick and opaque; the rest hang back.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Sample a vertical line</strong>
+        <p>Walk <code>y</code> down the loom bounds and ask <code>Waves.wave()</code> for a horizontal offset at each step.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Add a second motion</strong>
+        <p>The pool's own sampler adds a slow drift on top of the weave so threads breathe instead of just oscillating.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Tensioned structure</strong>
+        <p><code>MULTIPLY</code> blend lets the threads overlap like real yarn; the active pool reads as the one under load.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">four warp threads, active one under tension</span>
+      </div>
+      <div id="guide-warp" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>wave + drift -&gt; thread</span></div>
+        <div>result: <span>tensioned warp</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">drawWarpThreads(t)</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-warp">void drawWarpThreads(float t) {
+  int active = activeIndex(t);
+  float[] b = loomBounds();
+  blendMode(MULTIPLY);
+  noFill();
+  for (int i = 0; i &lt; pools.length; i++) {
+    Pool pool = pools[i];
+    Waves.WaveSampler sampler = threadSamplers[i];
+    float baseX = map(i, 0, pools.length - 1, b[0] + b[2] * 0.16, b[0] + b[2] * 0.84);
+    float amp = b[2] * (i == active ? 0.125 : 0.07);
+    stroke(pool.col, i == active ? 218 : 138);
+    strokeWeight(i == active ? 13 : 7);
+    beginShape();
+    for (float y = b[1]; y &lt;= b[1] + b[3]; y += 10) {
+      float local = y * 0.013 + i * 0.41;
+      float weave = Waves.wave(local, new WaveOpts()
+        .group(pool.group)
+        .shift(true)
+        .shiftInterval(3.2f + i * 0.35f)
+        .shiftDuration(1.1f)
+        .seed(1200 + i * 77)
+        .t(t * 0.74f)
+        .amplitude(amp)
+        .frequency(0.72f)
+        .mode(i == 1 ? "wild" : "stable")
+        .unpredictability(i == 1 ? 0.3f : 0f));
+      float drift = sampler.sample(y * 0.01, t) * 34;
+      vertex(baseX + weave + drift, y);
+    }
+    endShape();
+  }
+  blendMode(BLEND);
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="warp">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="weft-passes" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">03 / weft passes</div>
+      <h2>Throw The <span class="accent">Shuttle</span></h2>
+      <p class="section-desc">The weft is the horizontal pass. The pattern card decides which cells are lit; <code>motionSampler</code> lifts each row and <code>pulseSampler</code> sets the weight of every lit segment.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Read the card per row</strong>
+        <p>Each row asks the loom grid which columns are on, then only draws lit cells (plus a faint ground every third).</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Two samplers, two jobs</strong>
+        <p><code>motionSampler</code> tilts the row, <code>pulseSampler</code> maps to stroke weight so the shuttle has rhythm.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Woven passes</strong>
+        <p>Lit segments in the pool colour, ground in faint ink — the card becomes a physical-looking weave.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">thresholded weft over the loom grid</span>
+      </div>
+      <div id="guide-weft" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>card -&gt; lit segments</span></div>
+        <div>result: <span>rhythmic weave</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">drawWeftPasses(t)</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-weft">void drawWeftPasses(float t) {
+  int active = activeIndex(t);
+  Pool pool = pools[active];
+  int[] grid = looms[active].sample(t);
+  float[] b = loomBounds();
+  int rows = looms[active].rows;
+  int cols = looms[active].cols;
+  float rowGap = b[3] / rows;
+
+  blendMode(MULTIPLY);
+  strokeCap(SQUARE);
+  for (int row = 0; row &lt; rows; row++) {
+    float y = b[1] + rowGap * (row + 0.5);
+    float rowPower = motionSampler.sample(row * 0.13, t) * 15;
+    for (int col = 0; col &lt; cols; col++) {
+      boolean on = grid[row * cols + col] == 1;
+      if (!on &amp;&amp; (row + col) % 3 != 0) continue;
+      float x0 = b[0] + (col / (float)cols) * b[2];
+      float x1 = b[0] + ((col + 0.82) / (float)cols) * b[2];
+      float pulse = pulseSampler.sample((row + col) * 0.08, t);
+      stroke(on ? pool.col : INK, on ? 200 : 34);
+      strokeWeight(on ? map(pulse, 0, 1, 2, 7) : 1.2);
+      line(x0, y + rowPower, x1, y - rowPower * 0.35);
+    }
+  }
+  strokeCap(ROUND);
+  blendMode(BLEND);
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="weft">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="pattern-card" class="section">
+    <div class="section-header">
+      <div class="section-tag">04 / punch card</div>
+      <h2>Punch The <span class="accent">Card</span></h2>
+      <p class="section-desc">The pattern card is the loom's proof panel. Two fixed samplers — a <code>smooth solid sine</code> for rows and a <code>ramp up sine</code> for columns — are summed and thresholded with <code>rv + cv &gt; 0</code>.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Two fixed waves</strong>
+        <p>Row and column samplers use named waves, not the active pool, so the card stays a stable reference surface.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Sum and threshold</strong>
+        <p>A nested loop reads <code>rowS(row*5 + t)</code> and <code>colS(col*2.5 - t)</code>; sliding the sample positions animates it.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Binary punch card</strong>
+        <p>Lit cells in the pool colour, off cells in a checker — a rational readout beside the expressive loom.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">binary field rendered as a punch card</span>
+      </div>
+      <div id="guide-card" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>rowS + colS &gt; 0</span></div>
+        <div>result: <span>punch-card grid</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">class LoomGrid</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-card">class LoomGrid {
+  int cols;
+  int rows;
+  int offset;
+  Waves.WaveSampler rowS;
+  Waves.WaveSampler colS;
+
+  LoomGrid(int cols, int rows, Object group, int seed, int offset) {
+    this.cols = cols;
+    this.rows = rows;
+    this.offset = offset;
+    rowS = Waves.createSampler(new WaveOpts()
+      .wave("smooth solid sine")
+      .range(-1, 1)
+      .seed(seed));
+    colS = Waves.createSampler(new WaveOpts()
+      .wave("ramp up sine")
+      .range(-1, 1)
+      .seed(seed + 37));
+  }
+
+  int[] sample(float t) {
+    int[] cells = new int[cols * rows];
+    for (int row = 0; row &lt; rows; row++) {
+      float rv = rowS.sample(row * 5 + t);
+      for (int col = 0; col &lt; cols; col++) {
+        float cv = colS.sample(col * 2.5 - t);
+        cells[row * cols + col] = rv + cv &gt; 0 ? 1 : 0;
+      }
+    }
+    return cells;
+  }
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="card">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="kinetic-title" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">05 / kinetic typography</div>
+      <h2>Make The Title <span class="accent">Breathe</span></h2>
+      <p class="section-desc">The word stays typographic first, live second. Each letter is lifted by <code>motionSampler</code> at its own sample position; letters 7 and 8 (the L–O of LOOM) take an accent colour from <code>colorSampler</code>.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Keep the word intact</strong>
+        <p>Draw letter by letter with a cursor so spacing and the baseline of <code>SIGNAL LOOM</code> stay correct.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Sample each glyph</strong>
+        <p>One sampler, different sample index per letter, so the title moves as a family rather than randomly.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Alive, not unstable</strong>
+        <p>The lift is scaled to the font size so the word drifts just enough to read as live, never broken.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">one word, offset per letter</span>
+      </div>
+      <div id="guide-title" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>letter -&gt; sampled lift</span></div>
+        <div>result: <span>typography that breathes</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">drawTitle(t)</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-title">void drawTitle(float t) {
+  float m = max(18, min(width, height) * 0.05);
+  float x = m;
+  float[] panel = panelBounds();
+  float maxW = width &lt; 900 ? width - m * 2 : max(360, panel[0] - x - 24);
+  float size = fitSize("SIGNAL LOOM", maxW, width &lt; 760 ? 54 : 92, 28);
+  float y = width &lt; 760 ? height * 0.14 : height * 0.105;
+
+  textFont(displayFont);
+  textAlign(LEFT, TOP);
+  textSize(size);
+  float cursor = x;
+  String label = "SIGNAL LOOM";
+  for (int i = 0; i &lt; label.length(); i++) {
+    char ch = label.charAt(i);
+    if (ch == ' ') {
+      cursor += size * 0.28;
+      continue;
+    }
+    float lift = motionSampler.sample(i * 0.23, t) * size * 0.055;
+    fill(i == 7 || i == 8 ? accent(colorSampler.sample(i * 0.18, t)) : INK);
+    text(ch, cursor, y + lift);
+    cursor += textWidth(ch) * 0.98;
+  }
+
+  textFont(monoFont);
+  textSize(width &lt; 760 ? 13 : 16);
+  fill(INK);
+  text("a live loom for wave signals: source, tension, shuttle, pattern, output", x, y + size * 1.08);
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="title">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="machine-readout" class="section">
+    <div class="section-header">
+      <div class="section-tag">06 / tension meter</div>
+      <h2>Expose The <span class="accent">Tension</span></h2>
+      <p class="section-desc">The readout turns the loom into an instrument. The bar fill is the sampler's <code>mix()</code> during a shift; the labels expose the current and target wave name of the active pool.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>Pump the sampler</strong>
+        <p>Call <code>sampler.sample()</code> once first so <code>shifting()</code>, <code>mix()</code>, and the wave names are current this frame.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>State becomes UI</strong>
+        <p>Bar fill = <code>mix()</code>, left label = <code>tension + pool key</code>, right label = <code>waveName -&gt; targetName</code>.</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Readable instrument</strong>
+        <p>The loom explains itself without becoming a dashboard — the logic is present, but still graphic.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">mix bar + wave-name labels</span>
+      </div>
+      <div id="guide-readout" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>mix() -&gt; bar fill</span></div>
+        <div>result: <span>state as composition</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">drawMachineReadout(t)</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-readout">void drawMachineReadout(float t) {
+  int active = activeIndex(t);
+  Pool pool = pools[active];
+  Waves.WaveSampler sampler = threadSamplers[active];
+  sampler.sample(0.42, t);
+  float[] p = panelBounds();
+  float[] b = loomBounds();
+  float x = width &lt; 900 ? b[0] : p[0];
+  float y = width &lt; 900 ? b[1] + b[3] + 48 : p[1] + p[3] + 42;
+  float w = width &lt; 900 ? min(b[2], 520) : p[2];
+  float h = 34;
+  float mix = sampler.shifting() ? sampler.mix() : pulseSampler.sample(0.5, t);
+
+  noStroke();
+  fill(INK);
+  rect(x, y, w, h);
+  fill(pool.col);
+  rect(x, y, w * constrain(mix, 0, 1), h);
+  fill(mix &gt; 0.55 ? INK : PAPER);
+  textFont(monoFont);
+  textAlign(LEFT, CENTER);
+  textSize(11);
+  text(("tension " + pool.key).toUpperCase(), x + 12, y + h * 0.5);
+  fill(PAPER);
+  textAlign(RIGHT, CENTER);
+  text((shortName(sampler.waveName()) + " -&gt; " + shortName(sampler.targetName())).toUpperCase(), x + w - 12, y + h * 0.5);
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="readout">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="glyph-field" class="section section-dark">
+    <div class="section-header">
+      <div class="section-tag">07 / ambient language</div>
+      <h2>Let Vocabulary <span class="accent">Drift</span></h2>
+      <p class="section-desc">Loom words become marginalia. <code>pulseSampler</code> gates whether a word appears, <code>motionSampler</code> drifts it — context behind the hero statement, never filler on top.</p>
+    </div>
+    <div class="blocks-grid guide-blocks">
+      <div class="block-card">
+        <code>start</code>
+        <strong>A small vocabulary</strong>
+        <p>Words that belong to the machine: warp, weft, tension, shuttle, pattern, phase, morph, output.</p>
+      </div>
+      <div class="block-card">
+        <code>build</code>
+        <strong>Pulse gates, motion drifts</strong>
+        <p>Below <code>0.38</code> the word is invisible this frame; above it, <code>motionSampler</code> is read twice — once for x, once for y (offset <code>t + 2</code>).</p>
+      </div>
+      <div class="block-card">
+        <code>end product</code>
+        <strong>Context without clutter</strong>
+        <p>Ghost labels that flicker with the same pulse driving the weave — atmosphere from the same engine.</p>
+      </div>
+    </div>
+    <div class="ex-preview guide-example-shell">
+      <div class="runtime-row">
+        <span class="runtime-tag is-p5">p5 · simulation</span>
+        <span class="runtime-note">pulse-gated drifting vocabulary</span>
+      </div>
+      <div id="guide-glyphs" class="ex-canvas"></div>
+      <div class="guide-inline-strip">
+        <div>preview: <span>pulse -&gt; visibility</span></div>
+        <div>result: <span>ambient language field</span></div>
+      </div>
+      <div class="runtime-row">
+        <span class="runtime-tag is-processing">Processing · instruction</span>
+        <span class="runtime-note">buildGlyphs() + drawGlyphField(t)</span>
+      </div>
+      <pre class="ex-code-block"><code class="language-clike" id="code-glyphs">void buildGlyphs() {
+  randomSeed(16);
+  String[] words = { "warp", "weft", "tension", "shuttle", "pattern", "phase", "morph", "output" };
+  int count = constrain(floor((width * height) / 21000.0), 28, 82);
+  glyphs = new Glyph[count];
+  for (int i = 0; i &lt; count; i++) {
+    glyphs[i] = new Glyph(random(width), random(height), i, words[(int)random(words.length)], random(10, 15));
+  }
+}
+
+void drawGlyphField(float t) {
+  textFont(monoFont);
+  textAlign(CENTER, CENTER);
+  for (Glyph g : glyphs) {
+    float p = pulseSampler.sample(g.seed * 0.19, t);
+    if (p &lt; 0.38) continue;
+    float dx = motionSampler.sample(g.seed * 0.11, t) * 22;
+    float dy = motionSampler.sample(g.seed * 0.17, t + 2) * 17;
+    fill(INK, map(p, 0.38, 1, 44, 145));
+    textSize(g.size);
+    text(g.word, g.x + dx, g.y + dy);
+  }
+}</code></pre>
+      <div class="guide-action-row">
+        <button type="button" class="copy-btn" data-copy="glyphs">Copy PDE</button>
+        <div class="ex-links">
+          <a class="ex-full-link" href="#full-loom">-&gt; full loom</a>
+          <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="full-loom" class="section section-fullbleed">
+    <div class="section-header">
+      <div class="section-tag">full composition / live loom</div>
+      <h2>The Full <span class="accent">Loom</span></h2>
+      <p class="section-desc">Every module above, running together. This frame is the p5.waves loom; the Processing blocks above are its sibling — same structure, each using the strengths of its runtime.</p>
+    </div>
+    <div class="guide-poster-stage">
+      <iframe class="guide-poster-frame" src="signal-loom-poster.html" title="Signal Loom — full p5.waves loom" loading="lazy"></iframe>
+    </div>
+    <div class="guide-poster-links">
+      <a class="ex-full-link" href="signal-loom-poster.html" target="_blank">-&gt; open full loom</a>
+      <a class="ex-full-link" href="processing/SignalLoom/SignalLoom.pde" target="_blank">-&gt; pde source</a>
+      <a class="ex-full-link" href="downloads/SignalLoom_processing.zip" download>-&gt; download pde</a>
+      <a class="ex-full-link" href="guide.html">-&gt; api guide</a>
+    </div>
+  </section>
+
+  <footer>
+    <p>The instruction is <a href="guide.html">Processing</a> · the working preview is <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a></p>
+    <p class="footer-sub">Signal Loom · processing.waves / p5.waves · siblings, not clones · <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/seb-prjcts-be/p5.waves@main/p5.waves.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+  <script src="signal-loom.js"></script>
+</body>
+</html>

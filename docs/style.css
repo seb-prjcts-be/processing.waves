@@ -912,6 +912,34 @@ section[id] {
   color: #000;
 }
 
+/* runtime badges: makes the Processing / p5 split explicit */
+.runtime-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: 'Oswald', sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid var(--border-hard);
+}
+.runtime-tag.is-processing { background: #000; color: #fff; }
+.runtime-tag.is-p5 { background: #c7ff2d; color: #000; border-color: #000; }
+.runtime-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 2px;
+}
+.runtime-note {
+  font-family: 'Consolas', monospace;
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
 /* ── HAMBURGER ── */
 .nav-hamburger {
   display: none;
