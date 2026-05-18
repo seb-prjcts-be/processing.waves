@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Examples - processing.waves</title>
-  <meta name="description" content="Six Processing sketches that ship with processing.waves. Copy the code into Processing 4 to run.">
+  <meta name="description" content="Processing sketches that ship with processing.waves. Copy the code into Processing 4 to run.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
@@ -41,69 +41,11 @@
   </section>
 
   <div class="ex-page-header">
-    <p>Six Processing 4 sketches that ship with the library. Each one demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
+    <p>Six sketches ship with the library; five are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
     <p style="font-size:.85rem;font-style:italic;color:var(--text-muted);">Live demos on this page are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to get the same result.</p>
   </div>
 
   <main class="ex-list">
-
-    <!-- ── basic_demo ── -->
-    <section class="ex-block">
-      <div class="ex-head">
-        <h2>basic_demo</h2>
-        <span class="ex-tag">5-mode tour &middot; all features</span>
-      </div>
-      <p class="lead">The library tour. Press <kbd>1</kbd>&hellip;<kbd>5</kbd> to switch between five modes: (1) every wave drawn as its own row, (2) one sampler with shift, (3) morph swept by <code>mouseX</code>, (4) wild mode swept by <code>mouseX</code>, (5) a wave-as-velocity walker that lays a trail. <kbd>SPACE</kbd> reseeds.</p>
-      <div class="ex-static-note">No live preview: this sketch is interactive (keyboard + mouse switches between modes). Paste into Processing 4 to run.</div>
-      <div class="ex-links">
-        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/basic_demo/basic_demo.pde" target="_blank">View on GitHub &rarr;</a>
-      </div>
-      <pre class="ex-code-block">// basic_demo - 5-mode tour of processing.waves.
-// Press 1..5 to switch demo. Press SPACE to reseed.
-
-import waves.*;
-
-int demoMode = 1;
-int seed = 42;
-
-Waves.WaveSampler shiftSamp, morphSamp, walkerX, walkerY;
-float walkerPx, walkerPy;
-
-void setup() {
-  size(900, 500);
-  rebuild();
-}
-
-void rebuild() {
-  shiftSamp = Waves.createSampler(new WaveOpts()
-    .shift(true).seed(seed).amplitude(150).frequency(1)
-    .shiftInterval(2.5f).shiftDuration(1.0f));
-
-  morphSamp = Waves.createSampler(new WaveOpts()
-    .wave("classic sine", "mountain peaks").seed(seed).amplitude(150));
-
-  walkerX = Waves.createSampler(new WaveOpts()
-    .shift(true).group("gentle").amplitude(5).frequency(0.4f).seed(seed));
-  walkerY = Waves.createSampler(new WaveOpts()
-    .shift(true).group("gentle").amplitude(5).frequency(0.3f).seed(seed + 77));
-  walkerPx = width / 2f;
-  walkerPy = height / 2f;
-}
-
-void draw() {
-  if (demoMode != 5) background(20);
-  float t = millis() / 1000.0f;
-  switch (demoMode) {
-    case 1: drawAllWaves(t); break;
-    case 2: drawShift(t);    break;
-    case 3: drawMorph(t);    break;
-    case 4: drawWild(t);     break;
-    case 5: drawWalker(t);   break;
-  }
-}
-
-// (See full source on GitHub for the per-mode draw methods.)</pre>
-    </section>
 
     <!-- ── wave_shift ── -->
     <section class="ex-block">
