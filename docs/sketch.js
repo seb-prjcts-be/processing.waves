@@ -44,42 +44,102 @@ const WAVE_NAMES = [
 ];
 
 /* ------------------------------------------------------------
-   HERO - single drifting wave landscape
+   HERO - layered drifting wave landscape
+   ------------------------------------------------------------
+   Echoes the p5.waves hero (soft gray back-silhouettes under
+   bold filled colour ribbons), but carries the Signal Loom
+   "curation" palette instead of p5.waves' clean colours -
+   muddier reds/blues plus a VIOLET band that p5.waves doesn't
+   have, so this reads as the processing.waves sibling rather
+   than a copy. Background stays light gray to match the rest
+   of the (otherwise monochrome) site.
+
+   Sampler ranges are [-1,1] and scaled by canvas height at
+   draw time, so the composition stays proportional on resize
+   without rebuilding the samplers.
    ------------------------------------------------------------ */
+
+// Signal Loom palette (from SignalLoom.pde) - the "slightly dirty" cousins
+// of the p5.waves hero colours.
+const LOOM = {
+  DEEP:   [6, 71, 255],
+  SIGNAL: [255, 61, 46],
+  LIME:   [199, 255, 45],
+  VIOLET: [142, 81, 255],
+  AQUA:   [0, 189, 214]
+};
+
 function mountHero(host) {
   return new p5((p) => {
-    let sampler;
-    p.setup = () => {
-      const w = host.clientWidth;
-      const h = host.clientHeight;
-      p.createCanvas(w, h);
-      sampler = Waves.createSampler({
+    // Back layers: gray silhouettes filled down to the bottom edge.
+    const BG = [
+      { yPct: 0.60, amp: 0.10,  freq: 0.006, phase: 0,   seed: 10, gray: 225, alpha: 18 },
+      { yPct: 0.70, amp: 0.09,  freq: 0.009, phase: 1.4, seed: 11, gray: 205, alpha: 22 },
+      { yPct: 0.80, amp: 0.08,  freq: 0.012, phase: 2.8, seed: 12, gray: 180, alpha: 28 },
+      { yPct: 0.90, amp: 0.055, freq: 0.016, phase: 0.6, seed: 13, gray: 150, alpha: 40 }
+    ];
+    // Front layers: filled colour ribbons in the Loom palette.
+    const FG = [
+      { yPct: 0.55, amp: 0.20,  freq: 0.007, phase: 0.3, seed: 20, col: LOOM.DEEP,   alpha: 140, thick: 0.17 },
+      { yPct: 0.63, amp: 0.18,  freq: 0.010, phase: 1.8, seed: 21, col: LOOM.SIGNAL, alpha: 150, thick: 0.17 },
+      { yPct: 0.72, amp: 0.155, freq: 0.013, phase: 3.2, seed: 22, col: LOOM.LIME,   alpha: 160, thick: 0.17 },
+      { yPct: 0.80, amp: 0.145, freq: 0.015, phase: 0.9, seed: 23, col: LOOM.VIOLET, alpha: 170, thick: 0.17 },
+      { yPct: 0.88, amp: 0.12,  freq: 0.018, phase: 2.1, seed: 24, col: LOOM.AQUA,   alpha: 180, thick: 0.17 }
+    ];
+
+    let bgS = [], fgS = [];
+    let heroT = 0;
+
+    const makeSampler = (layer, i) =>
+      Waves.createSampler({
         shift: true,
-        shiftInterval: 4,
-        shiftDuration: 1.4,
-        group: "gentle",
-        amplitude: h * 0.18,
-        frequency: 0.012
+        shiftInterval: 3 + i,
+        shiftDuration: 1.3,
+        seed: layer.seed,
+        range: [-1, 1],
+        frequency: layer.freq,
+        phase: layer.phase
       });
+
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight);
+      bgS = BG.map(makeSampler);
+      fgS = FG.map(makeSampler);
     };
     p.windowResized = () => {
       p.resizeCanvas(host.clientWidth, host.clientHeight);
     };
     p.draw = () => {
       p.background(245);
-      p.noFill();
-      p.stroke(0, 30);
-      const t = p.millis() / 1000;
-      const rows = 14;
-      for (let r = 0; r < rows; r++) {
-        const yOff = p.height * (0.2 + 0.6 * (r / (rows - 1)));
+      p.noStroke();
+      heroT += 0.018;
+      const h = p.height;
+
+      BG.forEach((b, i) => {
+        const baseY = h * b.yPct;
+        p.fill(b.gray, b.alpha);
         p.beginShape();
-        for (let x = 0; x <= p.width; x += 4) {
-          const y = sampler.sample(x + r * 18, t + r * 0.2);
-          p.vertex(x, yOff + y);
+        p.vertex(0, h);
+        for (let x = 0; x <= p.width; x += 6) {
+          p.vertex(x, baseY + bgS[i].sample(x * 0.4, heroT) * b.amp * h);
         }
-        p.endShape();
-      }
+        p.vertex(p.width, h);
+        p.endShape(p.CLOSE);
+      });
+
+      FG.forEach((f, i) => {
+        const baseY = h * f.yPct;
+        const c = p.color(f.col[0], f.col[1], f.col[2], f.alpha);
+        p.fill(c);
+        p.beginShape();
+        for (let x = 0; x <= p.width; x += 3) {
+          p.vertex(x, baseY + fgS[i].sample(x * 0.4, heroT) * f.amp * h);
+        }
+        for (let x = p.width; x >= 0; x -= 3) {
+          p.vertex(x, baseY + f.thick * h);
+        }
+        p.endShape(p.CLOSE);
+      });
     };
   }, host);
 }
