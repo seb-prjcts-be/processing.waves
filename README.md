@@ -96,7 +96,7 @@ See the [full guide](https://seb-prjcts-be.github.io/processing.waves/guide.html
 
 ## Examples
 
-Six sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
+Twelve sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
 
 | Example | What it shows |
 | --- | --- |
@@ -106,6 +106,12 @@ Six sketches in [`examples/`](examples/). Open them from `Processing > File > Ex
 | [`flow_fields`](examples/flow_fields/flow_fields.pde) | ASCII flow field driven by a shifting sampler |
 | [`binary_field`](examples/binary_field/binary_field.pde) | Two samplers, summed and thresholded |
 | [`random_walker`](examples/random_walker/random_walker.pde) | Wave output IS the velocity, trails on `PGraphics` |
+| [`wave_params`](examples/wave_params/wave_params.pde) | Mouse drives frequency + amplitude, formula shifts on its own |
+| [`wild_mode`](examples/wild_mode/wild_mode.pde) | Stable vs wild side by side, mouse X = unpredictability |
+| [`time_strata`](examples/time_strata/time_strata.pde) | Time as a plain number: mouse X scrubs frozen HSB ribbons |
+| [`color_field`](examples/color_field/color_field.pde) | Six samplers driving a drifting RGB colour field |
+| [`spiky_lissajous`](examples/spiky_lissajous/spiky_lissajous.pde) | Period-exact Lissajous: spiky waves still close the path |
+| [`wave_volume_3d`](examples/wave_volume_3d/wave_volume_3d.pde) | P3D point volume breathing on three shift-samplers |
 
 Full descriptions and copyable source: <https://seb-prjcts-be.github.io/processing.waves/examples.html>.
 

@@ -242,7 +242,7 @@ function mountWavesPage() {
 }
 
 /* ------------------------------------------------------------
-   EXAMPLES PAGE - five live previews
+   EXAMPLES PAGE - eleven live previews
    Each mirrors a bundled .pde so visitors see exactly what the
    Java sketch produces when they paste the code into Processing.
    ------------------------------------------------------------ */
@@ -447,13 +447,344 @@ function mountRandomWalker(host) {
   }, host);
 }
 
+function mountWaveParams(host) {
+  return new p5((p) => {
+    const LINE_COUNT = 8;
+    let shiftSampler;
+    let t = 0;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.textFont("Consolas");
+      // Only used to get shifting wave names
+      shiftSampler = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 1.5, seed: 42 });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(245);
+      t += 0.015;
+      const freq = p.constrain(p.map(p.mouseX, 0, p.width, 0.15, 3.5), 0.15, 3.5);
+      const amp  = p.constrain(p.map(p.mouseY, 0, p.height, 120, 8), 8, 120);
+      shiftSampler.sample(0, t);
+      const waveName = shiftSampler.waveName;
+      for (let i = 0; i < LINE_COUNT; i++) {
+        const progress = i / (LINE_COUNT - 1);
+        const phase = i * 0.7;
+        const lineAmp = amp * (1 - progress * 0.5);
+        p.stroke(p.lerp(0, 200, progress));
+        p.strokeWeight(p.lerp(2.5, 0.8, progress));
+        p.noFill();
+        p.beginShape();
+        for (let x = 0; x <= p.width; x += 3) {
+          const val = Waves.wave(x, {
+            wave: waveName, t: t, amplitude: lineAmp,
+            frequency: freq * 0.01, phase: phase
+          });
+          p.vertex(x, p.height / 2 + val);
+        }
+        p.endShape();
+      }
+      p.noStroke(); p.fill(0); p.textSize(10);
+      p.textAlign(p.LEFT, p.TOP);
+      p.text(waveName, 8, 8);
+      p.textAlign(p.LEFT, p.BOTTOM);
+      p.text("frequency: " + freq.toFixed(2), 8, p.height - 8);
+      p.textAlign(p.RIGHT, p.BOTTOM);
+      p.text("amplitude: " + amp.toFixed(0), p.width - 8, p.height - 8);
+      p.stroke(0, 20); p.strokeWeight(0.5);
+      p.line(p.mouseX, 0, p.mouseX, p.height);
+      p.line(0, p.mouseY, p.width, p.mouseY);
+    };
+  }, host);
+}
+
+function mountWildMode(host) {
+  return new p5((p) => {
+    const COLS = 20, ROWS = 14;
+    let t = 0;
+    let wildWave;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.noStroke();
+      p.textFont("Consolas");
+      p.textAlign(p.CENTER);
+      wildWave = Math.floor(Math.random() * Waves.count);
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(238);
+      t += 0.012;
+      const cw = p.width / COLS;
+      const ch = (p.height - 24) / ROWS;
+      const maxR = Math.min(cw, ch) * 0.44;
+      const half = COLS / 2;
+      const unpred = p.constrain(p.map(p.mouseX, 0, p.width, 0, 1), 0, 1);
+      p.noStroke(); p.fill(0);
+      for (let row = 0; row < ROWS; row++) {
+        for (let col = 0; col < COLS; col++) {
+          const cx = (col + 0.5) * cw;
+          const cy = (row + 0.5) * ch;
+          const coord = col * 0.15 + row * 0.3;
+          const sz = (col < half)
+            ? Waves.wave(coord, { wave: wildWave, t: t, range: [3, maxR] })
+            : Waves.wave(coord, {
+                wave: wildWave, t: t, range: [3, maxR],
+                mode: "wild", unpredictability: unpred
+              });
+          p.circle(cx, cy, sz * 2);
+        }
+      }
+      p.stroke(0, 30); p.strokeWeight(1);
+      p.line(p.width / 2, 0, p.width / 2, p.height - 24);
+      p.noStroke(); p.fill(0); p.textSize(10);
+      p.text("stable", p.width / 4, p.height - 6);
+      p.text("wild  " + unpred.toFixed(2), 3 * p.width / 4, p.height - 6);
+    };
+  }, host);
+}
+
+function mountTimeStrata(host) {
+  return new p5((p) => {
+    const LAYERS = 16, WAVE_WINDOW = 6;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.colorMode(p.HSB, 360, 100, 100, 255);
+      p.textFont("Consolas");
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(0, 0, 96);
+      const timeBase = p.map(p.mouseX, 0, p.width, 0, 24);
+      p.noStroke();
+      for (let i = LAYERS - 1; i >= 0; i--) {
+        const layerT = timeBase + (i / LAYERS) * WAVE_WINDOW;
+        const y0 = p.map(i, 0, LAYERS - 1, 50, p.height - 50);
+        const wHue = (i * 22) % 360;
+        const alphaVal = p.map(i, 0, LAYERS - 1, 200, 60);
+        const freq = 0.6 + i * 0.08;
+        p.fill(wHue, 70, 85, alphaVal);
+        p.beginShape();
+        for (let x = 0; x <= p.width; x += 3) {
+          const dy = Waves.wave(x * 0.15, {
+            wave: "classic sine", t: layerT, amplitude: 25, frequency: freq
+          });
+          p.vertex(x, y0 + dy);
+        }
+        for (let x2 = p.width; x2 >= 0; x2 -= 3) {
+          const dy2 = Waves.wave(x2 * 0.15, {
+            wave: "classic sine", t: layerT + 0.3, amplitude: 15, frequency: freq
+          });
+          p.vertex(x2, y0 + dy2 + 22);
+        }
+        p.endShape(p.CLOSE);
+      }
+      p.fill(0); p.noStroke(); p.textSize(10);
+      p.textAlign(p.LEFT);
+      p.text("t = " + timeBase.toFixed(2), 12, 20);
+      p.text("move mouse", 12, 34);
+    };
+  }, host);
+}
+
+function mountColorField(host) {
+  return new p5((p) => {
+    let baseR, baseG, baseB, fieldR, fieldG, fieldB;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.noStroke();
+      p.textFont("Consolas");
+      baseR = Waves.createSampler({ shift: true, group: "gentle", range: [0, 155], frequency: 0.20, shiftInterval: 7, shiftDuration: 2 });
+      baseG = Waves.createSampler({ shift: true, group: "gentle", range: [0, 155], frequency: 0.17, shiftInterval: 8, shiftDuration: 2 });
+      baseB = Waves.createSampler({ shift: true, group: "gentle", range: [0, 155], frequency: 0.13, shiftInterval: 9, shiftDuration: 2 });
+      fieldR = Waves.createSampler({
+        shift: true,
+        group: ["classic sine", "triangle", "bumpy sine", "mountain peaks", "wobble sine"],
+        range: [0, 1], frequency: 0.08, shiftInterval: 4, shiftDuration: 1.5
+      });
+      fieldG = Waves.createSampler({
+        shift: true,
+        group: ["sine", "triangle", "squared sine", "valleys", "round linked sine"],
+        range: [0, 1], frequency: 0.06, shiftInterval: 5, shiftDuration: 1.5
+      });
+      fieldB = Waves.createSampler({
+        shift: true,
+        group: ["classic sine", "sharp peaks", "bumpy sine", "half sine", "smooth solid sine"],
+        range: [0, 1], frequency: 0.07, shiftInterval: 6, shiftDuration: 1.5
+      });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(245);
+      const cell = 8, top = 30;
+      const t = p.millis() / 1000;
+      const r0 = Math.floor(p.constrain(baseR.sample(0,   t), 0, 155));
+      const g0 = Math.floor(p.constrain(baseG.sample(100, t), 0, 155));
+      const b0 = Math.floor(p.constrain(baseB.sample(200, t), 0, 155));
+      for (let y = top; y < p.height; y += cell) {
+        for (let x = 0; x < p.width; x += cell) {
+          let rp = p.constrain(fieldR.sample(x + y * 0.35,        t), 0, 1);
+          let gp = p.constrain(fieldG.sample(x * 0.3 + y,         t), 0, 1);
+          let bp = p.constrain(fieldB.sample(x * 0.7 - y * 0.25,  t), 0, 1);
+          rp = p.lerp(rp, Math.random(), 0.15);
+          gp = p.lerp(gp, Math.random(), 0.15);
+          bp = p.lerp(bp, Math.random(), 0.15);
+          p.fill(r0 + rp * 100, g0 + gp * 100, b0 + bp * 100);
+          p.rect(x, y, cell, cell);
+        }
+      }
+      p.fill(20); p.textSize(11);
+      p.textAlign(p.LEFT, p.CENTER);
+      p.text("R " + r0 + "-" + (r0 + 100) +
+             "   G " + g0 + "-" + (g0 + 100) +
+             "   B " + b0 + "-" + (b0 + 100), 8, 12);
+    };
+  }, host);
+}
+
+function mountSpikyLissajous(host) {
+  return new p5((p) => {
+    const SPIKY = [
+      { name: "sharp peaks",   period: Math.PI * 10, color: [70, 220, 130] },
+      { name: "batman",        period: Math.PI * 20, color: [255, 70, 70] },
+      { name: "zig-zag sine",  period: Math.PI * 10, color: [60, 160, 255] },
+      { name: "up down pulse", period: Math.PI * 10, color: [250, 220, 40] }
+    ];
+    const RATIO_A = 3, RATIO_B = 5;
+    const SEGMENTS = 1400, CYCLE_MS = 4500;
+    let waveIdx = 0;
+    const xs = new Array(SEGMENTS + 1);
+    const ys = new Array(SEGMENTS + 1);
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.strokeJoin(p.ROUND);
+      p.noFill();
+      p.textFont("Consolas");
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(12);
+      p.translate(p.width / 2, p.height / 2);
+      const choice = SPIKY[waveIdx];
+      const period = choice.period;
+      const radius = Math.min(p.width, p.height) * 0.34;
+      // Freeze phase for one cycle so the pen draws a genuine closed loop.
+      const cycleId = Math.floor(p.millis() / CYCLE_MS);
+      const frozenMs = cycleId * CYCLE_MS;
+      const phaseX = frozenMs * 0.00015;
+      const phaseY = frozenMs * 0.00021;
+      const prog = (p.millis() % CYCLE_MS) / CYCLE_MS;
+      const drawnTo = Math.floor(prog * SEGMENTS);
+      for (let i = 0; i <= SEGMENTS; i++) {
+        const theta = (i / SEGMENTS) * period;
+        xs[i] = radius * Waves.wave(RATIO_A * theta + phaseX * period, { wave: choice.name, amplitude: 1 });
+        ys[i] = radius * Waves.wave(RATIO_B * theta + phaseY * period + period * 0.25, { wave: choice.name, amplitude: 1 });
+      }
+      // Dim ghost of the full closed loop.
+      p.noFill();
+      p.stroke(choice.color[0] * 0.22, choice.color[1] * 0.22, choice.color[2] * 0.22);
+      p.strokeWeight(1);
+      p.beginShape();
+      for (let i = 0; i <= SEGMENTS; i++) p.vertex(xs[i], ys[i]);
+      p.endShape(p.CLOSE);
+      // Bright pen trail up to the current progress.
+      p.stroke(choice.color[0], choice.color[1], choice.color[2]);
+      p.strokeWeight(1.4);
+      p.beginShape();
+      for (let i = 0; i <= drawnTo; i++) p.vertex(xs[i], ys[i]);
+      p.endShape();
+      // Start marker - the "home" the pen must return to.
+      const homeR = 12 + Math.sin(prog * p.TWO_PI) * 1.5;
+      p.noStroke();
+      p.fill(255); p.circle(xs[0], ys[0], homeR);
+      p.fill(18);  p.circle(xs[0], ys[0], homeR - 6);
+      // Pen cursor.
+      p.fill(255);
+      p.circle(xs[drawnTo], ys[drawnTo], 8);
+      // HUD
+      p.noStroke(); p.fill(220); p.textSize(12);
+      p.text(choice.name + "  /  ratio " + RATIO_A + ":" + RATIO_B,
+             -p.width / 2 + 18, -p.height / 2 + 24);
+      p.fill(120); p.textSize(10);
+      p.text("click to cycle wave  /  the pen returns to the white dot",
+             -p.width / 2 + 18, -p.height / 2 + 42);
+    };
+    p.mousePressed = () => {
+      if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+        waveIdx = (waveIdx + 1) % SPIKY.length;
+      }
+    };
+  }, host);
+}
+
+function mountWaveVolume3D(host) {
+  return new p5((p) => {
+    const N = 16, SPACING = 22;
+    const HALF = (N - 1) * SPACING / 2;
+    let samplerY, samplerX, samplerZ;
+    let rotAngle = 0;
+    let tilt = -0.5;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460, p.WEBGL);
+      p.frameRate(30);
+      p.noFill();
+      p.strokeWeight(4);
+      samplerY = Waves.createSampler({ shift: true, shiftInterval: 3, shiftDuration: 1.5, range: [-6, 6], frequency: 0.4,  seed: 0 });
+      samplerX = Waves.createSampler({ shift: true, shiftInterval: 4, shiftDuration: 1.2, range: [-3, 3], frequency: 0.3,  seed: 42 });
+      samplerZ = Waves.createSampler({ shift: true, shiftInterval: 5, shiftDuration: 1,   range: [-3, 3], frequency: 0.35, seed: 77 });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(12);
+      p.rotateX(tilt);
+      rotAngle += 0.005;
+      p.rotateY(rotAngle);
+      const t = p.millis() / 1000;
+      p.beginShape(p.POINTS);
+      for (let xi = 0; xi < N; xi++) {
+        for (let zi = 0; zi < N; zi++) {
+          const dy = samplerY.sample(xi * 0.9 + zi * 0.6, t);
+          const dx = samplerX.sample(zi * 0.8 + xi * 0.3, t * 0.85);
+          const dz = samplerZ.sample(xi * 0.7 + zi * 0.5, t * 0.7);
+          const surfaceRow = N / 2 + dy;
+          const thick = 2.5;
+          for (let yi = 0; yi < N; yi++) {
+            const gap = Math.abs(yi - surfaceRow);
+            if (gap < thick) {
+              const glow = 1 - gap / thick;
+              const bright = Math.round(80 + (yi / (N - 1)) * 175);
+              p.stroke(bright, bright, 255, 255 * glow);
+              p.vertex(
+                -HALF + xi * SPACING + dx * SPACING * 0.4,
+                -HALF + yi * SPACING,
+                -HALF + zi * SPACING + dz * SPACING * 0.4
+              );
+            }
+          }
+        }
+      }
+      p.endShape();
+    };
+    p.mouseDragged = () => {
+      if (p.mouseX >= 0 && p.mouseX <= p.width && p.mouseY >= 0 && p.mouseY <= p.height) {
+        rotAngle += (p.mouseX - p.pmouseX) * 0.01;
+        tilt     += (p.mouseY - p.pmouseY) * 0.01;
+      }
+    };
+  }, host);
+}
+
 function mountExamples() {
   const handlers = {
-    wave_shift:    mountWaveShift,
-    morph_wave:    mountMorphWave,
-    flow_fields:   mountFlowFields,
-    binary_field:  mountBinaryField,
-    random_walker: mountRandomWalker
+    wave_shift:      mountWaveShift,
+    morph_wave:      mountMorphWave,
+    flow_fields:     mountFlowFields,
+    binary_field:    mountBinaryField,
+    random_walker:   mountRandomWalker,
+    wave_params:     mountWaveParams,
+    wild_mode:       mountWildMode,
+    time_strata:     mountTimeStrata,
+    color_field:     mountColorField,
+    spiky_lissajous: mountSpikyLissajous,
+    wave_volume_3d:  mountWaveVolume3D
   };
   document.querySelectorAll("[data-example]").forEach((host) => {
     const fn = handlers[host.dataset.example];

@@ -41,7 +41,7 @@
   </section>
 
   <div class="ex-page-header">
-    <p>Six sketches ship with the library; five are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
+    <p>Twelve sketches ship with the library; eleven are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
     <p style="font-size:.85rem;font-style:italic;color:var(--text-muted);">Live demos on this page are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to get the same result.</p>
   </div>
 
@@ -405,6 +405,543 @@ void draw() {
   textFont(createFont("Consolas", 10));
   textAlign(LEFT);
   text(xWave.waveName() + " x " + yWave.waveName(), 8, 16);
+}</pre>
+    </section>
+
+    <!-- ── wave_params ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>wave_params</h2>
+        <span class="ex-tag">interactive &middot; frequency &middot; amplitude</span>
+      </div>
+      <p class="lead">Eight layered wave lines. Mouse X drives frequency, mouse Y drives amplitude, and the formula itself shifts automatically. Drag across the canvas to feel what each parameter does to the shape.</p>
+      <div class="ex-canvas-live" data-example="wave_params"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_params/wave_params.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Shape Parameters
+// mouseX = frequency, mouseY = amplitude.
+// Wave formula shifts automatically.
+// Drag to feel what each parameter does.
+
+import waves.*;
+
+final int LINE_COUNT = 8;
+
+Waves.WaveSampler shiftSampler;
+WaveOpts o;
+float t = 0;
+
+void setup() {
+  size(460, 460);
+  textFont(createFont("Consolas", 10));
+
+  // Only used to get shifting wave names
+  shiftSampler = Waves.createSampler(new WaveOpts()
+    .shift(true)
+    .shiftInterval(4)
+    .shiftDuration(1.5f)
+    .seed(42));
+
+  o = new WaveOpts();
+}
+
+void draw() {
+  background(245);
+  t += 0.015f;
+
+  // Mouse drives parameters
+  float freq = constrain(map(mouseX, 0, width, 0.15f, 3.5f), 0.15f, 3.5f);
+  float amp  = constrain(map(mouseY, 0, height, 120, 8), 8, 120);
+
+  // Ping the sampler to keep shift state updated
+  shiftSampler.sample(0, t);
+  String waveName = shiftSampler.waveName();
+
+  // Draw layered lines - each offset in phase for depth
+  for (int i = 0; i &lt; LINE_COUNT; i++) {
+    float progress = i / (float)(LINE_COUNT - 1);
+    float phase    = i * 0.7f;
+    float lineAmp  = amp * (1 - progress * 0.5f);
+    float gray     = lerp(0, 200, progress);
+    float weight   = lerp(2.5f, 0.8f, progress);
+
+    stroke(gray);
+    strokeWeight(weight);
+    noFill();
+    o.wave(waveName)
+     .t(t)
+     .amplitude(lineAmp)
+     .frequency(freq * 0.01f)
+     .phase(phase);
+    beginShape();
+    for (int x = 0; x &lt;= width; x += 3) {
+      float val = Waves.wave(x, o);
+      vertex(x, height / 2f + val);
+    }
+    endShape();
+  }
+
+  // Labels
+  noStroke();
+  fill(0);
+  textSize(10);
+  textAlign(LEFT, TOP);
+  text(waveName, 8, 8);
+
+  textAlign(LEFT, BOTTOM);
+  text("frequency: " + nf(freq, 1, 2), 8, height - 8);
+
+  textAlign(RIGHT, BOTTOM);
+  text("amplitude: " + round(amp), width - 8, height - 8);
+
+  // Crosshair
+  stroke(0, 20);
+  strokeWeight(0.5f);
+  line(mouseX, 0, mouseX, height);
+  line(0, mouseY, width, mouseY);
+}</pre>
+    </section>
+
+    <!-- ── wild_mode ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>wild_mode</h2>
+        <span class="ex-tag">wild mode &middot; unpredictability &middot; interactive</span>
+      </div>
+      <p class="lead">A grid of circles split down the middle. Left half: the wave as written. Right half: the same wave in wild mode. Mouse X is the unpredictability dial &mdash; drag right and feel the chaos build.</p>
+      <div class="ex-canvas-live" data-example="wild_mode"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wild_mode/wild_mode.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Wild Mode
+// Grid of circles: left half stable, right half wild.
+// mouseX controls unpredictability - drag to feel the chaos build.
+
+import waves.*;
+
+final int COLS = 20;
+final int ROWS = 14;
+
+float t = 0;
+int wildWave;
+WaveOpts stableOpts, wildOpts;
+
+void setup() {
+  size(460, 460);
+  noStroke();
+  textFont(createFont("Consolas", 10));
+  textAlign(CENTER);
+  wildWave = (int)random(Waves.count());
+
+  float cw = (float)width / COLS;
+  float ch = (height - 24) / (float)ROWS;
+  float maxR = min(cw, ch) * 0.44f;
+
+  stableOpts = new WaveOpts().wave(wildWave).range(3, maxR);
+  wildOpts   = new WaveOpts().wave(wildWave).range(3, maxR).mode("wild");
+}
+
+void draw() {
+  background(238);
+  t += 0.012f;
+  float cw = (float)width / COLS;
+  float ch = (height - 24) / (float)ROWS;
+  int half = COLS / 2;
+  float unpred = constrain(map(mouseX, 0, width, 0, 1), 0, 1);
+
+  stableOpts.t(t);
+  wildOpts.t(t).unpredictability(unpred);
+
+  fill(0);
+  for (int row = 0; row &lt; ROWS; row++) {
+    for (int col = 0; col &lt; COLS; col++) {
+      float cx = (col + 0.5f) * cw;
+      float cy = (row + 0.5f) * ch;
+      float coord = col * 0.15f + row * 0.3f;
+      WaveOpts o = (col &lt; half) ? stableOpts : wildOpts;
+      float sz = Waves.wave(coord, o);
+      circle(cx, cy, sz * 2);
+    }
+  }
+
+  stroke(0, 30);
+  strokeWeight(1);
+  line(width / 2f, 0, width / 2f, height - 24);
+  noStroke();
+  fill(0);
+  textSize(10);
+  text("stable", width / 4f, height - 6);
+  text("wild  " + nf(unpred, 1, 2), 3 * width / 4f, height - 6);
+}</pre>
+    </section>
+
+    <!-- ── time_strata ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>time_strata</h2>
+        <span class="ex-tag">manual time &middot; scrub &middot; HSB ribbons</span>
+      </div>
+      <p class="lead">Time is a plain number you pass in &mdash; the library never calls a clock. Sixteen filled ribbons, each frozen at its own moment in a 24-second window. Mouse X scrubs through the whole window like reading geological strata.</p>
+      <div class="ex-canvas-live" data-example="time_strata"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/time_strata/time_strata.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Time Strata
+// Time is a plain number - full manual control.
+// Mouse X scrubs a time window; each layer is frozen at its own t.
+// Layers are filled ribbons with HSB color, creating geological strata.
+
+import waves.*;
+
+final int   LAYERS      = 16;
+final float WAVE_WINDOW = 6;
+
+WaveOpts top, bottom;
+
+void setup() {
+  size(460, 460);
+  colorMode(HSB, 360, 100, 100, 255);
+  textFont(createFont("Consolas", 10));
+  top    = new WaveOpts().wave("classic sine").amplitude(25);
+  bottom = new WaveOpts().wave("classic sine").amplitude(15);
+}
+
+void draw() {
+  background(0, 0, 96);
+  float timeBase = map(mouseX, 0, width, 0, 24);
+
+  noStroke();
+  for (int i = LAYERS - 1; i &gt;= 0; i--) {
+    float layerT   = timeBase + (i / (float)LAYERS) * WAVE_WINDOW;
+    float y0       = map(i, 0, LAYERS - 1, 50, height - 50);
+    float wHue     = (i * 22) % 360;
+    float alphaVal = map(i, 0, LAYERS - 1, 200, 60);
+    float freq     = 0.6f + i * 0.08f;
+
+    fill(wHue, 70, 85, alphaVal);
+    top.t(layerT).frequency(freq);
+    bottom.t(layerT + 0.3f).frequency(freq);
+
+    beginShape();
+    for (int x = 0; x &lt;= width; x += 3) {
+      float dy = Waves.wave(x * 0.15f, top);
+      vertex(x, y0 + dy);
+    }
+    for (int x2 = width; x2 &gt;= 0; x2 -= 3) {
+      float dy2 = Waves.wave(x2 * 0.15f, bottom);
+      vertex(x2, y0 + dy2 + 22);
+    }
+    endShape(CLOSE);
+  }
+
+  // time cursor label
+  fill(0);
+  noStroke();
+  textSize(10);
+  textAlign(LEFT);
+  text("t = " + nf(timeBase, 1, 2), 12, 20);
+  text("move mouse", 12, 34);
+}</pre>
+    </section>
+
+    <!-- ── color_field ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>color_field</h2>
+        <span class="ex-tag">six samplers &middot; groups &middot; colour</span>
+      </div>
+      <p class="lead">A wave-driven take on <code>random(155) + 100</code>. Three slow base samplers set a per-channel floor; three faster field samplers add 0&ndash;100 on top, per cell. Every channel drifts inside a moving 100-wide window &mdash; static, but organised.</p>
+      <div class="ex-canvas-live" data-example="color_field"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/color_field/color_field.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Static Field
+// A wave-driven take on `random(155) + 100`.
+// Three slow base samplers set a per-channel floor in [0, 155].
+// Three faster field samplers add 0 to 100 on top, per cell.
+// Each channel stays inside a moving 100-wide window that drifts and morphs.
+
+import waves.*;
+
+Waves.WaveSampler baseR, baseG, baseB;
+Waves.WaveSampler fieldR, fieldG, fieldB;
+
+void setup() {
+  size(460, 460);
+  noStroke();
+  textFont(createFont("Consolas", 11));
+
+  baseR = Waves.createSampler(new WaveOpts()
+    .shift(true).group("gentle")
+    .range(0, 155).frequency(0.20f)
+    .shiftInterval(7).shiftDuration(2));
+  baseG = Waves.createSampler(new WaveOpts()
+    .shift(true).group("gentle")
+    .range(0, 155).frequency(0.17f)
+    .shiftInterval(8).shiftDuration(2));
+  baseB = Waves.createSampler(new WaveOpts()
+    .shift(true).group("gentle")
+    .range(0, 155).frequency(0.13f)
+    .shiftInterval(9).shiftDuration(2));
+
+  fieldR = Waves.createSampler(new WaveOpts()
+    .shift(true)
+    .group(new String[]{ "classic sine", "triangle", "bumpy sine", "mountain peaks", "wobble sine" })
+    .range(0, 1).frequency(0.08f)
+    .shiftInterval(4).shiftDuration(1.5f));
+  fieldG = Waves.createSampler(new WaveOpts()
+    .shift(true)
+    .group(new String[]{ "sine", "triangle", "squared sine", "valleys", "round linked sine" })
+    .range(0, 1).frequency(0.06f)
+    .shiftInterval(5).shiftDuration(1.5f));
+  fieldB = Waves.createSampler(new WaveOpts()
+    .shift(true)
+    .group(new String[]{ "classic sine", "sharp peaks", "bumpy sine", "half sine", "smooth solid sine" })
+    .range(0, 1).frequency(0.07f)
+    .shiftInterval(6).shiftDuration(1.5f));
+}
+
+void draw() {
+  background(245);
+  int   cell = 8;
+  int   top  = 30;
+  float t    = millis() / 1000.0f;
+
+  int r0 = floor(constrain(baseR.sample(0,   t), 0, 155));
+  int g0 = floor(constrain(baseG.sample(100, t), 0, 155));
+  int b0 = floor(constrain(baseB.sample(200, t), 0, 155));
+
+  for (int y = top; y &lt; height; y += cell) {
+    for (int x = 0; x &lt; width; x += cell) {
+      float rp = constrain(fieldR.sample(x + y * 0.35f,        t), 0, 1);
+      float gp = constrain(fieldG.sample(x * 0.3f + y,         t), 0, 1);
+      float bp = constrain(fieldB.sample(x * 0.7f - y * 0.25f, t), 0, 1);
+
+      rp = lerp(rp, random(1), 0.15f);
+      gp = lerp(gp, random(1), 0.15f);
+      bp = lerp(bp, random(1), 0.15f);
+
+      fill(r0 + rp * 100, g0 + gp * 100, b0 + bp * 100);
+      rect(x, y, cell, cell);
+    }
+  }
+
+  fill(20);
+  textSize(11);
+  textAlign(LEFT, CENTER);
+  text("R " + r0 + "-" + (r0 + 100) +
+       "   G " + g0 + "-" + (g0 + 100) +
+       "   B " + b0 + "-" + (b0 + 100), 8, 12);
+}</pre>
+    </section>
+
+    <!-- ── spiky_lissajous ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>spiky_lissajous</h2>
+        <span class="ex-tag">periodicity &middot; closed path &middot; interactive</span>
+      </div>
+      <p class="lead">A classic 3:5 Lissajous curve, but <code>sin()</code> is replaced by a spiky wave formula. The pen traces one period-exact cycle and lands back on the start marker &mdash; proof that <code>wave(0) == wave(A &times; period)</code>, so even sawtooth paths close. Click the canvas to cycle waves.</p>
+      <div class="ex-canvas-live" data-example="spiky_lissajous"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/spiky_lissajous/spiky_lissajous.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Spiky Lissajous
+// A classic a:b Lissajous curve, but sin() is replaced by a spiky
+// wave formula. The pen traces the curve over one frozen-phase cycle,
+// then lands exactly back on the start marker - proof that even with
+// spikes or sawtooth edges, wave(0) == wave(A * period) for integer A,
+// so the path closes.
+
+import waves.*;
+
+final String[] SPIKY_NAMES   = { "sharp peaks", "batman", "zig-zag sine", "up down pulse" };
+final float[]  SPIKY_PERIODS = { PI * 10, PI * 20, PI * 10, PI * 10 };
+final int[][]  SPIKY_COLORS  = {
+  { 70, 220, 130 },
+  { 255, 70, 70 },
+  { 60, 160, 255 },
+  { 250, 220, 40 }
+};
+
+final int RATIO_A  = 3;
+final int RATIO_B  = 5;
+final int SEGMENTS = 1400;
+final int CYCLE_MS = 4500;
+
+int waveIdx = 0;
+float[] xs = new float[SEGMENTS + 1];
+float[] ys = new float[SEGMENTS + 1];
+WaveOpts o = new WaveOpts().amplitude(1);
+
+void setup() {
+  size(720, 720);
+  strokeJoin(ROUND);
+  noFill();
+  textFont(createFont("Consolas", 12));
+}
+
+void draw() {
+  background(12);
+  translate(width / 2f, height / 2f);
+
+  String name   = SPIKY_NAMES[waveIdx];
+  float  period = SPIKY_PERIODS[waveIdx];
+  int[]  col    = SPIKY_COLORS[waveIdx];
+  float  radius = min(width, height) * 0.34f;
+
+  // Freeze phase for one cycle so the pen draws a genuine closed loop
+  // and literally returns to (xs[0], ys[0]) at prog = 1.
+  int   cycleId  = millis() / CYCLE_MS;
+  float frozenMs = cycleId * (float)CYCLE_MS;
+  float phaseX   = frozenMs * 0.00015f;
+  float phaseY   = frozenMs * 0.00021f;
+  float prog     = (millis() % CYCLE_MS) / (float)CYCLE_MS;
+  int   drawnTo  = floor(prog * SEGMENTS);
+
+  o.wave(name);
+  for (int i = 0; i &lt;= SEGMENTS; i++) {
+    float theta = (i / (float)SEGMENTS) * period;
+    xs[i] = radius * Waves.wave(RATIO_A * theta + phaseX * period, o);
+    ys[i] = radius * Waves.wave(RATIO_B * theta + phaseY * period + period * 0.25f, o);
+  }
+
+  // Dim ghost of the full closed loop - proves the target doesn't move.
+  noFill();
+  stroke(col[0] * 0.22f, col[1] * 0.22f, col[2] * 0.22f);
+  strokeWeight(1);
+  beginShape();
+  for (int i = 0; i &lt;= SEGMENTS; i++) vertex(xs[i], ys[i]);
+  endShape(CLOSE);
+
+  // Bright pen trail up to the current progress.
+  stroke(col[0], col[1], col[2]);
+  strokeWeight(1.4f);
+  beginShape();
+  for (int i = 0; i &lt;= drawnTo; i++) vertex(xs[i], ys[i]);
+  endShape();
+
+  // Start marker - the "home" the pen must return to.
+  float homeR = 12 + sin(prog * TWO_PI) * 1.5f;
+  noStroke();
+  fill(255); circle(xs[0], ys[0], homeR);
+  fill(18);  circle(xs[0], ys[0], homeR - 6);
+
+  // Pen cursor - the moving tip.
+  fill(255);
+  circle(xs[drawnTo], ys[drawnTo], 8);
+
+  // HUD
+  noStroke();
+  fill(220);
+  textSize(12);
+  text(name + "  /  ratio " + RATIO_A + ":" + RATIO_B,
+       -width / 2f + 18, -height / 2f + 24);
+  fill(120);
+  textSize(10);
+  text("click to cycle wave  /  the pen returns to the white dot",
+       -width / 2f + 18, -height / 2f + 42);
+}
+
+void mousePressed() {
+  waveIdx = (waveIdx + 1) % SPIKY_NAMES.length;
+}</pre>
+    </section>
+
+    <!-- ── wave_volume_3d ── -->
+    <section class="ex-block">
+      <div class="ex-head">
+        <h2>wave_volume_3d</h2>
+        <span class="ex-tag">P3D &middot; three samplers &middot; volume</span>
+      </div>
+      <p class="lead">A 16&times;16&times;16 point volume in P3D. Three desynchronised shift-samplers &mdash; one per axis &mdash; make the glowing surface breathe, drift sideways, and pulse in depth. The volume turns on its own; drag to rotate by hand.</p>
+      <div class="ex-canvas-live" data-example="wave_volume_3d"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_volume_3d/wave_volume_3d.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// 3D Wave Volume (P3D)
+// 16x16 grid with 3 shift-samplers - one per axis.
+// Every axis breathes independently, creating a living 3D volume.
+// Drag to rotate by hand; the volume also turns on its own.
+
+import waves.*;
+
+final int   N       = 16;
+final float SPACING = 22;
+final float HALF    = (N - 1) * SPACING / 2;
+
+Waves.WaveSampler samplerY, samplerX, samplerZ;
+float rotAngle = 0;
+float tilt     = -0.5f;
+
+void setup() {
+  size(460, 460, P3D);
+  frameRate(30);
+  noFill();
+  strokeWeight(4);
+
+  // Three desynchronised shift-samplers - each axis has its own wave life
+  samplerY = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(3).shiftDuration(1.5f)
+    .range(-6, 6).frequency(0.4f).seed(0));
+
+  samplerX = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(4).shiftDuration(1.2f)
+    .range(-3, 3).frequency(0.3f).seed(42));
+
+  samplerZ = Waves.createSampler(new WaveOpts()
+    .shift(true).shiftInterval(5).shiftDuration(1)
+    .range(-3, 3).frequency(0.35f).seed(77));
+}
+
+void draw() {
+  background(12);
+  translate(width / 2f, height / 2f);
+  rotateX(tilt);
+  rotAngle += 0.005f;
+  rotateY(rotAngle);
+
+  float t = millis() / 1000.0f;
+
+  beginShape(POINTS);
+  for (int xi = 0; xi &lt; N; xi++) {
+    for (int zi = 0; zi &lt; N; zi++) {
+      // Y: main surface displacement - full range across the cube
+      float dy = samplerY.sample(xi * 0.9f + zi * 0.6f, t);
+
+      // X: horizontal breathing - points drift sideways
+      float dx = samplerX.sample(zi * 0.8f + xi * 0.3f, t * 0.85f);
+
+      // Z: depth warping - grid pulses in and out
+      float dz = samplerZ.sample(xi * 0.7f + zi * 0.5f, t * 0.7f);
+
+      // Map dy to a grid row and spread points around the surface
+      float surfaceRow = N / 2f + dy;
+      float thick = 2.5f;
+
+      for (int yi = 0; yi &lt; N; yi++) {
+        float gap = abs(yi - surfaceRow);
+        if (gap &lt; thick) {
+          float glow   = 1 - gap / thick;
+          int   bright = round(80 + (yi / (float)(N - 1)) * 175);
+          stroke(bright, bright, 255, 255 * glow);
+          vertex(
+            -HALF + xi * SPACING + dx * SPACING * 0.4f,
+            -HALF + yi * SPACING,
+            -HALF + zi * SPACING + dz * SPACING * 0.4f
+          );
+        }
+      }
+    }
+  }
+  endShape();
+}
+
+// Drag to rotate the volume by hand
+void mouseDragged() {
+  rotAngle += (mouseX - pmouseX) * 0.01f;
+  tilt     += (mouseY - pmouseY) * 0.01f;
 }</pre>
     </section>
 
