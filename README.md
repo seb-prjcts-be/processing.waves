@@ -1,6 +1,6 @@
 # processing.waves
 
-**[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)**
+**[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)** · **[Wave Lab (exports .pde)](https://seb-prjcts-be.github.io/p5.waves_lab/)**
 
 Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
 
@@ -114,6 +114,8 @@ Twelve sketches in [`examples/`](examples/). Open them from `Processing > File >
 | [`wave_volume_3d`](examples/wave_volume_3d/wave_volume_3d.pde) | P3D point volume breathing on three shift-samplers |
 
 Full descriptions and copyable source: <https://seb-prjcts-be.github.io/processing.waves/examples.html>.
+
+Prefer to start visually? The [p5.waves Lab](https://seb-prjcts-be.github.io/p5.waves_lab/) (v2.0.0+) lets you tune seven scenes live in the browser and export each one as a ready-to-run `.pde` — the preview is numerically identical to what Processing renders.
 
 ## Build
 
