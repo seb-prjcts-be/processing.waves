@@ -2,7 +2,7 @@
 
 **[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)** · **[Wave Lab (exports .pde)](https://seb-prjcts-be.github.io/p5.waves_lab/)**
 
-Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.3.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
+Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.4.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
 
 ## About
 
@@ -96,13 +96,14 @@ See the [full guide](https://seb-prjcts-be.github.io/processing.waves/guide.html
 
 ## Examples
 
-Twelve sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
+Thirteen sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
 
 | Example | What it shows |
 | --- | --- |
 | [`basic_demo`](examples/basic_demo/basic_demo.pde) | 5-mode tour: all waves, shift, morph, wild, walker |
 | [`wave_shift`](examples/wave_shift/wave_shift.pde) | Filled ribbons, auto-shifting |
 | [`morph_wave`](examples/morph_wave/morph_wave.pde) | Horizontal lines blending two formulas |
+| [`seamless_closing`](examples/seamless_closing/seamless_closing.pde) | Shifting ring that never tears its seam: `group("closing")` + `period()` |
 | [`flow_fields`](examples/flow_fields/flow_fields.pde) | ASCII flow field driven by a shifting sampler |
 | [`binary_field`](examples/binary_field/binary_field.pde) | Two samplers, summed and thresholded |
 | [`random_walker`](examples/random_walker/random_walker.pde) | Wave output IS the velocity, trails on `PGraphics` |

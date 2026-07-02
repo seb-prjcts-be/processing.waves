@@ -320,6 +320,56 @@ function mountMorphWave(host) {
   }, host);
 }
 
+/* ------------------------------------------------------------
+   Example: seamless_closing
+   ------------------------------------------------------------ */
+function mountSeamlessClosing(host) {
+  return new p5((p) => {
+    const LOBES = 6;     // base-period repeats around the ring
+    const SEGS = 3000;   // dense enough for the shortest closing wave
+    let ring;
+    let t = 0;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.strokeJoin(p.ROUND);
+      p.textFont("Consolas");
+      ring = Waves.createSampler({
+        shift: true, shiftInterval: 3, shiftDuration: 1.4,
+        group: "closing", amplitude: 1
+      });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(12);
+      t += 0.02;
+      // ring.period comes straight from the library: 62.8319 for the
+      // closing pool - stable through every shift.
+      const sweep  = ring.period * LOBES;
+      const radius = Math.min(p.width, p.height) * 0.28;
+      const wobble = Math.min(p.width, p.height) * 0.10;
+      const col = p.lerpColor(p.color(60, 200, 255), p.color(255, 80, 120), ring.mix);
+      p.push();
+      p.translate(p.width / 2, p.height / 2);
+      p.noFill();
+      p.stroke(col);
+      p.strokeWeight(1.6);
+      p.beginShape();
+      for (let i = 0; i < SEGS; i++) {
+        const frac = i / SEGS;
+        const angle = frac * p.TWO_PI;
+        const r = radius + ring.sample(frac * sweep, t) * wobble;
+        p.vertex(p.cos(angle) * r, p.sin(angle) * r);
+      }
+      p.endShape(p.CLOSE);
+      p.pop();
+      p.noStroke();
+      p.fill(220);
+      p.textSize(11);
+      p.text(ring.waveName, 8, 16);
+    };
+  }, host);
+}
+
 function mountFlowFields(host) {
   return new p5((p) => {
     const COLS = 30, ROWS = 30;
@@ -776,6 +826,7 @@ function mountExamples() {
   const handlers = {
     wave_shift:      mountWaveShift,
     morph_wave:      mountMorphWave,
+    seamless_closing: mountSeamlessClosing,
     flow_fields:     mountFlowFields,
     binary_field:    mountBinaryField,
     random_walker:   mountRandomWalker,

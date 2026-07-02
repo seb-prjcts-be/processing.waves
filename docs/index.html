@@ -69,7 +69,7 @@
     <div class="section-header">
       <div class="section-tag">examples/</div>
       <h2>See it in <span class="accent">action</span></h2>
-      <p class="section-desc">Twelve sketches ship with the library; eleven are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
+      <p class="section-desc">Thirteen sketches ship with the library; twelve are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, shift-proof closing rings, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
       <p class="section-desc" style="font-size:.78rem;margin-top:1rem;font-style:italic;">Live demos below are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to get the same result.</p>
       <p class="section-desc" style="font-size:.78rem;margin-top:.5rem;font-style:italic;">Prefer to compose your own? The <a href="https://seb-prjcts-be.github.io/p5.waves_lab/" target="_blank">p5.waves Lab</a> lets you tune seven scenes live in the browser and export each one as a ready-to-run <code>.pde</code>.</p>
     </div>
@@ -199,6 +199,82 @@ void draw() {
   fill(255, 0, 0);
   textAlign(RIGHT);
   text(WAVE_B, width - 8, height - 8);
+}</pre>
+      </section>
+
+      <!-- seamless_closing -->
+      <section class="ex-block">
+        <div class="ex-head">
+          <h2>seamless_closing</h2>
+          <span class="ex-tag">shift &middot; group: "closing" &middot; period</span>
+        </div>
+        <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave - every formula has its own period. The <code>"closing"</code> pool fixes that: all 17 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
+        <div class="ex-canvas-live" data-example="seamless_closing"></div>
+        <div class="ex-links">
+          <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/seamless_closing/seamless_closing.pde" target="_blank">View on GitHub &rarr;</a>
+        </div>
+        <pre class="ex-code-block">// Seamless Closing
+// A ring sampled with shift normally tears its seam open the moment it
+// lands on a new wave - every formula has its own period. The "closing"
+// pool fixes that: all 17 waves in it share one base period, so a sweep
+// of ring.period() * LOBES closes through every morph. The loop keeps
+// changing shape and never shows a seam.
+
+import waves.*;
+
+final int LOBES = 6;     // base-period repeats around the ring
+final int SEGS  = 3000;  // dense enough for the shortest closing wave
+
+Waves.WaveSampler ring;
+float t = 0;
+
+void setup() {
+  size(600, 600);
+  strokeJoin(ROUND);
+  textFont(createFont("Consolas", 12));
+
+  ring = Waves.createSampler(new WaveOpts()
+    .shift(true)
+    .shiftInterval(3)
+    .shiftDuration(1.4f)
+    .group("closing")
+    .amplitude(1));
+}
+
+void draw() {
+  background(12);
+  translate(width / 2f, height / 2f);
+
+  t += 0.02;
+
+  // ring.period() comes straight from the library: 62.8319 for the
+  // closing pool - stable through every shift. You never type it.
+  float sweep  = ring.period() * LOBES;
+  float radius = width * 0.28f;
+  float wobble = width * 0.10f;
+
+  // Cyan at rest, warming to pink mid-morph.
+  color cold = color(60, 200, 255);
+  color warm = color(255, 80, 120);
+  stroke(lerpColor(cold, warm, ring.mix()));
+  strokeWeight(1.6f);
+  noFill();
+
+  beginShape();
+  for (int i = 0; i &lt; SEGS; i++) {
+    float frac  = i / (float)SEGS;
+    float angle = frac * TWO_PI;
+    float r     = radius + ring.sample(frac * sweep, t) * wobble;
+    vertex(cos(angle) * r, sin(angle) * r);
+  }
+  endShape(CLOSE);
+
+  // HUD
+  noStroke();
+  fill(220);
+  textSize(12);
+  text(ring.waveName() + (ring.shifting() ? "  to  " + ring.targetName() : ""),
+       -width / 2f + 18, -height / 2f + 24);
 }</pre>
       </section>
 
@@ -1014,7 +1090,7 @@ void draw() {
 
   <!-- FOOTER -->
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
     <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 

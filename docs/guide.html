@@ -28,7 +28,7 @@
 
   <main class="guide-wrap">
     <h1>Guide</h1>
-    <p class="guide-intro">Everything you need to use <strong>processing.waves</strong> in Processing 4. The API mirrors <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> v3.3.0, with Java fluent builders in place of JS object literals.</p>
+    <p class="guide-intro">Everything you need to use <strong>processing.waves</strong> in Processing 4. The API mirrors <a href="https://seb-prjcts-be.github.io/p5.waves/" target="_blank">p5.waves</a> v3.4.0, with Java fluent builders in place of JS object literals.</p>
 
     <div class="guide-quicklinks">
       <a class="guide-chip" href="#install">Install</a>
@@ -269,7 +269,7 @@ void draw() {
   }
   endShape(CLOSE);
 }</pre>
-    <p><code>sampler.period()</code> returns the current wave's measured period as a <code>Float</code> - the stable base period for a closing pool, <code>null</code> for non-periodic waves. So you read the sweep length straight off the sampler instead of hard-coding a number per wave.</p>
+    <p><code>sampler.period()</code> and <code>sampler.targetPeriod()</code> report the current and next wave's measured period as a <code>Float</code> - both return the stable base period for a closing pool, <code>null</code> for non-periodic waves (and <code>targetPeriod()</code> also before the first <code>sample()</code> call or on non-shift samplers). So you read the sweep length straight off the sampler instead of hard-coding a number per wave.</p>
     <div class="callout"><p><strong>Experimental</strong> (since p5.waves 3.3.0). Period values may drift by ~0.001 in minor versions. Perfect for visuals; not for plotters, CNC, or anything that gets angry about sub-unit drift.</p></div>
 
     <!-- ── MORPH ── -->
@@ -360,13 +360,13 @@ float hue = Waves.wave(x, new WaveOpts().wave("noise").range(0, 360));</pre>
 
     <!-- ── PORT NOTES ── -->
     <h2 id="port-notes">Port notes: Java vs JS</h2>
-    <p>The library is a byte-for-byte numerical port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0. Where the languages differ, we kept the semantics. Differences worth knowing:</p>
+    <p>The library is a byte-for-byte numerical port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0. Where the languages differ, we kept the semantics. Differences worth knowing:</p>
     <ul class="step-list">
       <li><p><strong>No runtime string evaluator.</strong> JS uses <code>new Function(algoString)</code> to evaluate wave formulas at runtime. Java replaces this with hand-translated lambdas, one per wave. The string-eval feature was never exposed via the public API, so no functional difference.</p></li>
       <li><p><strong>Internal math runs in <code>double</code></strong> (matching JS Numbers) but the public API returns <code>float</code> (Processing convention). Result: visually identical to JS, with sub-pixel match where deterministic.</p></li>
       <li><p><strong>FNV-1a seed + mulberry32 PRNG ported 1:1.</strong> <code>seedFrom()</code> returns the unsigned uint32 as a <code>long</code> so subsequent float math matches JS's unsigned-Number semantics.</p></li>
       <li><p><strong>Shift entropy.</strong> <code>shift(true)</code> uses <code>Math.random()</code> for per-session entropy, outputs are non-deterministic across runs, same as JS.</p></li>
-      <li><p><strong>Sampler getters.</strong> <code>waveIndex()</code>, <code>waveName()</code>, <code>targetName()</code>, <code>mix()</code>, <code>shifting()</code> and <code>period()</code> are ported as methods (JS exposes them as properties). JS's <code>sampler.targetPeriod</code> getter is not ported - it only matters for the closing pool, where <code>period()</code> already returns the shared base period through every shift.</p></li>
+      <li><p><strong>Sampler getters.</strong> <code>waveIndex()</code>, <code>waveName()</code>, <code>targetName()</code>, <code>mix()</code>, <code>shifting()</code>, <code>period()</code> and <code>targetPeriod()</code> are ported as methods (JS exposes them as properties).</p></li>
       <li><p><strong>Validated.</strong> A 35-case validator in <code>/tests</code> runs the JS reference via Node and compares against the Java output. Tolerance: <code>1e-3</code> for stable mode, <code>0.5</code> for wild mode (small float vs double differences amplify through noise modulation).</p></li>
     </ul>
 
@@ -466,7 +466,7 @@ void draw() {
   </main>
 
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.3.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
     <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
