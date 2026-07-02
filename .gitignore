@@ -29,3 +29,6 @@ Thumbs.db
 
 # Internal submission checklist (maintainer-only)
 SUBMITTING.md
+
+# Local agent working notes (maintainer-only)
+CLAUDE.md
