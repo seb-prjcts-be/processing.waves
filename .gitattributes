@@ -1,0 +1,21 @@
+# Normalize line endings: repo stores LF, working tree follows platform/editor.
+* text=auto
+
+# Explicit text types
+*.java text
+*.pde  text
+*.js   text
+*.cjs  text
+*.html text
+*.css  text
+*.md   text
+*.tsv  text
+*.ps1  text
+*.properties text
+
+# Binaries: never touch
+*.jar binary
+*.zip binary
+*.png binary
+*.jpg binary
+*.gif binary
