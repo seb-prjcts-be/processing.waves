@@ -1,7 +1,7 @@
 // Spiky Lissajous
 // A classic a:b Lissajous curve, but sin() is replaced by a spiky
 // wave formula. The pen traces the curve over one frozen-phase cycle,
-// then lands exactly back on the start marker - proof that even with
+// then lands exactly back on the start marker — proof that even with
 // spikes or sawtooth edges, wave(0) == wave(A * period) for integer A,
 // so the path closes.
 
@@ -58,7 +58,7 @@ void draw() {
     ys[i] = radius * Waves.wave(RATIO_B * theta + phaseY * period + period * 0.25f, o);
   }
 
-  // Dim ghost of the full closed loop - proves the target doesn't move.
+  // Dim ghost of the full closed loop — proves the target doesn't move.
   noFill();
   stroke(col[0] * 0.22f, col[1] * 0.22f, col[2] * 0.22f);
   strokeWeight(1);
@@ -73,13 +73,13 @@ void draw() {
   for (int i = 0; i <= drawnTo; i++) vertex(xs[i], ys[i]);
   endShape();
 
-  // Start marker - the "home" the pen must return to.
+  // Start marker — the "home" the pen must return to.
   float homeR = 12 + sin(prog * TWO_PI) * 1.5f;
   noStroke();
   fill(255); circle(xs[0], ys[0], homeR);
   fill(18);  circle(xs[0], ys[0], homeR - 6);
 
-  // Pen cursor - the moving tip.
+  // Pen cursor — the moving tip.
   fill(255);
   circle(xs[drawnTo], ys[drawnTo], 8);
 

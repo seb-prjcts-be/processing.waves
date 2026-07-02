@@ -37,7 +37,7 @@ void draw() {
   shiftSampler.sample(0, t);
   String waveName = shiftSampler.waveName();
 
-  // Draw layered lines - each offset in phase for depth
+  // Draw layered lines — each offset in phase for depth
   for (int i = 0; i < LINE_COUNT; i++) {
     float progress = i / (float)(LINE_COUNT - 1);
     float phase    = i * 0.7f;

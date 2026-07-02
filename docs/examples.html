@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Examples - processing.waves</title>
+  <title>Examples &mdash; processing.waves</title>
   <meta name="description" content="Processing sketches that ship with processing.waves. Copy the code into Processing 4 to run.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -179,14 +179,14 @@ void draw() {
         <h2>seamless_closing</h2>
         <span class="ex-tag">shift &middot; group: "closing" &middot; period</span>
       </div>
-      <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave - every formula has its own period. The <code>"closing"</code> pool fixes that: all 17 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
+      <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave &mdash; every formula has its own period. The <code>"closing"</code> pool fixes that: all 17 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
       <div class="ex-canvas-live" data-example="seamless_closing"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/seamless_closing/seamless_closing.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
       <pre class="ex-code-block">// Seamless Closing
 // A ring sampled with shift normally tears its seam open the moment it
-// lands on a new wave - every formula has its own period. The "closing"
+// lands on a new wave — every formula has its own period. The "closing"
 // pool fixes that: all 17 waves in it share one base period, so a sweep
 // of ring.period() * LOBES closes through every morph. The loop keeps
 // changing shape and never shows a seam.
@@ -219,7 +219,7 @@ void draw() {
   t += 0.02;
 
   // ring.period() comes straight from the library: 62.8319 for the
-  // closing pool - stable through every shift. You never type it.
+  // closing pool — stable through every shift. You never type it.
   float sweep  = ring.period() * LOBES;
   float radius = width * 0.28f;
   float wobble = width * 0.10f;
@@ -534,7 +534,7 @@ void draw() {
   shiftSampler.sample(0, t);
   String waveName = shiftSampler.waveName();
 
-  // Draw layered lines - each offset in phase for depth
+  // Draw layered lines — each offset in phase for depth
   for (int i = 0; i &lt; LINE_COUNT; i++) {
     float progress = i / (float)(LINE_COUNT - 1);
     float phase    = i * 0.7f;
@@ -592,7 +592,7 @@ void draw() {
       </div>
       <pre class="ex-code-block">// Wild Mode
 // Grid of circles: left half stable, right half wild.
-// mouseX controls unpredictability - drag to feel the chaos build.
+// mouseX controls unpredictability — drag to feel the chaos build.
 
 import waves.*;
 
@@ -664,7 +664,7 @@ void draw() {
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/time_strata/time_strata.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
       <pre class="ex-code-block">// Time Strata
-// Time is a plain number - full manual control.
+// Time is a plain number — full manual control.
 // Mouse X scrubs a time window; each layer is frozen at its own t.
 // Layers are filled ribbons with HSB color, creating geological strata.
 
@@ -826,7 +826,7 @@ void draw() {
       <pre class="ex-code-block">// Spiky Lissajous
 // A classic a:b Lissajous curve, but sin() is replaced by a spiky
 // wave formula. The pen traces the curve over one frozen-phase cycle,
-// then lands exactly back on the start marker - proof that even with
+// then lands exactly back on the start marker — proof that even with
 // spikes or sawtooth edges, wave(0) == wave(A * period) for integer A,
 // so the path closes.
 
@@ -883,7 +883,7 @@ void draw() {
     ys[i] = radius * Waves.wave(RATIO_B * theta + phaseY * period + period * 0.25f, o);
   }
 
-  // Dim ghost of the full closed loop - proves the target doesn't move.
+  // Dim ghost of the full closed loop — proves the target doesn't move.
   noFill();
   stroke(col[0] * 0.22f, col[1] * 0.22f, col[2] * 0.22f);
   strokeWeight(1);
@@ -898,13 +898,13 @@ void draw() {
   for (int i = 0; i &lt;= drawnTo; i++) vertex(xs[i], ys[i]);
   endShape();
 
-  // Start marker - the "home" the pen must return to.
+  // Start marker — the "home" the pen must return to.
   float homeR = 12 + sin(prog * TWO_PI) * 1.5f;
   noStroke();
   fill(255); circle(xs[0], ys[0], homeR);
   fill(18);  circle(xs[0], ys[0], homeR - 6);
 
-  // Pen cursor - the moving tip.
+  // Pen cursor — the moving tip.
   fill(255);
   circle(xs[drawnTo], ys[drawnTo], 8);
 
@@ -937,7 +937,7 @@ void mousePressed() {
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_volume_3d/wave_volume_3d.pde" target="_blank">View on GitHub &rarr;</a>
       </div>
       <pre class="ex-code-block">// 3D Wave Volume (P3D)
-// 16x16 grid with 3 shift-samplers - one per axis.
+// 16x16 grid with 3 shift-samplers — one per axis.
 // Every axis breathes independently, creating a living 3D volume.
 // Drag to rotate by hand; the volume also turns on its own.
 
@@ -957,7 +957,7 @@ void setup() {
   noFill();
   strokeWeight(4);
 
-  // Three desynchronised shift-samplers - each axis has its own wave life
+  // Three desynchronised shift-samplers — each axis has its own wave life
   samplerY = Waves.createSampler(new WaveOpts()
     .shift(true).shiftInterval(3).shiftDuration(1.5f)
     .range(-6, 6).frequency(0.4f).seed(0));
@@ -983,13 +983,13 @@ void draw() {
   beginShape(POINTS);
   for (int xi = 0; xi &lt; N; xi++) {
     for (int zi = 0; zi &lt; N; zi++) {
-      // Y: main surface displacement - full range across the cube
+      // Y: main surface displacement — full range across the cube
       float dy = samplerY.sample(xi * 0.9f + zi * 0.6f, t);
 
-      // X: horizontal breathing - points drift sideways
+      // X: horizontal breathing — points drift sideways
       float dx = samplerX.sample(zi * 0.8f + xi * 0.3f, t * 0.85f);
 
-      // Z: depth warping - grid pulses in and out
+      // Z: depth warping — grid pulses in and out
       float dz = samplerZ.sample(xi * 0.7f + zi * 0.5f, t * 0.7f);
 
       // Map dy to a grid row and spread points around the surface

@@ -1,6 +1,6 @@
 // Seamless Closing
 // A ring sampled with shift normally tears its seam open the moment it
-// lands on a new wave - every formula has its own period. The "closing"
+// lands on a new wave — every formula has its own period. The "closing"
 // pool fixes that: all 17 waves in it share one base period, so a sweep
 // of ring.period() * LOBES closes through every morph. The loop keeps
 // changing shape and never shows a seam.
@@ -33,7 +33,7 @@ void draw() {
   t += 0.02;
 
   // ring.period() comes straight from the library: 62.8319 for the
-  // closing pool - stable through every shift. You never type it.
+  // closing pool — stable through every shift. You never type it.
   float sweep  = ring.period() * LOBES;
   float radius = width * 0.28f;
   float wobble = width * 0.10f;

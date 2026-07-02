@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Guide - processing.waves</title>
+  <title>Guide &mdash; processing.waves</title>
   <meta name="description" content="Install, API reference, port notes, and copy-paste starters for processing.waves.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -204,9 +204,9 @@ text(s.mix(),        10, 80);   // 0.0 -&gt; 1.0 during the morph</pre>
 
     <!-- ── CLOSING SHAPES ── -->
     <h2 id="closing">Closing curved shapes</h2>
-    <p>When you sample a wave around a circle, the last vertex rarely lines up with the first one - <code>endShape(CLOSE)</code> then draws an ugly seam back to the start. The fix is to sweep over an integer multiple of the wave's <strong>period</strong>: the x-distance over which <code>wave(x)</code> repeats.</p>
+    <p>When you sample a wave around a circle, the last vertex rarely lines up with the first one &mdash; <code>endShape(CLOSE)</code> then draws an ugly seam back to the start. The fix is to sweep over an integer multiple of the wave's <strong>period</strong>: the x-distance over which <code>wave(x)</code> repeats.</p>
     <p>Every periodic wave in the library has a measured period, listed on the <a href="waves.html#periodicity">Waves page</a>. For <code>"classic sine"</code> it's <code>62.83</code>. Multiply by however many lobes you want around the ring.</p>
-    <p><em>Why <code>62.83</code> and not <code>360</code>?</em> <code>x</code> is a generic coordinate here, like in <code>noise(x)</code> - not an angle. Ten of the 34 waves are not sine-based at all (<code>square</code>, <code>triangle</code>, <code>ramp</code>, <code>noise</code>...), so radians would be meaningless for them.</p>
+    <p><em>Why <code>62.83</code> and not <code>360</code>?</em> <code>x</code> is a generic coordinate here, like in <code>noise(x)</code> &mdash; not an angle. Ten of the 34 waves are not sine-based at all (<code>square</code>, <code>triangle</code>, <code>ramp</code>, <code>noise</code>...), so radians would be meaningless for them.</p>
     <pre class="code-block">import waves.*;
 
 WaveOpts o;
@@ -236,11 +236,11 @@ void draw() {
   }
   endShape(CLOSE);
 }</pre>
-    <p>Change <code>lobes</code> to 3, 5, 13 - any positive integer closes cleanly. Change <code>steps</code> for finer or coarser resolution; it never affects whether the shape closes.</p>
-    <div class="callout"><p>Some waves have no clean period - <code>"noise"</code>, <code>"fade out"</code>, <code>"meta sine"</code>, and the rest of the <em>no-close</em> group on the <a href="waves.html#periodicity">Waves page</a>. For those, use two rings (inner + outer) and connect them with radial lines, or fade the stroke to zero at the endpoints instead of closing.</p></div>
+    <p>Change <code>lobes</code> to 3, 5, 13 &mdash; any positive integer closes cleanly. Change <code>steps</code> for finer or coarser resolution; it never affects whether the shape closes.</p>
+    <div class="callout"><p>Some waves have no clean period &mdash; <code>"noise"</code>, <code>"fade out"</code>, <code>"meta sine"</code>, and the rest of the <em>no-close</em> group on the <a href="waves.html#periodicity">Waves page</a>. For those, use two rings (inner + outer) and connect them with radial lines, or fade the stroke to zero at the endpoints instead of closing.</p></div>
 
-    <h3>Stay closed <em>while</em> shifting - <code>.group("closing")</code></h3>
-    <p>Shift and closed shapes fight each other by default. A ring sampled with <code>.shift(true)</code> tears its seam open the moment it lands on a new wave, because every formula has its own period and your fixed sweep stops lining up. The <code>"closing"</code> pool ends that fight: all 17 waves in it share one base period (<code>62.8319</code>, that's <code>2&pi;/0.1</code>), so a sweep of <code>sampler.period() &times; lobes</code> closes seamlessly through every transition - the shape keeps morphing into new waves and never shows a seam.</p>
+    <h3>Stay closed <em>while</em> shifting &mdash; <code>.group("closing")</code></h3>
+    <p>Shift and closed shapes fight each other by default. A ring sampled with <code>.shift(true)</code> tears its seam open the moment it lands on a new wave, because every formula has its own period and your fixed sweep stops lining up. The <code>"closing"</code> pool ends that fight: all 17 waves in it share one base period (<code>62.8319</code>, that's <code>2&pi;/0.1</code>), so a sweep of <code>sampler.period() &times; lobes</code> closes seamlessly through every transition &mdash; the shape keeps morphing into new waves and never shows a seam.</p>
     <pre class="code-block">import waves.*;
 
 Waves.WaveSampler ring;
@@ -269,7 +269,7 @@ void draw() {
   }
   endShape(CLOSE);
 }</pre>
-    <p><code>sampler.period()</code> and <code>sampler.targetPeriod()</code> report the current and next wave's measured period as a <code>Float</code> - both return the stable base period for a closing pool, <code>null</code> for non-periodic waves (and <code>targetPeriod()</code> also before the first <code>sample()</code> call or on non-shift samplers). So you read the sweep length straight off the sampler instead of hard-coding a number per wave.</p>
+    <p><code>sampler.period()</code> and <code>sampler.targetPeriod()</code> report the current and next wave's measured period as a <code>Float</code> &mdash; both return the stable base period for a closing pool, <code>null</code> for non-periodic waves (and <code>targetPeriod()</code> also before the first <code>sample()</code> call or on non-shift samplers). So you read the sweep length straight off the sampler instead of hard-coding a number per wave.</p>
     <div class="callout"><p><strong>Experimental</strong> (since p5.waves 3.3.0). Period values may drift by ~0.001 in minor versions. Perfect for visuals; not for plotters, CNC, or anything that gets angry about sub-unit drift.</p></div>
 
     <!-- ── MORPH ── -->
@@ -294,7 +294,7 @@ float y = Waves.wave(x, wild);</pre>
 
     <!-- ── TIME ── -->
     <h2 id="time">Time is just a number</h2>
-    <p>You pass <code>t</code> in seconds - processing.waves never calls a clock itself. That means you can <strong>scrub time</strong>: map <code>mouseX</code> to <code>t</code>, run faster than real-time, run backwards, freeze at a moment.</p>
+    <p>You pass <code>t</code> in seconds &mdash; processing.waves never calls a clock itself. That means you can <strong>scrub time</strong>: map <code>mouseX</code> to <code>t</code>, run faster than real-time, run backwards, freeze at a moment.</p>
     <pre class="code-block">float t = map(mouseX, 0, width, 0, 10);   // 10 seconds across the canvas
 float y = sampler.sample(x, t);</pre>
 

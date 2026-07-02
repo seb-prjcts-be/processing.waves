@@ -1,5 +1,5 @@
 // Time Strata
-// Time is a plain number - full manual control.
+// Time is a plain number — full manual control.
 // Mouse X scrubs a time window; each layer is frozen at its own t.
 // Layers are filled ribbons with HSB color, creating geological strata.
 

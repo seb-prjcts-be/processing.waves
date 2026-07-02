@@ -31,7 +31,7 @@ cd processing.waves
 
 `build.ps1` reads `sketchbook.path.four` from Processing's preferences and copies the library where Processing expects it. Drop `-Install` to just build the jar into `library/`.
 
-> **Platform support**: tested on Windows. The compiled jar is pure Java with no native dependencies, so it should run on macOS and Linux without changes - but neither has been tested yet. If you hit a platform-specific issue, please [open an issue](https://github.com/seb-prjcts-be/processing.waves/issues).
+> **Platform support**: tested on Windows. The compiled jar is pure Java with no native dependencies, so it should run on macOS and Linux without changes — but neither has been tested yet. If you hit a platform-specific issue, please [open an issue](https://github.com/seb-prjcts-be/processing.waves/issues).
 >
 > A future release will be available via Processing 4's Contribution Manager.
 
@@ -64,14 +64,14 @@ void draw() {
 ## API at a glance
 
 ```java
-// 1. Lazy - default seed, default everything
+// 1. Lazy — default seed, default everything
 Waves.wave(x);
 
-// 2. Quick - by name or by seed
+// 2. Quick — by name or by seed
 Waves.wave(x, "classic sine");
 Waves.wave(x, 42);
 
-// 3. Full control - fluent builder
+// 3. Full control — fluent builder
 WaveOpts o = new WaveOpts()
   .wave("bumpy sine")
   .amplitude(80).frequency(1).phase(0)

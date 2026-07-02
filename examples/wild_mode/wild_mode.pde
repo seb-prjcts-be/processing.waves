@@ -1,6 +1,6 @@
 // Wild Mode
 // Grid of circles: left half stable, right half wild.
-// mouseX controls unpredictability - drag to feel the chaos build.
+// mouseX controls unpredictability — drag to feel the chaos build.
 
 import waves.*;
 

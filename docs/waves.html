@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All 34 Waves - processing.waves</title>
+  <title>All 34 Waves &mdash; processing.waves</title>
   <meta name="description" content="Every wave in processing.waves, with formula, character, and period. Click the name to copy.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -155,13 +155,13 @@
         <code>wave(x) == wave(x + T)</code> for every <code>x</code>. That distance is
         the wave's <strong>period</strong>. Knowing the period lets you close curved
         shapes cleanly: sample a wave around a circle over an integer number of periods,
-        and the last vertex lands on the first one - <code>endShape(CLOSE)</code> draws
+        and the last vertex lands on the first one &mdash; <code>endShape(CLOSE)</code> draws
         a zero-length line, no ugly seam.
       </p>
       <p>
         <strong>Why <code>62.83</code> and not <code>360</code>?</strong>
         <code>Waves.wave(x)</code> treats <code>x</code> as a generic coordinate -
-        the same mental model as <code>noise(x)</code> - not an angle in degrees
+        the same mental model as <code>noise(x)</code> &mdash; not an angle in degrees
         or radians. Frequencies are tuned for character, not for round numbers.
         Ten of the 34 waves are not sine-based at all
         (<code>square</code>, <code>triangle</code>, <code>ramp</code>,
@@ -178,7 +178,7 @@
       </p>
 
       <h3>Closed-shape recipe</h3>
-      <p>The integer <code>lobes</code> is the only thing you tune - anything from 1 upward works. Full Java code (including the shift-proof <code>.group("closing")</code> variant) lives in the <a href="guide.html#closing">guide</a>.</p>
+      <p>The integer <code>lobes</code> is the only thing you tune &mdash; anything from 1 upward works. Full Java code (including the shift-proof <code>.group("closing")</code> variant) lives in the <a href="guide.html#closing">guide</a>.</p>
       <pre class="code-block">// Draw a closed wobble ring. No visible seam.
 float period = 62.83f;           // from the table below (classic sine)
 int   lobes  = 8;                // how many bumps around the ring
@@ -242,13 +242,13 @@ endShape(CLOSE);</pre>
 
       <h3>How to read the result</h3>
       <ul>
-        <li><strong>Periodic</strong> - a number. Use any integer multiple of it as your sweep.</li>
-        <li><strong>&mdash;</strong> - wave is quasi-periodic (incommensurate rhythms) or non-periodic (growing amplitudes, Perlin noise, random branches). Close with a soft blend back to the starting value instead of <code>CLOSE</code>.</li>
+        <li><strong>Periodic</strong> &mdash; a number. Use any integer multiple of it as your sweep.</li>
+        <li><strong>&mdash;</strong> &mdash; wave is quasi-periodic (incommensurate rhythms) or non-periodic (growing amplitudes, Perlin noise, random branches). Close with a soft blend back to the starting value instead of <code>CLOSE</code>.</li>
       </ul>
       <p>
         Want a shape that stays closed <em>while shifting</em> between formulas? Use
-        <code>.group("closing")</code> - a pool of 17 waves that all share the base period
-        <code>62.8319</code> - and read the sweep from <code>sampler.period()</code>.
+        <code>.group("closing")</code> &mdash; a pool of 17 waves that all share the base period
+        <code>62.8319</code> &mdash; and read the sweep from <code>sampler.period()</code>.
         See <a href="guide.html#closing">Closing curved shapes</a> in the guide.
       </p>
     </section>

@@ -59,7 +59,7 @@ const WAVE_NAMES = [
    without rebuilding the samplers.
    ------------------------------------------------------------ */
 
-// Signal Loom palette (from SignalLoom.pde) - the "slightly dirty" cousins
+// Signal Loom palette (from SignalLoom.pde) — the "slightly dirty" cousins
 // of the p5.waves hero colours.
 const LOOM = {
   DEEP:   [6, 71, 255],
@@ -343,7 +343,7 @@ function mountSeamlessClosing(host) {
       p.background(12);
       t += 0.02;
       // ring.period comes straight from the library: 62.8319 for the
-      // closing pool - stable through every shift.
+      // closing pool — stable through every shift.
       const sweep  = ring.period * LOBES;
       const radius = Math.min(p.width, p.height) * 0.28;
       const wobble = Math.min(p.width, p.height) * 0.10;
@@ -741,7 +741,7 @@ function mountSpikyLissajous(host) {
       p.beginShape();
       for (let i = 0; i <= drawnTo; i++) p.vertex(xs[i], ys[i]);
       p.endShape();
-      // Start marker - the "home" the pen must return to.
+      // Start marker — the "home" the pen must return to.
       const homeR = 12 + Math.sin(prog * p.TWO_PI) * 1.5;
       p.noStroke();
       p.fill(255); p.circle(xs[0], ys[0], homeR);

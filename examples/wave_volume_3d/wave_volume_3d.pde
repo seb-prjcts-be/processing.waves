@@ -1,5 +1,5 @@
 // 3D Wave Volume (P3D)
-// 16x16 grid with 3 shift-samplers - one per axis.
+// 16x16 grid with 3 shift-samplers — one per axis.
 // Every axis breathes independently, creating a living 3D volume.
 // Drag to rotate by hand; the volume also turns on its own.
 
@@ -19,7 +19,7 @@ void setup() {
   noFill();
   strokeWeight(4);
 
-  // Three desynchronised shift-samplers - each axis has its own wave life
+  // Three desynchronised shift-samplers — each axis has its own wave life
   samplerY = Waves.createSampler(new WaveOpts()
     .shift(true).shiftInterval(3).shiftDuration(1.5f)
     .range(-6, 6).frequency(0.4f).seed(0));
@@ -45,13 +45,13 @@ void draw() {
   beginShape(POINTS);
   for (int xi = 0; xi < N; xi++) {
     for (int zi = 0; zi < N; zi++) {
-      // Y: main surface displacement - full range across the cube
+      // Y: main surface displacement — full range across the cube
       float dy = samplerY.sample(xi * 0.9f + zi * 0.6f, t);
 
-      // X: horizontal breathing - points drift sideways
+      // X: horizontal breathing — points drift sideways
       float dx = samplerX.sample(zi * 0.8f + xi * 0.3f, t * 0.85f);
 
-      // Z: depth warping - grid pulses in and out
+      // Z: depth warping — grid pulses in and out
       float dz = samplerZ.sample(xi * 0.7f + zi * 0.5f, t * 0.7f);
 
       // Map dy to a grid row and spread points around the surface
