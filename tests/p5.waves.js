@@ -1,7 +1,7 @@
 ﻿/*!
  * p5.waves
  * Wave sampling for p5.js. Always returns a number.
- * Version 3.3.0
+ * Version 3.4.0
  * Author: seb@prjcts
  * License: MIT
  */
@@ -9,42 +9,85 @@
   'use strict';
 
   // ─── Wave definitions (34 entries, unique names) ─────────────────────────────
+  // Each wave carries a real, precompiled `fn` — the library never calls
+  // new Function / eval, so it runs under a strict Content-Security-Policy
+  // (no 'unsafe-eval'). The `algo` string is display-only metadata; it must
+  // stay in sync with `fn` (tests/snapshot.js verifies this in Node).
+  // The aliases below let `fn` read exactly like its `algo` string.
+
+  const sin = Math.sin, cos = Math.cos, tan = Math.tan, abs = Math.abs,
+        ceil = Math.ceil, round = Math.round, floor = Math.floor,
+        min = Math.min, max = Math.max, log = Math.log, PI = Math.PI;
 
   const WAVES = [
-    { name: 'classic sine',      algo: 'sin(x*.1)*.4' },
-    { name: 'sine',              algo: 'sin(x*.2)*.25' },
-    { name: 'sharp peaks',       algo: 'abs(sin(x*.1))*.5' },
-    { name: 'square',            algo: '(x*.025)%1 < .5 ? -.5 : .5' },
-    { name: 'pulse',             algo: '(x*.5)%20 < 1 ? -.5 : .5' },
-    { name: 'stepped sine',      algo: 'ceil(sin(x*.1))*.25' },
-    { name: 'mountain peaks',    algo: 'abs(cos(x*.1))*.35 + sin(x*.1)*.25' },
-    { name: 'valleys',           algo: 'abs(cos(x*.1))*-.35 + sin(x*.1)*.25' },
-    { name: 'zig-zag sine',      algo: 'sin(x*.2)*.4 % .12' },
-    { name: 'batman',            algo: 'sin(x*.1)*.7 % .4' },
-    { name: 'offset sine',       algo: 'ceil(cos(x*.1))*.25 - sin(x*.1)*.25' },
-    { name: 'steps down',        algo: 'ceil(tan(x*.1))*.25' },
-    { name: 'steps',             algo: 'round(sin(-x*.1))*.25' },
-    { name: 'squared sine',      algo: 'sq(sin(x*.1))*.25' },
-    { name: 'bumpy sine',        algo: 'sin(x*.1)*.25 + sin(x*.5)*.1' },
-    { name: 'wobble sine',       algo: 'sin(x*.1)*cos(x*.2)*.5' },
-    { name: 'up down noise',     algo: 'x*sin(x*.1) % .5' },
-    { name: 'meta sine',         algo: 'sin(x*.45 + radians(x))*cos(x*.4)*.5' },
-    { name: 'triangle',          algo: 'abs((x*.03) % (.5*2) - .5)' },
-    { name: 'ramp',              algo: '-1*(x*.02%1)/1 + 0.5' },
-    { name: 'saw down',          algo: 'x*.03 % .5' },
-    { name: 'saw up',            algo: '-x*.03 % .5' },
-    { name: 'fade out',          algo: 'log(x)*.1' },
-    { name: 'grow random',       algo: 'random(x*.003)' },
-    { name: 'noise',             algo: 'noise(x*.1) - .5' },
-    { name: 'fuzzy pulse',       algo: 'tan(x*20)*.05' },
-    { name: 'up down pulse',     algo: 'tan(x*.1)*.05' },
-    { name: 'bald patch',        algo: 'sq(x*.05) % .5' },
-    { name: 'fuzzy peak sine',   algo: 'sin(x*.1) < 0 ? random(-.2, .2) : sin(x*.1)*.5' },
-    { name: 'ramp up sine',      algo: 'sin(x)*(x*.01%.5)' },
-    { name: 'triangle sine',     algo: 'sin(x)*(x*.01%1-.5)' },
-    { name: 'round linked sine', algo: 'sin(x*.1)*cos(x*1)*.5' },
-    { name: 'half sine',         algo: 'sin(x*.05)*(x*.1%.5)' },
-    { name: 'smooth solid sine', algo: 'sin(x*3.1)*.25' },
+    { name: 'classic sine',      algo: 'sin(x*.1)*.4',
+      fn: (x) => sin(x*.1)*.4 },
+    { name: 'sine',              algo: 'sin(x*.2)*.25',
+      fn: (x) => sin(x*.2)*.25 },
+    { name: 'sharp peaks',       algo: 'abs(sin(x*.1))*.5',
+      fn: (x) => abs(sin(x*.1))*.5 },
+    { name: 'square',            algo: '(x*.025)%1 < .5 ? -.5 : .5',
+      fn: (x) => (x*.025)%1 < .5 ? -.5 : .5 },
+    { name: 'pulse',             algo: '(x*.5)%20 < 1 ? -.5 : .5',
+      fn: (x) => (x*.5)%20 < 1 ? -.5 : .5 },
+    { name: 'stepped sine',      algo: 'ceil(sin(x*.1))*.25',
+      fn: (x) => ceil(sin(x*.1))*.25 },
+    { name: 'mountain peaks',    algo: 'abs(cos(x*.1))*.35 + sin(x*.1)*.25',
+      fn: (x) => abs(cos(x*.1))*.35 + sin(x*.1)*.25 },
+    { name: 'valleys',           algo: 'abs(cos(x*.1))*-.35 + sin(x*.1)*.25',
+      fn: (x) => abs(cos(x*.1))*-.35 + sin(x*.1)*.25 },
+    { name: 'zig-zag sine',      algo: 'sin(x*.2)*.4 % .12',
+      fn: (x) => sin(x*.2)*.4 % .12 },
+    { name: 'batman',            algo: 'sin(x*.1)*.7 % .4',
+      fn: (x) => sin(x*.1)*.7 % .4 },
+    { name: 'offset sine',       algo: 'ceil(cos(x*.1))*.25 - sin(x*.1)*.25',
+      fn: (x) => ceil(cos(x*.1))*.25 - sin(x*.1)*.25 },
+    { name: 'steps down',        algo: 'ceil(tan(x*.1))*.25',
+      fn: (x) => ceil(tan(x*.1))*.25 },
+    { name: 'steps',             algo: 'round(sin(-x*.1))*.25',
+      fn: (x) => round(sin(-x*.1))*.25 },
+    { name: 'squared sine',      algo: 'sq(sin(x*.1))*.25',
+      fn: (x) => sq(sin(x*.1))*.25 },
+    { name: 'bumpy sine',        algo: 'sin(x*.1)*.25 + sin(x*.5)*.1',
+      fn: (x) => sin(x*.1)*.25 + sin(x*.5)*.1 },
+    { name: 'wobble sine',       algo: 'sin(x*.1)*cos(x*.2)*.5',
+      fn: (x) => sin(x*.1)*cos(x*.2)*.5 },
+    { name: 'up down noise',     algo: 'x*sin(x*.1) % .5',
+      fn: (x) => x*sin(x*.1) % .5 },
+    { name: 'meta sine',         algo: 'sin(x*.45 + radians(x))*cos(x*.4)*.5',
+      fn: (x) => sin(x*.45 + radians(x))*cos(x*.4)*.5 },
+    { name: 'triangle',          algo: 'abs((x*.03) % (.5*2) - .5)',
+      fn: (x) => abs((x*.03) % (.5*2) - .5) },
+    { name: 'ramp',              algo: '-1*(x*.02%1)/1 + 0.5',
+      fn: (x) => -1*(x*.02%1)/1 + 0.5 },
+    { name: 'saw down',          algo: 'x*.03 % .5',
+      fn: (x) => x*.03 % .5 },
+    { name: 'saw up',            algo: '-x*.03 % .5',
+      fn: (x) => -x*.03 % .5 },
+    { name: 'fade out',          algo: 'log(x)*.1',
+      fn: (x) => log(x)*.1 },
+    { name: 'grow random',       algo: 'random(x*.003)',
+      fn: (x) => random(x*.003) },
+    { name: 'noise',             algo: 'noise(x*.1) - .5',
+      fn: (x) => noise(x*.1) - .5 },
+    { name: 'fuzzy pulse',       algo: 'tan(x*20)*.05',
+      fn: (x) => tan(x*20)*.05 },
+    { name: 'up down pulse',     algo: 'tan(x*.1)*.05',
+      fn: (x) => tan(x*.1)*.05 },
+    { name: 'bald patch',        algo: 'sq(x*.05) % .5',
+      fn: (x) => sq(x*.05) % .5 },
+    { name: 'fuzzy peak sine',   algo: 'sin(x*.1) < 0 ? random(-.2, .2) : sin(x*.1)*.5',
+      fn: (x) => sin(x*.1) < 0 ? random(-.2, .2) : sin(x*.1)*.5 },
+    { name: 'ramp up sine',      algo: 'sin(x)*(x*.01%.5)',
+      fn: (x) => sin(x)*(x*.01%.5) },
+    { name: 'triangle sine',     algo: 'sin(x)*(x*.01%1-.5)',
+      fn: (x) => sin(x)*(x*.01%1-.5) },
+    { name: 'round linked sine', algo: 'sin(x*.1)*cos(x*1)*.5',
+      fn: (x) => sin(x*.1)*cos(x*1)*.5 },
+    { name: 'half sine',         algo: 'sin(x*.05)*(x*.1%.5)',
+      fn: (x) => sin(x*.05)*(x*.1%.5) },
+    { name: 'smooth solid sine', algo: 'sin(x*3.1)*.25',
+      fn: (x) => sin(x*3.1)*.25 },
   ];
 
   // ─── Character classification ────────────────────────────────────────────────
@@ -56,8 +99,9 @@
     'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
     'gentle', 'gentle', 'gentle',
     'harsh',                                     // 11 steps down (tan)
-    'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
-    'gentle', 'gentle', 'gentle',
+    'gentle', 'gentle', 'gentle', 'gentle',
+    'harsh',                                     // 16 up down noise (x*sin grows unbounded)
+    'gentle', 'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
     'harsh',                                     // 23 grow random (random)
     'harsh',                                     // 24 noise (noise)
     'harsh',                                     // 25 fuzzy pulse (tan hi freq)
@@ -160,8 +204,7 @@
 
   // ─── Caches ──────────────────────────────────────────────────────────────────
 
-  const COMPILE_CACHE = new Map();
-  const STATS_CACHE   = new Map();
+  const STATS_CACHE = new Map();
 
   // Runtime entropy for wave() shift - stable per page load, different each session
   const _waveShiftEntropy = Math.floor(Math.random() * 100000);
@@ -197,6 +240,9 @@
   let _seedCachePtr = 0, _seedCacheFill = 0;
 
   function seedFrom(value) {
+    // NaN never matches itself in the cache scan below; coerce it to its
+    // string form so repeated NaN seeds hit the cache like any other value.
+    if (typeof value === 'number' && Number.isNaN(value)) value = 'NaN';
     // Check small ring-buffer cache first
     for (let i = 0; i < _seedCacheFill; i++) {
       if (_seedCacheKeys[i] === value) return _seedCacheVals[i];
@@ -281,6 +327,64 @@
     return pool[(i + 1) % pool.length];
   }
 
+  // ─── Shift selection: per-cycle permutation ──────────────────────────────────
+  // A naive per-era random draw clusters (coupon-collector): some waves repeat,
+  // others never appear in a session. Instead, shuffle the pool once per full
+  // cycle of L eras (Fisher-Yates seeded by base + cycle) and read it position
+  // by position. Every wave shows exactly once per L eras, still pseudo-random
+  // per session, still a pure function of era. Decks are memoised so the
+  // per-pixel stateless wave() path stays O(1) amortised.
+
+  let _allIndices = null;
+  function allIndices() {
+    if (_allIndices === null) {
+      _allIndices = [];
+      for (let i = 0; i < WAVES.length; i++) _allIndices.push(i);
+    }
+    return _allIndices;
+  }
+
+  // Deck cache: compare (cycle, pool ref, base string) directly so the hot
+  // per-pixel path never builds a composite key or hashes on a hit. Named
+  // groups ('gentle'/'harsh') resolve to a stable array reference, so the
+  // pool === check holds across calls.
+  const _deckBase  = new Array(4);
+  const _deckCycle = new Array(4);
+  const _deckPool  = new Array(4);
+  const _deckVals  = new Array(4);
+  let _deckPtr = 0, _deckFill = 0;
+
+  function shuffledDeck(seedBase, cycle, pool) {
+    for (let i = 0; i < _deckFill; i++) {
+      if (_deckCycle[i] === cycle && _deckPool[i] === pool && _deckBase[i] === seedBase) {
+        return _deckVals[i];
+      }
+    }
+    const deck = ((pool && pool.length) ? pool : allIndices()).slice();
+    const rng  = mulberry32(seedFrom(seedBase + '.' + cycle));
+    for (let i = deck.length - 1; i > 0; i--) {
+      const j   = Math.floor(rng() * (i + 1));
+      const tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+    }
+    _deckBase[_deckPtr]  = seedBase;
+    _deckCycle[_deckPtr] = cycle;
+    _deckPool[_deckPtr]  = pool;
+    _deckVals[_deckPtr]  = deck;
+    _deckPtr = (_deckPtr + 1) & 3;
+    if (_deckFill < 4) _deckFill++;
+    return deck;
+  }
+
+  // Drop-in for pickWaveIndexIn(base + '.' + era, pool) on the shift path.
+  function pickWaveIndexForEra(seedBase, era, pool) {
+    const src = (pool && pool.length) ? pool : allIndices();
+    const L = src.length;
+    if (L <= 1) return src[0];
+    const cycle = Math.floor(era / L);
+    const pos   = era - cycle * L;
+    return shuffledDeck(seedBase, cycle, pool)[pos];
+  }
+
   function findWaveByName(name) {
     const key  = normalizeName(name);
     const keyC = compact(key);
@@ -323,26 +427,15 @@
 
   function noiseSigned(x, seed) { return noise1D(x, seed) * 2 - 1; }
 
-  // ─── Compilation ─────────────────────────────────────────────────────────────
-
-  const ARG_NAMES = [
-    'x', 't',
-    'random', 'noise',
-    'sin', 'cos', 'tan', 'abs', 'ceil', 'round', 'floor', 'min', 'max',
-    'log', 'sq', 'radians', 'PI'
-  ];
-
-  function compile(expr) {
-    if (COMPILE_CACHE.has(expr)) return COMPILE_CACHE.get(expr);
-    const fn = new Function(...ARG_NAMES, 'return (' + expr + ');');
-    COMPILE_CACHE.set(expr, fn);
-    return fn;
-  }
+  // ─── Evaluation ──────────────────────────────────────────────────────────────
+  // Wave fns are plain precompiled functions (see WAVES). `random` and `noise`
+  // below are the deterministic primitives they reference; both read the
+  // module-scope eval state, so evaluate() must set it before each call.
 
   // Module-scope state for evaluate - avoids closure allocation on every call
   let _evalSeed = 0, _evalX = 0, _evalCalls = 0;
 
-  function _evalRandom(min, max) {
+  function random(min, max) {
     const r = rand01(_evalSeed, _evalX, _evalCalls++);
     if (min === undefined) return r;
     if (max === undefined) { max = min; min = 0; }
@@ -350,16 +443,12 @@
     return min + r * (max - min);
   }
 
-  function _evalNoise(n) { return noise1D(n, _evalSeed); }
+  function noise(n) { return noise1D(n, _evalSeed); }
 
   function evaluate(fn, x, t, seed) {
+    if (typeof fn !== 'function') return 0;
     _evalSeed = seed; _evalX = x; _evalCalls = 0;
-    const out = fn(
-      x, toNumber(t, 0),
-      _evalRandom, _evalNoise,
-      Math.sin, Math.cos, Math.tan, Math.abs, Math.ceil, Math.round, Math.floor, Math.min, Math.max,
-      Math.log, sq, radians, Math.PI
-    );
+    const out = fn(x, toNumber(t, 0));
     return Number.isFinite(out) ? out : 0;
   }
 
@@ -393,7 +482,7 @@
     const key = waveIndex + '|' + internalSeed;
     if (STATS_CACHE.has(key)) return STATS_CACHE.get(key);
 
-    const fn  = compile(WAVES[waveIndex].algo);
+    const fn  = WAVES[waveIndex].fn;
     let mn = Infinity, mx = -Infinity;
 
     for (let i = 0; i < STATS_SAMPLES; i++) {
@@ -442,14 +531,14 @@
     if (secondParam == null) {
       const idx   = pickWaveIndex(0);
       const iSeed = seedFrom(0);
-      const raw   = evaluate(compile(WAVES[idx].algo), toNumber(y, 0), 0, iSeed);
+      const raw   = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed);
       return normalizeVal(raw, getStats(idx, iSeed)) * 100;
     }
     // ─── Fast path: wave(y, number)  - seed only ──────────────
     if (typeof secondParam === 'number') {
       const iSeed = seedFrom(secondParam);
       const idx   = pickWaveIndex(secondParam);
-      const raw   = evaluate(compile(WAVES[idx].algo), toNumber(y, 0), 0, iSeed);
+      const raw   = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed);
       return normalizeVal(raw, getStats(idx, iSeed)) * 100;
     }
     // ─── Fast path: wave(y, 'name')  - wave name only ─────────
@@ -457,7 +546,7 @@
       const r     = resolveWave(secondParam);
       const idx   = r >= 0 ? r : pickWaveIndex(0);
       const iSeed = seedFrom(0);
-      const raw   = evaluate(compile(WAVES[idx].algo), toNumber(y, 0), 0, iSeed);
+      const raw   = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed);
       return normalizeVal(raw, getStats(idx, iSeed)) * 100;
     }
 
@@ -491,16 +580,19 @@
       // Runtime entropy - stateless wave() has no persistent state,
       // but the entropy is stable within a single page load via closure
       const waveShiftEntropy = _waveShiftEntropy;
+      const shiftBase = seed + '.' + waveShiftEntropy;
 
       const userIdx = waveRef !== undefined ? resolveWave(waveRef) : -1;
-      const idxA = (era === 0 && userIdx >= 0) ? userIdx : pickWaveIndexIn(seed + '.' + waveShiftEntropy + '.' + era, groupPool);
-      const fnA  = compile(WAVES[idxA].algo);
+      const idxA = (era === 0 && userIdx >= 0) ? userIdx : pickWaveIndexForEra(shiftBase, era, groupPool);
+      const fnA  = WAVES[idxA].fn;
       const valA = evalKernel(fnA, y, t, frequency, phase, internalSeed, mode, unpredictability);
 
       if (progress >= shiftInterval) {
-        let idxB = (era === 1 && userIdx >= 0) ? pickWaveIndexIn(seed + '.' + waveShiftEntropy + '.1', groupPool) : pickWaveIndexIn(seed + '.' + waveShiftEntropy + '.' + (era + 1), groupPool);
+        // Mirror the sampler's pickForEra: the next wave is always era+1's
+        // deck pick; only era 0 honours a user-supplied wave (via idxA above).
+        let idxB = pickWaveIndexForEra(shiftBase, era + 1, groupPool);
         if (idxB === idxA) idxB = nextDifferentInPool(idxA, groupPool);
-        const fnB  = compile(WAVES[idxB].algo);
+        const fnB  = WAVES[idxB].fn;
         const valB = evalKernel(fnB, y, t, frequency, phase, internalSeed, mode, unpredictability);
         let m = clamp((progress - shiftInterval) / shiftDuration, 0, 1);
         m = m * m * (3 - 2 * m);
@@ -525,8 +617,8 @@
       const rB   = waveRef.length > 1 ? resolveWave(waveRef[1]) : rA;
       const idxA = rA >= 0 ? rA : pickWaveIndexIn(seed, groupPool);
       const idxB = rB >= 0 ? rB : pickWaveIndexIn(seed, groupPool);
-      const fnA  = compile(WAVES[idxA].algo);
-      const fnB  = compile(WAVES[idxB].algo);
+      const fnA  = WAVES[idxA].fn;
+      const fnB  = WAVES[idxB].fn;
       const valA = evalKernel(fnA, y, t, frequency, phase, internalSeed, mode, unpredictability);
       const valB = evalKernel(fnB, y, t, frequency, phase, internalSeed, mode, unpredictability);
       if (range !== null) {
@@ -547,7 +639,7 @@
       waveIndex = pickWaveIndexIn(seed, groupPool);
     }
 
-    const fn    = compile(WAVES[waveIndex].algo);
+    const fn    = WAVES[waveIndex].fn;
     const val   = evalKernel(fn, y, t, frequency, phase, internalSeed, mode, unpredictability);
     const stats = getStats(waveIndex, internalSeed);
 
@@ -594,8 +686,8 @@
       waveIndexB = rB >= 0 ? rB : pickWaveIndexIn(seed, groupPool);
     }
 
-    const fn     = compile(WAVES[waveIndexA].algo);
-    const fnB    = waveIndexB >= 0 ? compile(WAVES[waveIndexB].algo) : null;
+    const fn     = WAVES[waveIndexA].fn;
+    const fnB    = waveIndexB >= 0 ? WAVES[waveIndexB].fn : null;
     const statsA = getStats(waveIndexA, internalSeed);
     const statsB = waveIndexB >= 0 ? getStats(waveIndexB, internalSeed) : null;
 
@@ -608,6 +700,7 @@
       const hasUserWave = opts.wave !== undefined && !Array.isArray(opts.wave);
       // Runtime entropy so each session produces a different sequence
       const shiftEntropy = Math.floor(Math.random() * 100000);
+      const shiftBase = seed + '.' + shiftEntropy;
 
       let cachedEra = -Infinity;
       let curIdx = waveIndexA, nxtIdx = -1;
@@ -617,7 +710,7 @@
 
       function pickForEra(era) {
         if (era === 0 && hasUserWave) return waveIndexA;
-        return pickWaveIndexIn(seed + '.' + shiftEntropy + '.' + era, groupPool);
+        return pickWaveIndexForEra(shiftBase, era, groupPool);
       }
 
       function ensureEra(era) {
@@ -626,8 +719,8 @@
         curIdx  = pickForEra(era);
         nxtIdx  = pickForEra(era + 1);
         if (nxtIdx === curIdx) nxtIdx = nextDifferentInPool(curIdx, groupPool);
-        curFn   = compile(WAVES[curIdx].algo);
-        nxtFn   = compile(WAVES[nxtIdx].algo);
+        curFn   = WAVES[curIdx].fn;
+        nxtFn   = WAVES[nxtIdx].fn;
         curName = WAVES[curIdx].name;
         nxtName = WAVES[nxtIdx].name;
       }
@@ -754,4 +847,5 @@
 
   global.Waves = Waves;
 
-})(typeof window !== 'undefined' ? window : this);
+})(typeof globalThis !== 'undefined' ? globalThis :
+   typeof window !== 'undefined' ? window : this);

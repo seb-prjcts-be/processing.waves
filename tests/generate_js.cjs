@@ -11,7 +11,7 @@ const wavesScript = fs.readFileSync(path.join(__dirname, 'p5.waves.js'), 'utf8')
 // Strip the IIFE wrapper so we can run it in our own scope and grab `Waves`.
 const inner = wavesScript
   .replace(/^\(function \(global\) \{/m, '')
-  .replace(/\}\)\(typeof window[^)]+\);[\s]*$/m, '');
+  .replace(/\}\)\(typeof (?:globalThis|window)[\s\S]+\);[\s]*$/m, '');
 const fn = new Function('global', inner + '\nreturn global.Waves;');
 const Waves = fn(wavesModule);
 if (!Waves) throw new Error('Failed to load Waves from p5.waves.js');
