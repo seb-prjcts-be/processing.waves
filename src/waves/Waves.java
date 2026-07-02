@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Java/Processing port of p5.waves v3.3.0.
+ * Java/Processing port of p5.waves v3.4.0 (tracks upstream main).
  * 34 wave shapes. Pass a number in, get a number back.
  *
  * Public API returns float (Processing convention) but all internal math runs
@@ -46,7 +46,7 @@ public class Waves {
     }
   }
 
-  // ----- Registry: all 34 waves in v3.3.0 order -----
+  // ----- Registry: all 34 waves in v3.4.0 order -----
   // Order matters: pickWaveIndex(seed) returns floor(rng * 34), so the same seed
   // must select the same wave between JS and Java.
   public static final WaveDef[] WAVES = new WaveDef[] {
@@ -83,7 +83,7 @@ public class Waves {
     new WaveDef("wobble sine",       "sin(x*.1)*cos(x*.2)*.5",
       (x, t, c) -> Math.sin(x*0.1) * Math.cos(x*0.2) * 0.5,                "gentle", 62.8319f),
     new WaveDef("up down noise",     "x*sin(x*.1) % .5",
-      (x, t, c) -> (x * Math.sin(x*0.1)) % 0.5,                            "gentle", null),
+      (x, t, c) -> (x * Math.sin(x*0.1)) % 0.5,                            "harsh", null),
     new WaveDef("meta sine",         "sin(x*.45 + radians(x))*cos(x*.4)*.5",
       (x, t, c) -> Math.sin(x*0.45 + Math.toRadians(x)) * Math.cos(x*0.4) * 0.5, "gentle", null),
     new WaveDef("triangle",          "abs((x*.03) % (.5*2) - .5)",
@@ -206,6 +206,66 @@ public class Waves {
     int i = pool.indexOf(curIdx);
     if (i < 0) return pool.get(0);
     return pool.get((i + 1) % pool.size());
+  }
+
+  // ----- Shift selection: per-cycle permutation (upstream main, post v3.4.0) -----
+  // A naive per-era random draw clusters (coupon-collector): some waves repeat,
+  // others never appear in a session. Instead, shuffle the pool once per full
+  // cycle of L eras (Fisher-Yates seeded by base + cycle) and read it position
+  // by position. Every wave shows exactly once per L eras, still pseudo-random
+  // per session, still a pure function of era. Decks are memoised so the
+  // per-pixel stateless wave() path stays O(1) amortised.
+  static List<Integer> _allIndices = null;
+  static List<Integer> allIndices() {
+    if (_allIndices == null) {
+      List<Integer> a = new ArrayList<Integer>();
+      for (int i = 0; i < WAVES.length; i++) a.add(i);
+      _allIndices = a;
+    }
+    return _allIndices;
+  }
+
+  // Deck cache: compare (cycle, pool ref, base string) directly so the hot
+  // per-pixel path never builds a composite key or hashes on a hit. Named
+  // groups ('gentle'/'harsh'/'closing') resolve to a stable list reference,
+  // so the pool == identity check holds across calls.
+  static final String[] _deckBase  = new String[4];
+  static final int[]    _deckCycle = new int[4];
+  static final Object[] _deckPool  = new Object[4];
+  static final int[][]  _deckVals  = new int[4][];
+  static int _deckPtr = 0, _deckFill = 0;
+
+  static int[] shuffledDeck(String seedBase, int cycle, List<Integer> pool) {
+    for (int i = 0; i < _deckFill; i++) {
+      if (_deckCycle[i] == cycle && _deckPool[i] == pool && seedBase.equals(_deckBase[i])) {
+        return _deckVals[i];
+      }
+    }
+    List<Integer> src = (pool != null && !pool.isEmpty()) ? pool : allIndices();
+    int[] deck = new int[src.size()];
+    for (int i = 0; i < deck.length; i++) deck[i] = src.get(i);
+    Mulberry32 rng = new Mulberry32((int)seedFrom(seedBase + "." + cycle));
+    for (int i = deck.length - 1; i > 0; i--) {
+      int j = (int)(rng.next() * (i + 1));
+      int tmp = deck[i]; deck[i] = deck[j]; deck[j] = tmp;
+    }
+    _deckBase[_deckPtr]  = seedBase;
+    _deckCycle[_deckPtr] = cycle;
+    _deckPool[_deckPtr]  = pool;
+    _deckVals[_deckPtr]  = deck;
+    _deckPtr = (_deckPtr + 1) & 3;
+    if (_deckFill < 4) _deckFill++;
+    return deck;
+  }
+
+  // Drop-in for pickWaveIndexIn(base + "." + era, pool) on the shift path.
+  static int pickWaveIndexForEra(String seedBase, int era, List<Integer> pool) {
+    List<Integer> src = (pool != null && !pool.isEmpty()) ? pool : allIndices();
+    int L = src.size();
+    if (L <= 1) return src.get(0);
+    int cycle = Math.floorDiv(era, L);
+    int pos   = era - cycle * L;
+    return shuffledDeck(seedBase, cycle, pool)[pos];
   }
 
   static int findWaveByName(String name) {
@@ -415,16 +475,17 @@ public class Waves {
       double cycleDur = shiftInterval + shiftDuration;
       int era      = (int)Math.floor(t / cycleDur);
       double progress = t - era * cycleDur;
+      String shiftBase = seed + "." + waveShiftEntropy;
       int userIdx = o.wave != null ? resolveWave(o.wave) : -1;
       int idxA = (era == 0 && userIdx >= 0) ? userIdx
-        : pickWaveIndexIn(seed + "." + waveShiftEntropy + "." + era, pool);
+        : pickWaveIndexForEra(shiftBase, era, pool);
       WaveFn fnA = WAVES[idxA].fn;
       double valA = evalKernel(fnA, y, t, frequency, phase, internalSeed, mode, u, ctx);
 
       if (progress >= shiftInterval) {
-        int idxB = (era == 1 && userIdx >= 0)
-          ? pickWaveIndexIn(seed + "." + waveShiftEntropy + ".1", pool)
-          : pickWaveIndexIn(seed + "." + waveShiftEntropy + "." + (era + 1), pool);
+        // Mirror the sampler's pickForEra: the next wave is always era+1's
+        // deck pick; only era 0 honours a user-supplied wave (via idxA above).
+        int idxB = pickWaveIndexForEra(shiftBase, era + 1, pool);
         if (idxB == idxA) idxB = nextDifferentInPool(idxA, pool);
         double valB = evalKernel(WAVES[idxB].fn, y, t, frequency, phase, internalSeed, mode, u, ctx);
         double m = clamp((progress - shiftInterval) / shiftDuration, 0, 1);
@@ -501,6 +562,7 @@ public class Waves {
     final double shiftInt, shiftDur, cycleDur;
     final boolean hasUserWave;
     final int shiftEntropy;
+    final String shiftBase;
     int cachedEra = Integer.MIN_VALUE;
     int curIdx, nxtIdx = -1;
     WaveFn curFn, nxtFn;
@@ -540,13 +602,14 @@ public class Waves {
       this.cycleDur = shiftInt + shiftDur;
       this.hasUserWave = (o.wave != null) && !(o.wave instanceof Object[]);
       this.shiftEntropy = (int)(Math.random() * 100000);
+      this.shiftBase = o.seed + "." + shiftEntropy;
       this.curIdx = waveIndexA;
       this.curFn  = fn;
     }
 
     int pickForEra(int era) {
       if (era == 0 && hasUserWave) return waveIndexA;
-      return pickWaveIndexIn(o.seed + "." + shiftEntropy + "." + era, pool);
+      return pickWaveIndexForEra(shiftBase, era, pool);
     }
 
     void ensureEra(int era) {
@@ -632,6 +695,14 @@ public class Waves {
     public Float period() {
       if (isClosingPool) return CLOSING_BASE_PERIOD;
       return shift ? WAVES[curIdx].period : WAVES[waveIndexA].period;
+    }
+    /** Period of the next wave during a shift transition (JS: sampler.targetPeriod).
+     *  Closing pool returns the stable base period; null before the first
+     *  sample() call or on non-shift samplers. */
+    public Float targetPeriod() {
+      if (!shift) return null;
+      if (isClosingPool) return CLOSING_BASE_PERIOD;
+      return nxtIdx >= 0 ? WAVES[nxtIdx].period : null;
     }
   }
 
