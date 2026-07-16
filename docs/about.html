@@ -28,7 +28,7 @@
 
   <main class="guide-wrap">
     <h1>About</h1>
-    <p class="guide-intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 34 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each one a tiny formula tuned to drive motion, color, shape, or pattern in a sketch.</p>
+    <p class="guide-intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 35 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each one a tiny formula tuned to drive motion, color, shape, or pattern in a sketch.</p>
 
     <h2>A Java twin</h2>
     <p><strong>processing.waves</strong> is the Java sibling of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a>, a p5.js library originally built for the browser side of generative coding. The Java port carries the same vocabulary across to Processing 4: same names, same indices, same numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you.</p>
@@ -43,24 +43,25 @@
     </ul>
 
     <h2>Trust, then verify</h2>
-    <p>To prove the port works, the repo ships a numerical validator. It runs the JS reference (loaded via Node), captures 35 input/output pairs across all 34 waves and every code path, then runs the Java port over the same inputs and asserts equality within tolerance.</p>
+    <p>To prove the port works, the repo ships a numerical validator. It runs the JS reference (loaded via Node), captures 49 input/output pairs across the wave registry and every code path, then runs the Java port over the same inputs and asserts equality within tolerance.</p>
     <table class="opts-table">
       <thead><tr><th>Metric</th><th>Value</th></tr></thead>
       <tbody>
-        <tr><td>Cases</td><td>35 (covers all 34 waves + 1 shift case)</td></tr>
+        <tr><td>Cases</td><td>49 (representative waves, every option path, and the group pools)</td></tr>
         <tr><td>Stable-mode tolerance</td><td>1e-3</td></tr>
         <tr><td>Wild-mode tolerance</td><td>0.5</td></tr>
-        <tr><td>Current status</td><td>35 / 35 pass</td></tr>
+        <tr><td>Current status</td><td>49 / 49 pass</td></tr>
       </tbody>
     </table>
     <p>Wild mode's looser tolerance is intentional: noise modulation amplifies tiny float-vs-double differences. The wave envelope still matches across the languages; only the per-sample chaos detail diverges within the noise budget. Visually you cannot tell them apart.</p>
 
-    <h2>34 shapes, three temperaments</h2>
-    <p>Every wave has a character. The library splits them into three groups so you can lean into the one you want:</p>
+    <h2>35 shapes, four pools</h2>
+    <p>Every wave has a character, and the library groups them so you can lean into the one you want:</p>
     <ul class="step-list">
-      <li><p><strong>Gentle</strong>: pure functions of x. Deterministic, repeatable, made of sines, cosines and modulos. The dependable section.</p></li>
-      <li><p><strong>Harsh</strong>: noise-driven or tangent-spiked. They pull from a seeded PRNG, so they jitter and surprise within the wave's envelope.</p></li>
-      <li><p><strong>Closing</strong>: a small set whose period divides 2&pi;&middot;n cleanly. A shape drawn over a full cycle joins back to itself without a seam, which is what you want when you sweep a wave around a circle.</p></li>
+      <li><p><strong>Gentle</strong>: calm and bounded. Sines, cosines and modulos, plus the sharp-but-periodic shapes like <code>square</code> and <code>pulse</code> &mdash; hard edges, dependable rhythm.</p></li>
+      <li><p><strong>Harsh</strong>: breaks rhythm. Tangent-spiked or noise-driven, but also the ones that simply refuse to stay calm &mdash; <code>fade out</code> runs to &minus;&infin; at zero, <code>bald patch</code> accelerates without bound, <code>half sine</code> keeps changing its stride.</p></li>
+      <li><p><strong>Closing</strong>: the set whose period divides 2&pi;&middot;n cleanly. A shape drawn over a full cycle joins back to itself without a seam, which is what you want when you sweep a wave around a circle.</p></li>
+      <li><p><strong>Ghost</strong>: six closing waves hand-picked to stay clean when a wave is plotted against a delayed copy of itself &mdash; that pairing draws the wave's phase portrait as a closed loop.</p></li>
     </ul>
     <p>You don't have to pick by hand. Ask the library for "a gentle one" and let a seed decide. Ask for a specific name. Ask for two names and crossfade between them with <code>mix</code>. Flip <code>shift</code> on and watch the library cycle through random formulas at a tempo you set. All from one function call.</p>
 
@@ -96,8 +97,8 @@
   </main>
 
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.5.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
 </body>

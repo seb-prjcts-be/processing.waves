@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>All 34 Waves &mdash; processing.waves</title>
+  <title>All 35 Waves &mdash; processing.waves</title>
   <meta name="description" content="Every wave in processing.waves, with formula, character, and period. Click the name to copy.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
@@ -61,13 +61,13 @@
   </nav>
 
   <main class="waves-page">
-    <h1 style="font-family:'Oswald',sans-serif;font-size:2.8rem;text-align:center;margin-bottom:.5rem;">All 34 Waves</h1>
+    <h1 style="font-family:'Oswald',sans-serif;font-size:2.8rem;text-align:center;margin-bottom:.5rem;">All 35 Waves</h1>
     <p class="waves-intro">Each wave is a deterministic function: pass a number in, get a number back. The output range is roughly [&minus;0.5, +0.5] before you scale it. Live previews are rendered by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS); <strong>processing.waves</strong> (Java) produces numerically identical output.</p>
     <div class="waves-legend">
       <span>idx</span>
       <span>name</span>
       <span>formula</span>
-      <span style="border-color:#000;color:#000;">harsh = uses randomness</span>
+      <span style="border-color:#000;color:#000;">harsh = breaks rhythm</span>
       <span style="background:#000;color:#fff;border-color:#000;">closing = periodic at 2&pi;&middot;n</span>
       <span style="border-style:dashed;">T = measured period (&mdash; = no clean close)</span>
     </div>
@@ -79,7 +79,7 @@
         <article class="wave-card"><div class="wave-canvas" data-wave="classic sine"></div><div class="wave-meta"><div class="idx">00</div><div class="name">classic sine</div><div class="formula">sin(x*.1)*.4</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="sine"></div><div class="wave-meta"><div class="idx">01</div><div class="name">sine</div><div class="formula">sin(x*.2)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="sharp peaks"></div><div class="wave-meta"><div class="idx">02</div><div class="name">sharp peaks</div><div class="formula">abs(sin(x*.1))*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="smooth solid sine"></div><div class="wave-meta"><div class="idx">33</div><div class="name">smooth solid sine</div><div class="formula">sin(x*3.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T 2.03</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="smooth solid sine"></div><div class="wave-meta"><div class="idx">33</div><div class="name">smooth solid sine</div><div class="formula">sin(x*3.1)*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 2.03</span></div></div></article>
       </div>
     </section>
 
@@ -99,7 +99,7 @@
       <p>Quantised waves: ceil/round/modulo carve smooth shapes into plateaus.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wave="stepped sine"></div><div class="wave-meta"><div class="idx">05</div><div class="name">stepped sine</div><div class="formula">ceil(sin(x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.60</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 31.42</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="steps down"></div><div class="wave-meta"><div class="idx">11</div><div class="name">steps down</div><div class="formula">ceil(tan(x*.1))*.25</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="steps"></div><div class="wave-meta"><div class="idx">12</div><div class="name">steps</div><div class="formula">round(sin(&minus;x*.1))*.25</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.82</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="zig-zag sine"></div><div class="wave-meta"><div class="idx">08</div><div class="name">zig-zag sine</div><div class="formula">sin(x*.2)*.4 % .12</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="square"></div><div class="wave-meta"><div class="idx">03</div><div class="name">square</div><div class="formula">(x*.025)%1 &lt; .5 ? &minus;.5 : .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T 40</span></div></div></article>
@@ -118,7 +118,7 @@
         <article class="wave-card"><div class="wave-canvas" data-wave="round linked sine"></div><div class="wave-meta"><div class="idx">31</div><div class="name">round linked sine</div><div class="formula">sin(x*.1)*cos(x*1)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="ramp up sine"></div><div class="wave-meta"><div class="idx">29</div><div class="name">ramp up sine</div><div class="formula">sin(x)*(x*.01%.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="triangle sine"></div><div class="wave-meta"><div class="idx">30</div><div class="name">triangle sine</div><div class="formula">sin(x)*(x*.01%1&minus;.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="half sine"></div><div class="wave-meta"><div class="idx">32</div><div class="name">half sine</div><div class="formula">sin(x*.05)*(x*.1%.5)</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="half sine"></div><div class="wave-meta"><div class="idx">32</div><div class="name">half sine</div><div class="formula">sin(x*.05)*(x*.1%.5)</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
       </div>
     </section>
 
@@ -137,14 +137,15 @@
       <h2>Chaos &amp; special</h2>
       <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em>: they use a seeded PRNG or a non-trig function with surprising spikes.</p>
       <div class="wave-cards">
-        <article class="wave-card"><div class="wave-canvas" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="grow random"></div><div class="wave-meta"><div class="idx">23</div><div class="name">grow random</div><div class="formula">random(x*.003)</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="noise"></div><div class="wave-meta"><div class="idx">24</div><div class="name">noise</div><div class="formula">noise(x*.1) &minus; .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="fuzzy pulse"></div><div class="wave-meta"><div class="idx">25</div><div class="name">fuzzy pulse</div><div class="formula">tan(x*20)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 17.75</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="up down pulse"></div><div class="wave-meta"><div class="idx">26</div><div class="name">up down pulse</div><div class="formula">tan(x*.1)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 31.42</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="bald patch"></div><div class="wave-meta"><div class="idx">27</div><div class="name">bald patch</div><div class="formula">sq(x*.05) % .5</div><div class="tags"><span class="tag">gentle</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="up down pulse"></div><div class="wave-meta"><div class="idx">26</div><div class="name">up down pulse</div><div class="formula">tan(x*.1)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag closing">closing</span><span class="tag period">T 31.42</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="bald patch"></div><div class="wave-meta"><div class="idx">27</div><div class="name">bald patch</div><div class="formula">sq(x*.05) % .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="fuzzy peak sine"></div><div class="wave-meta"><div class="idx">28</div><div class="name">fuzzy peak sine</div><div class="formula">sin(x*.1) &lt; 0 ? random(&minus;.2, .2) : sin(x*.1)*.5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="spike sine"></div><div class="wave-meta"><div class="idx">34</div><div class="name">spike sine</div><div class="formula">sq(sq(sin(x*.1)))*sin(x*.1)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
       </div>
     </section>
 
@@ -163,7 +164,7 @@
         <code>Waves.wave(x)</code> treats <code>x</code> as a generic coordinate -
         the same mental model as <code>noise(x)</code> &mdash; not an angle in degrees
         or radians. Frequencies are tuned for character, not for round numbers.
-        Ten of the 34 waves are not sine-based at all
+        Ten of the 35 waves are not sine-based at all
         (<code>square</code>, <code>triangle</code>, <code>ramp</code>,
         <code>noise</code>...) so radians would be meaningless for them.
         Use this table as your lookup instead of reaching for <code>TWO_PI</code>.
@@ -196,7 +197,7 @@ for (int i = 0; i &lt; steps; i++) {
 endShape(CLOSE);</pre>
 
       <h3>Quick lookup</h3>
-      <p>24 waves close cleanly, 10 don't. Each card above also shows its measured period.</p>
+      <p>25 waves close cleanly, 10 don't. Each card above also shows its measured period.</p>
       <table class="period-table">
         <tr>
           <th>Period T</th>
@@ -232,7 +233,7 @@ endShape(CLOSE);</pre>
         </tr>
         <tr>
           <td class="num"><strong>62.83</strong></td>
-          <td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 31 round linked sine</td>
+          <td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 31 round linked sine, 34 spike sine</td>
         </tr>
         <tr>
           <td class="num"><strong>&mdash;</strong></td>
@@ -247,7 +248,7 @@ endShape(CLOSE);</pre>
       </ul>
       <p>
         Want a shape that stays closed <em>while shifting</em> between formulas? Use
-        <code>.group("closing")</code> &mdash; a pool of 17 waves that all share the base period
+        <code>.group("closing")</code> &mdash; a pool of 18 waves that all share the base period
         <code>62.8319</code> &mdash; and read the sweep from <code>sampler.period()</code>.
         See <a href="guide.html#closing">Closing curved shapes</a> in the guide.
       </p>
@@ -255,8 +256,8 @@ endShape(CLOSE);</pre>
   </main>
 
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.5.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
   <script src="sketch.js"></script>

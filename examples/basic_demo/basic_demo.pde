@@ -56,7 +56,7 @@ void draw() {
   drawHud();
 }
 
-// 1) Each of the 34 waves drawn as its own row
+// 1) Each of the 35 waves drawn as its own row
 void drawAllWaves(float t) {
   int n = Waves.count();
   float rowH = (float)height / n;

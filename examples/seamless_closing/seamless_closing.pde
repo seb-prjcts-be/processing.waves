@@ -1,7 +1,7 @@
 // Seamless Closing
 // A ring sampled with shift normally tears its seam open the moment it
 // lands on a new wave — every formula has its own period. The "closing"
-// pool fixes that: all 17 waves in it share one base period, so a sweep
+// pool fixes that: all 18 waves in it share one base period, so a sweep
 // of ring.period() * LOBES closes through every morph. The loop keeps
 // changing shape and never shows a seam.
 

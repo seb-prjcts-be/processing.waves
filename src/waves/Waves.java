@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Java/Processing port of p5.waves v3.4.0 (tracks upstream main).
- * 34 wave shapes. Pass a number in, get a number back.
+ * Java/Processing port of p5.waves v3.5.0 (tracks upstream main).
+ * 35 wave shapes. Pass a number in, get a number back.
  *
  * Public API returns float (Processing convention) but all internal math runs
  * in double for parity with the JS reference (JS Numbers are 64-bit doubles).
@@ -46,9 +46,14 @@ public class Waves {
     }
   }
 
-  // ----- Registry: all 34 waves in v3.4.0 order -----
-  // Order matters: pickWaveIndex(seed) returns floor(rng * 34), so the same seed
+  // ----- Registry: all 35 waves in v3.5.0 order -----
+  // Order matters: pickWaveIndex(seed) returns floor(rng * 35), so the same seed
   // must select the same wave between JS and Java.
+  //
+  // 'harsh' = breaks rhythm: tan/random/noise-driven, or otherwise not-calm
+  // (unbounded/Inf, or erratic accelerating rhythm). 'gentle' = calm and
+  // bounded, including sharp-but-periodic (square, pulse) and steady
+  // non-periodic waves (ramp up sine, triangle sine, meta sine).
   public static final WaveDef[] WAVES = new WaveDef[] {
     new WaveDef("classic sine",      "sin(x*.1)*.4",
       (x, t, c) -> Math.sin(x*0.1) * 0.4,                                  "gentle", 62.8319f),
@@ -95,7 +100,7 @@ public class Waves {
     new WaveDef("saw up",            "-x*.03 % .5",
       (x, t, c) -> (-x*0.03) % 0.5,                                        "gentle", 16.6667f),
     new WaveDef("fade out",          "log(x)*.1",
-      (x, t, c) -> Math.log(x) * 0.1,                                      "gentle", null),
+      (x, t, c) -> Math.log(x) * 0.1,                                      "harsh", null),
     new WaveDef("grow random",       "random(x*.003)",
       (x, t, c) -> c.randomMax(x*0.003),                                   "harsh", null),
     new WaveDef("noise",             "noise(x*.1) - .5",
@@ -105,7 +110,7 @@ public class Waves {
     new WaveDef("up down pulse",     "tan(x*.1)*.05",
       (x, t, c) -> Math.tan(x*0.1) * 0.05,                                 "harsh", 31.4159f),
     new WaveDef("bald patch",        "sq(x*.05) % .5",
-      (x, t, c) -> ((x*0.05) * (x*0.05)) % 0.5,                            "gentle", null),
+      (x, t, c) -> ((x*0.05) * (x*0.05)) % 0.5,                            "harsh", null),
     new WaveDef("fuzzy peak sine",   "sin(x*.1) < 0 ? random(-.2, .2) : sin(x*.1)*.5",
       (x, t, c) -> {
         double s = Math.sin(x*0.1);
@@ -118,17 +123,36 @@ public class Waves {
     new WaveDef("round linked sine", "sin(x*.1)*cos(x*1)*.5",
       (x, t, c) -> Math.sin(x*0.1) * Math.cos(x) * 0.5,                    "gentle", 62.8319f),
     new WaveDef("half sine",         "sin(x*.05)*(x*.1%.5)",
-      (x, t, c) -> Math.sin(x*0.05) * ((x*0.1) % 0.5),                     "gentle", null),
+      (x, t, c) -> Math.sin(x*0.05) * ((x*0.1) % 0.5),                     "harsh", null),
     new WaveDef("smooth solid sine", "sin(x*3.1)*.25",
       (x, t, c) -> Math.sin(x*3.1) * 0.25,                                 "gentle", 2.0268f),
+    new WaveDef("spike sine",        "sq(sq(sin(x*.1)))*sin(x*.1)*.5",
+      (x, t, c) -> {
+        double s = Math.sin(x*0.1), s2 = s*s;
+        return s2*s2 * s * 0.5;
+      }, "gentle", 62.8319f),                    // odd sin^5 preserves full period
   };
 
   // ----- Pools -----
   static final List<Integer> GENTLE_INDICES  = new ArrayList<Integer>();
   static final List<Integer> HARSH_INDICES   = new ArrayList<Integer>();
   static final List<Integer> CLOSING_INDICES = new ArrayList<Integer>();
+  static final List<Integer> GHOST_INDICES   = new ArrayList<Integer>();
   static final float CLOSING_BASE_PERIOD = 62.8319f;
   static final float CLOSING_RATIO_TOL   = 0.001f;
+
+  // 'ghost' pool = a hand-picked subset of the closing waves that read well
+  // under the ghost-delay embedding (see examples/ghost_delay): plot one wave
+  // against a delayed copy of itself and it closes into a loop ring. Every
+  // member closes over CLOSING_BASE_PERIOD and gives a clean loop, from a plain
+  // ellipse (wobble sine) up to dense rosettes (mountain peaks, valleys). The
+  // tan-based closing waves blow up under that pairing and the very-short-period
+  // ones tangle, so they are left out. Aesthetic selection — discover membership
+  // at runtime via the group, do not hardcode this list in consumer code.
+  static final String[] GHOST_NAMES = {
+    "wobble sine", "bumpy sine", "batman", "round linked sine",
+    "mountain peaks", "valleys"
+  };
 
   static {
     for (int i = 0; i < WAVES.length; i++) {
@@ -140,6 +164,11 @@ public class Waves {
         if (Math.abs(ratio - Math.round(ratio)) < CLOSING_RATIO_TOL) {
           CLOSING_INDICES.add(i);
         }
+      }
+    }
+    for (int i = 0; i < GHOST_NAMES.length; i++) {
+      for (int j = 0; j < WAVES.length; j++) {
+        if (WAVES[j].name.equals(GHOST_NAMES[i])) { GHOST_INDICES.add(j); break; }
       }
     }
   }
@@ -208,7 +237,7 @@ public class Waves {
     return pool.get((i + 1) % pool.size());
   }
 
-  // ----- Shift selection: per-cycle permutation (upstream main, post v3.4.0) -----
+  // ----- Shift selection: per-cycle permutation (upstream main, v3.4.0+) -----
   // A naive per-era random draw clusters (coupon-collector): some waves repeat,
   // others never appear in a session. Instead, shuffle the pool once per full
   // cycle of L eras (Fisher-Yates seeded by base + cycle) and read it position
@@ -294,6 +323,7 @@ public class Waves {
       if (k.equals("gentle"))  return GENTLE_INDICES;
       if (k.equals("harsh"))   return HARSH_INDICES;
       if (k.equals("closing")) return CLOSING_INDICES;
+      if (k.equals("ghost"))   return GHOST_INDICES;
       return null;
     }
     if (opt instanceof Object[]) {
@@ -408,6 +438,9 @@ public class Waves {
     double evalX   = x * freqScale + phaseNoise;
     ctx.reset(seed, evalX);
     double val = fn.eval(evalX, t, ctx);
+    // JS clamps non-finite inside evaluate(), i.e. before the lerp below.
+    // Clamping after it would feed NaN into lerp and diverge from the reference.
+    if (!Double.isFinite(val)) val = 0;
     if (wildMix > 0) {
       double carrier = noiseSigned(evalX * 0.97 + seed * 0.0001, seed + 101);
       val = lerp(val, carrier, wildMix);

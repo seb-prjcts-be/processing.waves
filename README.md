@@ -2,15 +2,15 @@
 
 **[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)** · **[Wave Lab (exports .pde)](https://seb-prjcts-be.github.io/p5.waves_lab/)**
 
-Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.4.0 for Processing 4. **34 wave shapes. One function call. Pass a number in, get a number back.**
+Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.5.0 for Processing 4. **35 wave shapes. One function call. Pass a number in, get a number back.**
 
 ## About
 
-Behind that one promise lives a curated set of 34 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos. Each one is a tiny formula tuned to drive motion, color, shape, or pattern in a Processing sketch. The library hands you all of them through a single `Waves.wave(x, ...)` call, plus the controls to crossfade between them, auto-cycle on a tempo, or push any of them into wild mode.
+Behind that one promise lives a curated set of 35 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos. Each one is a tiny formula tuned to drive motion, color, shape, or pattern in a Processing sketch. The library hands you all of them through a single `Waves.wave(x, ...)` call, plus the controls to crossfade between them, auto-cycle on a tempo, or push any of them into wild mode.
 
 processing.waves is the Java sibling of p5.waves, originally built in JavaScript for the browser side of generative coding. The port carries the same vocabulary across to Processing 4: same names, same indices, same numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you. The challenge of the port was less about translating syntax and more about making the *output* of two implementations match bit-for-bit, despite signed-versus-unsigned int quirks and floating-point traps. FNV-1a hashing, the mulberry32 PRNG, and a double-precision internal math layer carry that weight.
 
-To prove the port works the repo ships a numerical validator that runs the JS reference via Node and compares its outputs against the Java port across 34 waves and 35 cases. Current status: 35 / 35 pass. Visually identical to JS, sub-pixel numerical match where deterministic. See the [site](https://seb-prjcts-be.github.io/processing.waves/) for live previews of every wave and every bundled sketch.
+To prove the port works the repo ships a numerical validator that runs the JS reference via Node and compares its outputs against the Java port across 49 cases covering representative waves, every option path, and the group pools. Current status: 49 / 49 pass. Visually identical to JS, sub-pixel numerical match where deterministic. See the [site](https://seb-prjcts-be.github.io/processing.waves/) for live previews of every wave and every bundled sketch.
 
 ## Install
 
@@ -96,7 +96,7 @@ See the [full guide](https://seb-prjcts-be.github.io/processing.waves/guide.html
 
 ## Examples
 
-Thirteen sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
+Fourteen sketches in [`examples/`](examples/). Open them from `Processing > File > Examples > Contributed Libraries > waves`.
 
 | Example | What it shows |
 | --- | --- |
@@ -104,6 +104,7 @@ Thirteen sketches in [`examples/`](examples/). Open them from `Processing > File
 | [`wave_shift`](examples/wave_shift/wave_shift.pde) | Filled ribbons, auto-shifting |
 | [`morph_wave`](examples/morph_wave/morph_wave.pde) | Horizontal lines blending two formulas |
 | [`seamless_closing`](examples/seamless_closing/seamless_closing.pde) | Shifting ring that never tears its seam: `group("closing")` + `period()` |
+| [`ghost_delay`](examples/ghost_delay/ghost_delay.pde) | One wave against a delayed copy of itself: `group("ghost")` draws its phase portrait |
 | [`flow_fields`](examples/flow_fields/flow_fields.pde) | ASCII flow field driven by a shifting sampler |
 | [`binary_field`](examples/binary_field/binary_field.pde) | Two samplers, summed and thresholded |
 | [`random_walker`](examples/random_walker/random_walker.pde) | Wave output IS the velocity, trails on `PGraphics` |
@@ -135,7 +136,7 @@ The `tests/` folder validates that processing.waves produces the same output as 
 ./tests/run.ps1
 ```
 
-Current status: **35 / 35 pass**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
+Current status: **49 / 49 pass**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
 
 ## Port notes (Java vs JS)
 

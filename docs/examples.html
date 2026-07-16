@@ -35,13 +35,13 @@
       <div class="hero-text">
         <div class="hero-badge">Processing 4 library</div>
         <h1><span class="accent">Examples</span></h1>
-        <p class="hero-sub">34 wave shapes. One function call.<br>Pass a number in, get a number back. Use it for anything.</p>
+        <p class="hero-sub">35 wave shapes. One function call.<br>Pass a number in, get a number back. Use it for anything.</p>
       </div>
     </div>
   </section>
 
   <div class="ex-page-header">
-    <p>Thirteen sketches ship with the library; twelve are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, shift-proof closing rings, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
+    <p>Fourteen sketches ship with the library; thirteen are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, shift-proof closing rings, phase portraits, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
     <p style="font-size:.85rem;font-style:italic;color:var(--text-muted);">Live demos on this page are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to get the same result.</p>
   </div>
 
@@ -179,7 +179,7 @@ void draw() {
         <h2>seamless_closing</h2>
         <span class="ex-tag">shift &middot; group: "closing" &middot; period</span>
       </div>
-      <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave &mdash; every formula has its own period. The <code>"closing"</code> pool fixes that: all 17 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
+      <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave &mdash; every formula has its own period. The <code>"closing"</code> pool fixes that: all 18 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
       <div class="ex-canvas-live" data-example="seamless_closing"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/seamless_closing/seamless_closing.pde" target="_blank">View on GitHub &rarr;</a>
@@ -187,7 +187,7 @@ void draw() {
       <pre class="ex-code-block">// Seamless Closing
 // A ring sampled with shift normally tears its seam open the moment it
 // lands on a new wave — every formula has its own period. The "closing"
-// pool fixes that: all 17 waves in it share one base period, so a sweep
+// pool fixes that: all 18 waves in it share one base period, so a sweep
 // of ring.period() * LOBES closes through every morph. The loop keeps
 // changing shape and never shows a seam.
 
@@ -246,6 +246,103 @@ void draw() {
   textSize(12);
   text(ring.waveName() + (ring.shifting() ? "  to  " + ring.targetName() : ""),
        -width / 2f + 18, -height / 2f + 24);
+}</pre>
+    </section>
+
+    <!-- ── ghost_delay ── -->
+    <section class="ex-block" id="ghost-delay">
+      <div class="ex-head">
+        <h2>ghost_delay</h2>
+        <span class="ex-tag">shift &middot; group: "ghost" &middot; period</span>
+      </div>
+      <p class="lead">One 1D wave, read against a delayed copy of itself. Plot <code>sample(u)</code> against <code>sample(u + tau)</code> and a single scalar wave closes into a loop ring &mdash; its phase portrait. The <code>"ghost"</code> pool is six closing waves hand-picked to stay clean under that pairing, and <code>shift</code> keeps morphing between them, so the loop family never settles. The strip along the bottom is that one wave; the dots are the two read points.</p>
+      <div class="ex-canvas-live" data-example="ghost_delay"></div>
+      <div class="ex-links">
+        <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/ghost_delay/ghost_delay.pde" target="_blank">View on GitHub &rarr;</a>
+      </div>
+      <pre class="ex-code-block">// Ghost Delay
+// One 1D wave, read against a delayed copy of itself.
+// x = sample(u), y = sample(u + tau): one scalar wave closes into a loop
+// ring — its phase portrait. shift morphs the wave, so the loop family
+// keeps changing. The strip along the bottom is that one wave; the dots
+// are the two read points.
+
+import waves.*;
+
+final int N = 800;
+
+Waves.WaveSampler sampler;
+
+void setup() {
+  size(720, 720);
+  colorMode(HSB, 360, 100, 100, 100);
+  strokeJoin(ROUND);
+  textFont(createFont("Consolas", 12));
+
+  // "ghost" is a built-in pool of closing waves that stay clean under this
+  // delay. range(-1, 1) gives unit output (the default would be amplitude 100).
+  sampler = Waves.createSampler(new WaveOpts()
+    .group("ghost")
+    .shift(true)
+    .range(-1, 1));
+}
+
+void draw() {
+  background(230, 25, 8);
+  noFill();
+
+  float t   = millis() / 1000.0f;
+  float hue = (t * 12) % 360;
+
+  float period = sampler.period();                      // ghost waves share one period
+  float tau    = period * (0.5f + 0.35f * sin(t * 0.35f));  // the ghost delay, breathing
+
+  // The ring: the wave against its own delayed self.
+  float rad = min(width, height) * 0.36f;
+  stroke(hue, 55, 100, 90);
+  strokeWeight(1.4f);
+  pushMatrix();
+  translate(width / 2f, height / 2f - 30);
+  beginShape();
+  for (int i = 0; i &lt;= N; i++) {
+    float u = (i / (float)N) * period;                  // one period -&gt; the ring closes
+    vertex(sampler.sample(u, t) * rad, sampler.sample(u + tau, t) * rad);
+  }
+  endShape(CLOSE);
+  popMatrix();
+
+  drawWaveStrip(t, tau, hue, period);
+
+  // shift is cycling the ghost pool; name the current wave.
+  noStroke();
+  fill(0, 0, 70);
+  textSize(12);
+  text(sampler.waveName(), 18, 26);
+}
+
+// The raw 1D wave as a height line, with the two read points (u and u + tau)
+// marked. The whole trick is reading this one wave twice.
+void drawWaveStrip(float t, float tau, float hue, float period) {
+  float baseY = height - 60;
+  float w     = width - 120;
+  float left  = 60;
+  float amp   = 24;
+
+  noFill();
+  stroke(hue, 45, 100, 70);
+  strokeWeight(1.2f);
+  beginShape();
+  for (int i = 0; i &lt;= N; i++) {
+    float u = (i / (float)N) * period;
+    vertex(left + (i / (float)N) * w, baseY - sampler.sample(u, t) * amp);
+  }
+  endShape();
+
+  noStroke();
+  fill(0, 0, 100);
+  circle(left, baseY - sampler.sample(0, t) * amp, 7);
+  fill(hue, 70, 100);
+  circle(left + (tau % period) / period * w, baseY - sampler.sample(tau, t) * amp, 7);
 }</pre>
     </section>
 
@@ -1024,8 +1121,8 @@ void mouseDragged() {
   </main>
 
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.4.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.0.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p class="footer-sub">MIT License &middot; v1.5.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
   <script src="sketch.js"></script>

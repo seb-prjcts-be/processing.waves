@@ -34,3 +34,19 @@ id	desc	y	t	seed	wave	amplitude	frequency	phase	mode	u	mix	rlo	rhi	group	waveB
 33	large negative y=-1000	-1000	0	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
 34	t=100	10	100	0	classic sine	100	1	0	stable	0	0.5	-	-	all	-
 35	frequency 0	10	0	0	classic sine	100	0	0	stable	0	0.5	-	-	all	-
+36	spike sine y=15	15	0	0	spike sine	100	1	0	stable	0	0.5	-	-	all	-
+37	spike sine y=-40	-40	0	0	spike sine	100	1	0	stable	0	0.5	-	-	all	-
+38	spike sine wild u=0.5	15	0	0	spike sine	100	1	0	wild	0.5	0.5	-	-	all	-
+39	spike sine range -1 to 1	15	0	0	spike sine	100	1	0	stable	0	0.5	-1	1	all	-
+40	morph 0.5 spike to wobble	15	0	0	spike sine	100	1	0	stable	0	0.5	-	-	all	wobble sine
+41	seed 999 group ghost	10	0	999	-	100	1	0	stable	0	0.5	-	-	ghost	-
+42	seed 7 group ghost	10	0	7	-	100	1	0	stable	0	0.5	-	-	ghost	-
+43	seed 123 group ghost	22	0	123	-	100	1	0	stable	0	0.5	-1	1	ghost	-
+44	seed 5 group harsh	10	0	5	-	100	1	0	stable	0	0.5	-	-	harsh	-
+45	seed 2024 group gentle	10	0	2024	-	100	1	0	stable	0	0.5	-	-	gentle	-
+46	fade out y=0 (log -Inf edge)	0	0	0	fade out	100	1	0	stable	0	0.5	-	-	all	-
+47	fade out y=-10	-10	0	0	fade out	100	1	0	stable	0	0.5	-	-	all	-
+48	bald patch y=0.5	0.5	0	0	bald patch	100	1	0	stable	0	0.5	-	-	all	-
+49	half sine y=10	10	0	0	half sine	100	1	0	stable	0	0.5	-	-	all	-
+50	fade out y=0 wild u=1.0 (non-finite clamp)	0	0	0	fade out	100	1	0	wild	1.0	0.5	-	-	all	-
+51	fade out y=-10 wild u=0.5 (non-finite clamp)	-10	0	0	fade out	100	1	0	wild	0.5	0.5	-	-	all	-

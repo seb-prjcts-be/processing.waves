@@ -33,7 +33,7 @@ public class WaveOpts {
   public boolean shift            = false;
   public float   shiftInterval    = 3f;
   public float   shiftDuration    = 1f;
-  public Object  group            = null;     // "gentle" / "harsh" / "closing" / "all" / String[]
+  public Object  group            = null;     // "gentle" / "harsh" / "closing" / "ghost" / "all" / String[]
 
   public WaveOpts wave(Object v)            { this.wave = v; return this; }
   public WaveOpts wave(String a, String b)  { this.wave = new String[]{a, b}; return this; }

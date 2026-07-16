@@ -4,7 +4,7 @@
    Live previews on this site are rendered by p5.js + the
    original p5.waves JS library (loaded from CDN). The Java
    port (processing.waves) produces numerically identical
-   output, verified by a 35-case validator in /tests.
+   output, verified by a 49-case validator in /tests.
 
    Every preview is lazy-mounted via IntersectionObserver:
    the p5 instance is created only when its container scrolls
@@ -40,7 +40,7 @@ const WAVE_NAMES = [
   "grow random", "noise", "fuzzy pulse", "up down pulse",
   "bald patch", "fuzzy peak sine", "ramp up sine",
   "triangle sine", "round linked sine", "half sine",
-  "smooth solid sine"
+  "smooth solid sine", "spike sine"
 ];
 
 /* ------------------------------------------------------------
@@ -145,7 +145,7 @@ function mountHero(host) {
 }
 
 /* ------------------------------------------------------------
-   GALLERY - 34 mini waves in a responsive grid
+   GALLERY - 35 mini waves in a responsive grid
    ------------------------------------------------------------ */
 function mountGalleryCell(canvasHost, name) {
   return new p5((p) => {
@@ -822,11 +822,78 @@ function mountWaveVolume3D(host) {
   }, host);
 }
 
+/* ------------------------------------------------------------
+   Example: ghost_delay
+   ------------------------------------------------------------ */
+function mountGhostDelay(host) {
+  return new p5((p) => {
+    const N = 800;
+    let sampler;
+    p.setup = () => {
+      p.createCanvas(host.clientWidth, host.clientHeight || 460);
+      p.colorMode(p.HSB, 360, 100, 100, 100);
+      p.strokeJoin(p.ROUND);
+      p.textFont("Consolas");
+      // 'ghost' is a built-in pool of closing waves that stay clean under
+      // this delay. range [-1, 1] gives unit output.
+      sampler = Waves.createSampler({ group: "ghost", shift: true, range: [-1, 1] });
+    };
+    p.windowResized = () => p.resizeCanvas(host.clientWidth, host.clientHeight || 460);
+    p.draw = () => {
+      p.background(230, 25, 8);
+      p.noFill();
+      const t = p.millis() / 1000;
+      const hu = (t * 12) % 360;
+      const period = sampler.period;                      // ghost waves share one period
+      const tau = period * (0.5 + 0.35 * p.sin(t * 0.35)); // the ghost delay, breathing
+
+      // The ring: the wave against its own delayed self.
+      const rad = Math.min(p.width, p.height) * 0.36;
+      p.stroke(hu, 55, 100, 90);
+      p.strokeWeight(1.4);
+      p.push();
+      p.translate(p.width / 2, p.height / 2 - 20);
+      p.beginShape();
+      for (let i = 0; i <= N; i++) {
+        const u = (i / N) * period;                       // one period -> the ring closes
+        p.vertex(sampler.sample(u, t) * rad, sampler.sample(u + tau, t) * rad);
+      }
+      p.endShape(p.CLOSE);
+      p.pop();
+
+      // The raw 1D wave as a height line, with the two read points marked.
+      const baseY = p.height - 40;
+      const w = p.width - 120;
+      const left = 60;
+      const amp = 20;
+      p.noFill();
+      p.stroke(hu, 45, 100, 70);
+      p.strokeWeight(1.2);
+      p.beginShape();
+      for (let i = 0; i <= N; i++) {
+        const u = (i / N) * period;
+        p.vertex(left + (i / N) * w, baseY - sampler.sample(u, t) * amp);
+      }
+      p.endShape();
+      p.noStroke();
+      p.fill(0, 0, 100);
+      p.circle(left, baseY - sampler.sample(0, t) * amp, 7);
+      p.fill(hu, 70, 100);
+      p.circle(left + ((tau % period) / period) * w, baseY - sampler.sample(tau, t) * amp, 7);
+
+      p.fill(0, 0, 70);
+      p.textSize(11);
+      p.text(sampler.waveName, 8, 16);
+    };
+  }, host);
+}
+
 function mountExamples() {
   const handlers = {
     wave_shift:      mountWaveShift,
     morph_wave:      mountMorphWave,
     seamless_closing: mountSeamlessClosing,
+    ghost_delay:     mountGhostDelay,
     flow_fields:     mountFlowFields,
     binary_field:    mountBinaryField,
     random_walker:   mountRandomWalker,
