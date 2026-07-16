@@ -144,7 +144,7 @@ float y = Waves.wave(x, o);</pre>
     </table>
 
     <div class="callout">
-      <p><strong>Frequency is a zoom, not a speed dial.</strong> It multiplies <code>x</code> and nothing else, so what you get depends on where <code>x</code> sits in the formula. <code>classic sine</code> is <code>sin(x*.1)</code>, which becomes <code>sin(2x*.1)</code> &mdash; genuinely faster. But <code>fade out</code> is <code>log(x)</code>, and <code>log(2x) = log(x) + log(2)</code>: a logarithm turns multiplying into adding, so it slides up and keeps its rhythm. And <code>half sine</code> (<code>sin(x*.05)*(x*.1%.5)</code>) carries <code>x</code> twice, so it cycles faster <em>and</em> grows a taller envelope. One dial, three outcomes.</p>
+      <p><strong>Frequency is a zoom, not a speed dial.</strong> It multiplies <code>x</code> and nothing else, so what you get depends on where <code>x</code> sits in the formula. <code>classic sine</code> is <code>sin(x*.1)</code>, which becomes <code>sin(2x*.1)</code> &mdash; genuinely faster. But <code>shake out</code> is a mirrored log chirp, and <code>log(2x) = log(x) + log(2)</code>: a logarithm turns multiplying into adding, so frequency slides the shake sideways (and tightens the period) rather than speeding the whole wave up evenly. And <code>half sine</code> (<code>sin(x*.05)*(x*.1%.5)</code>) carries <code>x</code> twice, so it cycles faster <em>and</em> grows a taller envelope. One dial, three outcomes.</p>
     </div>
 
     <h3>Level up</h3>
@@ -241,10 +241,10 @@ void draw() {
   endShape(CLOSE);
 }</pre>
     <p>Change <code>lobes</code> to 3, 5, 13 &mdash; any positive integer closes cleanly. Change <code>steps</code> for finer or coarser resolution; it never affects whether the shape closes.</p>
-    <div class="callout"><p>Some waves have no clean period &mdash; <code>"noise"</code>, <code>"fade out"</code>, <code>"meta sine"</code>, and the rest of the <em>no-close</em> group on the <a href="waves.html#periodicity">Waves page</a>. For those, use two rings (inner + outer) and connect them with radial lines, or fade the stroke to zero at the endpoints instead of closing.</p></div>
+    <div class="callout"><p>Some waves have no clean period &mdash; <code>"noise"</code>, <code>"meta sine"</code>, and the rest of the <em>no-close</em> group on the <a href="waves.html#periodicity">Waves page</a>. For those, use two rings (inner + outer) and connect them with radial lines, or fade the stroke to zero at the endpoints instead of closing.</p></div>
 
     <h3>Stay closed <em>while</em> shifting &mdash; <code>.group("closing")</code></h3>
-    <p>Shift and closed shapes fight each other by default. A ring sampled with <code>.shift(true)</code> tears its seam open the moment it lands on a new wave, because every formula has its own period and your fixed sweep stops lining up. The <code>"closing"</code> pool ends that fight: all 18 waves in it share one base period (<code>62.8319</code>, that's <code>2&pi;/0.1</code>), so a sweep of <code>sampler.period() &times; lobes</code> closes seamlessly through every transition &mdash; the shape keeps morphing into new waves and never shows a seam.</p>
+    <p>Shift and closed shapes fight each other by default. A ring sampled with <code>.shift(true)</code> tears its seam open the moment it lands on a new wave, because every formula has its own period and your fixed sweep stops lining up. The <code>"closing"</code> pool ends that fight: all 19 waves in it share one base period (<code>62.8319</code>, that's <code>2&pi;/0.1</code>), so a sweep of <code>sampler.period() &times; lobes</code> closes seamlessly through every transition &mdash; the shape keeps morphing into new waves and never shows a seam.</p>
     <pre class="code-block">import waves.*;
 
 Waves.WaveSampler ring;
@@ -255,7 +255,7 @@ void setup() {
   stroke(0);
   ring = Waves.createSampler(new WaveOpts()
     .shift(true)
-    .group("closing")    // 18 waves that all close on the same sweep
+    .group("closing")    // 19 waves that all close on the same sweep
     .amplitude(30));
 }
 
@@ -349,7 +349,7 @@ float hue = Waves.wave(x, new WaveOpts().wave("noise").range(0, 360));</pre>
       <div class="wave-item"><span class="wi">19</span>ramp</div>
       <div class="wave-item"><span class="wi">20</span>saw down</div>
       <div class="wave-item"><span class="wi">21</span>saw up</div>
-      <div class="wave-item"><span class="wi">22</span>fade out</div>
+      <div class="wave-item"><span class="wi">22</span>shake out</div>
       <div class="wave-item"><span class="wi">23</span>grow random</div>
       <div class="wave-item"><span class="wi">24</span>noise</div>
       <div class="wave-item"><span class="wi">25</span>fuzzy pulse</div>
@@ -473,7 +473,7 @@ void draw() {
 
   <footer>
     <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.5.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p class="footer-sub">MIT License &middot; v1.6.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
 </body>

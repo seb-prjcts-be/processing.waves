@@ -138,7 +138,7 @@
       <p>Things break loose: tangents, noise, logarithm, random. Most are flagged <em>harsh</em>: they use a seeded PRNG or a non-trig function with surprising spikes.</p>
       <div class="wave-cards">
         <article class="wave-card"><div class="wave-canvas" data-wave="up down noise"></div><div class="wave-meta"><div class="idx">16</div><div class="name">up down noise</div><div class="formula">x*sin(x*.1) % .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
-        <article class="wave-card"><div class="wave-canvas" data-wave="fade out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">fade out</div><div class="formula">log(x)*.1</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
+        <article class="wave-card"><div class="wave-canvas" data-wave="shake out"></div><div class="wave-meta"><div class="idx">22</div><div class="name">shake out</div><div class="formula">sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5</div><div class="tags"><span class="tag">gentle</span><span class="tag closing">closing</span><span class="tag period">T 62.83</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="grow random"></div><div class="wave-meta"><div class="idx">23</div><div class="name">grow random</div><div class="formula">random(x*.003)</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="noise"></div><div class="wave-meta"><div class="idx">24</div><div class="name">noise</div><div class="formula">noise(x*.1) &minus; .5</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T &mdash;</span></div></div></article>
         <article class="wave-card"><div class="wave-canvas" data-wave="fuzzy pulse"></div><div class="wave-meta"><div class="idx">25</div><div class="name">fuzzy pulse</div><div class="formula">tan(x*20)*.05</div><div class="tags"><span class="tag harsh">harsh</span><span class="tag period">T 17.75</span></div></div></article>
@@ -233,11 +233,11 @@ endShape(CLOSE);</pre>
         </tr>
         <tr>
           <td class="num"><strong>62.83</strong></td>
-          <td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 31 round linked sine, 34 spike sine</td>
+          <td>0 classic sine, 5 stepped sine, 6 mountain peaks, 7 valleys, 9 batman, 10 offset sine, 12 steps, 14 bumpy sine, 15 wobble sine, 22 shake out, 31 round linked sine, 34 spike sine</td>
         </tr>
         <tr>
           <td class="num"><strong>&mdash;</strong></td>
-          <td><em>no clean close:</em> 16 up down noise, 17 meta sine, 22 fade out, 23 grow random, 24 noise, 27 bald patch, 28 fuzzy peak sine, 29 ramp up sine, 30 triangle sine, 32 half sine</td>
+          <td><em>no clean close:</em> 16 up down noise, 17 meta sine, 23 grow random, 24 noise, 27 bald patch, 28 fuzzy peak sine, 29 ramp up sine, 30 triangle sine, 32 half sine</td>
         </tr>
       </table>
 
@@ -248,7 +248,7 @@ endShape(CLOSE);</pre>
       </ul>
       <p>
         Want a shape that stays closed <em>while shifting</em> between formulas? Use
-        <code>.group("closing")</code> &mdash; a pool of 18 waves that all share the base period
+        <code>.group("closing")</code> &mdash; a pool of 19 waves that all share the base period
         <code>62.8319</code> &mdash; and read the sweep from <code>sampler.period()</code>.
         See <a href="guide.html#closing">Closing curved shapes</a> in the guide.
       </p>
@@ -257,7 +257,7 @@ endShape(CLOSE);</pre>
 
   <footer>
     <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.5.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p class="footer-sub">MIT License &middot; v1.6.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
   <script src="sketch.js"></script>

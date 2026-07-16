@@ -2,7 +2,7 @@
 
 **[Open site](https://seb-prjcts-be.github.io/processing.waves/)** · **[p5.waves (JS original)](https://seb-prjcts-be.github.io/p5.waves/)** · **[Wave Lab (exports .pde)](https://seb-prjcts-be.github.io/p5.waves_lab/)**
 
-Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.5.0 for Processing 4. **35 wave shapes. One function call. Pass a number in, get a number back.**
+Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.6.0 for Processing 4. **35 wave shapes. One function call. Pass a number in, get a number back.**
 
 ## About
 

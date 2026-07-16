@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Java/Processing port of p5.waves v3.5.0 (tracks upstream main).
+ * Java/Processing port of p5.waves v3.6.0 (tracks upstream main).
  * 35 wave shapes. Pass a number in, get a number back.
  *
  * Public API returns float (Processing convention) but all internal math runs
@@ -46,7 +46,7 @@ public class Waves {
     }
   }
 
-  // ----- Registry: all 35 waves in v3.5.0 order -----
+  // ----- Registry: all 35 waves in v3.6.0 order -----
   // Order matters: pickWaveIndex(seed) returns floor(rng * 35), so the same seed
   // must select the same wave between JS and Java.
   //
@@ -99,8 +99,12 @@ public class Waves {
       (x, t, c) -> (x*0.03) % 0.5,                                         "gentle", 16.6667f),
     new WaveDef("saw up",            "-x*.03 % .5",
       (x, t, c) -> (-x*0.03) % 0.5,                                        "gentle", 16.6667f),
-    new WaveDef("fade out",          "log(x)*.1",
-      (x, t, c) -> Math.log(x) * 0.1,                                      "harsh", null),
+    new WaveDef("shake out",         "sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5",
+      (x, t, c) -> {
+        double m = Math.abs(x) % 62.8319;
+        m = Math.min(m, 62.8319 - m);
+        return Math.sin(Math.log(m*m + 1.0) * 3.0) * 0.5;
+      }, "gentle", 62.8319f),                    // mirrored log chirp - palindrome over 2pi/0.1
     new WaveDef("grow random",       "random(x*.003)",
       (x, t, c) -> c.randomMax(x*0.003),                                   "harsh", null),
     new WaveDef("noise",             "noise(x*.1) - .5",

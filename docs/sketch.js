@@ -36,7 +36,7 @@ const WAVE_NAMES = [
   "stepped sine", "mountain peaks", "valleys", "zig-zag sine",
   "batman", "offset sine", "steps down", "steps", "squared sine",
   "bumpy sine", "wobble sine", "up down noise", "meta sine",
-  "triangle", "ramp", "saw down", "saw up", "fade out",
+  "triangle", "ramp", "saw down", "saw up", "shake out",
   "grow random", "noise", "fuzzy pulse", "up down pulse",
   "bald patch", "fuzzy peak sine", "ramp up sine",
   "triangle sine", "round linked sine", "half sine",

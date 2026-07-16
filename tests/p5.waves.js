@@ -1,7 +1,7 @@
 ﻿/*!
  * p5.waves
  * Wave sampling for p5.js. Always returns a number.
- * Version 3.5.0
+ * Version 3.6.0
  * Author: seb@prjcts
  * License: MIT
  */
@@ -64,8 +64,8 @@
       fn: (x) => x*.03 % .5 },
     { name: 'saw up',            algo: '-x*.03 % .5',
       fn: (x) => -x*.03 % .5 },
-    { name: 'fade out',          algo: 'log(x)*.1',
-      fn: (x) => log(x)*.1 },
+    { name: 'shake out',         algo: 'sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5',
+      fn: (x) => sin(log(sq(min(abs(x)%62.8319,62.8319-abs(x)%62.8319))+1)*3)*.5 },
     { name: 'grow random',       algo: 'random(x*.003)',
       fn: (x) => random(x*.003) },
     { name: 'noise',             algo: 'noise(x*.1) - .5',
@@ -106,7 +106,7 @@
     'gentle', 'gentle', 'gentle', 'gentle',
     'harsh',                                     // 16 up down noise (x*sin grows unbounded)
     'gentle', 'gentle', 'gentle', 'gentle', 'gentle',
-    'harsh',                                     // 22 fade out (log ramp: unbounded, -Inf at x=0, barely oscillates)
+    'gentle',                                    // 22 shake out (mirrored log chirp: bounded, shake returns every period)
     'harsh',                                     // 23 grow random (random)
     'harsh',                                     // 24 noise (noise)
     'harsh',                                     // 25 fuzzy pulse (tan hi freq)
@@ -161,7 +161,7 @@
     50.0000,  // 19 ramp                1/0.02
     16.6667,  // 20 saw down            0.5/0.03
     16.6667,  // 21 saw up              0.5/0.03
-    null,     // 22 fade out            log(x)
+    62.8319,  // 22 shake out           mirrored log chirp — palindrome over 2π/0.1
     null,     // 23 grow random         non-deterministic
     null,     // 24 noise                non-deterministic
     17.75,    // 25 fuzzy pulse         empirical (tan(x*20) clips oddly)

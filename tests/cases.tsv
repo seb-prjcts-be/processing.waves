@@ -44,9 +44,13 @@ id	desc	y	t	seed	wave	amplitude	frequency	phase	mode	u	mix	rlo	rhi	group	waveB
 43	seed 123 group ghost	22	0	123	-	100	1	0	stable	0	0.5	-1	1	ghost	-
 44	seed 5 group harsh	10	0	5	-	100	1	0	stable	0	0.5	-	-	harsh	-
 45	seed 2024 group gentle	10	0	2024	-	100	1	0	stable	0	0.5	-	-	gentle	-
-46	fade out y=0 (log -Inf edge)	0	0	0	fade out	100	1	0	stable	0	0.5	-	-	all	-
-47	fade out y=-10	-10	0	0	fade out	100	1	0	stable	0	0.5	-	-	all	-
+46	shake out y=0 (m=0 edge)	0	0	0	shake out	100	1	0	stable	0	0.5	-	-	all	-
+47	shake out y=-10 (abs mirror)	-10	0	0	shake out	100	1	0	stable	0	0.5	-	-	all	-
 48	bald patch y=0.5	0.5	0	0	bald patch	100	1	0	stable	0	0.5	-	-	all	-
 49	half sine y=10	10	0	0	half sine	100	1	0	stable	0	0.5	-	-	all	-
-50	fade out y=0 wild u=1.0 (non-finite clamp)	0	0	0	fade out	100	1	0	wild	1.0	0.5	-	-	all	-
-51	fade out y=-10 wild u=0.5 (non-finite clamp)	-10	0	0	fade out	100	1	0	wild	0.5	0.5	-	-	all	-
+50	shake out y=0 wild u=1.0	0	0	0	shake out	100	1	0	wild	1.0	0.5	-	-	all	-
+51	shake out y=-10 wild u=0.5	-10	0	0	shake out	100	1	0	wild	0.5	0.5	-	-	all	-
+52	shake out y=31.416 (mirror fold)	31.416	0	0	shake out	100	1	0	stable	0	0.5	-	-	all	-
+53	shake out y=70 (past one period)	70	0	0	shake out	100	1	0	stable	0	0.5	-	-	all	-
+54	shake out y=200 (three periods in)	200	0	0	shake out	100	1	0	stable	0	0.5	-	-	all	-
+55	shake out frequency 2 (period scales)	5	0	0	shake out	100	2	0	stable	0	0.5	-	-	all	-
