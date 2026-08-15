@@ -336,18 +336,18 @@ function drawTitle(t) {
   textAlign(LEFT, TOP);
   textStyle(BOLD);
   textSize(size);
-  let cursor = x;
+  let labelCursor = x;
   const label = 'SIGNAL LOOM';
   for (let i = 0; i < label.length; i++) {
     const ch = label[i];
     if (ch === ' ') {
-      cursor += size * 0.28;
+      labelCursor += size * 0.28;
       continue;
     }
     const lift = motionSampler.sample(i * 0.23, t) * size * 0.055;
     fill(i === 7 || i === 8 ? accent(colorSampler.sample(i * 0.18, t)) : INK);
-    text(ch, cursor, y + lift);
-    cursor += textWidth(ch) * 0.98;
+    text(ch, labelCursor, y + lift);
+    labelCursor += textWidth(ch) * 0.98;
   }
 
   textStyle(NORMAL);

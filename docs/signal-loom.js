@@ -670,8 +670,8 @@
 
   document.querySelectorAll('.copy-btn').forEach(function (button) {
     button.addEventListener('click', function () {
-      var key = button.getAttribute('data-copy');
-      var source = document.getElementById('code-' + key);
+      var copyKey = button.getAttribute('data-copy');
+      var source = document.getElementById('code-' + copyKey);
       var text = source ? source.textContent : '';
       var original = button.textContent;
       copyText(text).then(function () {
