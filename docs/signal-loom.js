@@ -672,9 +672,9 @@
     button.addEventListener('click', function () {
       var copyKey = button.getAttribute('data-copy');
       var source = document.getElementById('code-' + copyKey);
-      var text = source ? source.textContent : '';
+      var codeText = source ? source.textContent : '';
       var original = button.textContent;
-      copyText(text).then(function () {
+      copyText(codeText).then(function () {
         button.textContent = 'Copied';
         button.classList.add('copied');
       }).catch(function () {

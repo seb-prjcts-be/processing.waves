@@ -387,16 +387,16 @@ function drawTicker(t) {
   noStroke();
   const h = 34;
   const y = height - h;
-  const copy = 'SOURCE -> TENSION -> SHUTTLE -> PATTERN -> OUTPUT / P5 LOOM / PROCESSING LOOM / WAVES.WAVE / CREATESAMPLER / MIX / PHASE / SHIFT / ';
+  const tickerText = 'SOURCE -> TENSION -> SHUTTLE -> PATTERN -> OUTPUT / P5 LOOM / PROCESSING LOOM / WAVES.WAVE / CREATESAMPLER / MIX / PHASE / SHIFT / ';
   fill(INK);
   rect(0, y, width, h);
   fill(PAPER);
   textAlign(LEFT, CENTER);
   textSize(12);
-  const tw = textWidth(copy);
+  const tw = textWidth(tickerText);
   let x = -((t * 72) % tw);
   while (x < width + tw) {
-    text(copy, x, y + h * 0.5);
+    text(tickerText, x, y + h * 0.5);
     x += tw;
   }
 }
@@ -423,24 +423,24 @@ function fitSize(str, maxW, maxSize, minSize) {
 
 function drawWrappedText(str, x, y, maxW, leading, maxLines = 3) {
   const words = str.split(' ');
-  let line = '';
+  let currentLine = '';
   let cy = y;
   let lines = 0;
 
   for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (textWidth(test) > maxW && line) {
-      text(line, x, cy);
+    const test = currentLine ? `${currentLine} ${word}` : word;
+    if (textWidth(test) > maxW && currentLine) {
+      text(currentLine, x, cy);
       lines++;
       if (lines >= maxLines) return;
-      line = word;
+      currentLine = word;
       cy += leading;
     } else {
-      line = test;
+      currentLine = test;
     }
   }
 
-  if (line && lines < maxLines) text(line, x, cy);
+  if (currentLine && lines < maxLines) text(currentLine, x, cy);
 }
 
 function hexAlpha(alpha) {
