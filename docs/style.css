@@ -2,7 +2,7 @@
    p5.waves Showcase - Sober B&W, Oswald titles
    ============================================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500&display=swap');
+@import url('assets/fonts/fonts.css');
 
 :root {
   --bg:          #f5f5f5;

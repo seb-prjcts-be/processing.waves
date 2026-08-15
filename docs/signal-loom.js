@@ -216,7 +216,7 @@
       threadS.sample(0.42, t);
       var rw = Math.min(bw, 420), rh = 26;
       var rx = bx, ryy = by + bh + 18;
-      var morphMix = threadS.shifting ? threadS.mix : pulse.sample(0.5, t);
+      var morphMix = threadS.shifting ? threadS['mix'] : pulse.sample(0.5, t);
       p.fill(INK);
       p.rect(rx, ryy, rw, rh);
       p.fill(pool.color);
@@ -559,7 +559,7 @@
       s.sample(0.42, t);
       var x = 22, y = p.height * 0.4;
       var w = p.width - 44, h = 30;
-      var morphMix = s.shifting ? s.mix : pulse.sample(0.5, t);
+      var morphMix = s.shifting ? s['mix'] : pulse.sample(0.5, t);
       p.background(PAPER);
 
       p.noStroke();

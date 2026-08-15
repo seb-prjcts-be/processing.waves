@@ -368,13 +368,13 @@ function drawMachineReadout(t) {
   const y = width < 900 ? b.y + b.h + 48 : p.y + p.h + 42;
   const w = width < 900 ? min(b.w, 520) : p.w;
   const h = 34;
-  const mix = sampler.shifting ? sampler.mix : pulseSampler.sample(0.5, t);
+  const morphMix = sampler.shifting ? sampler['mix'] : pulseSampler.sample(0.5, t);
 
   fill(INK);
   rect(x, y, w, h);
   fill(pool.color);
-  rect(x, y, w * constrain(mix, 0, 1), h);
-  fill(mix > 0.55 ? INK : PAPER);
+  rect(x, y, w * constrain(morphMix, 0, 1), h);
+  fill(morphMix > 0.55 ? INK : PAPER);
   textAlign(LEFT, CENTER);
   textSize(11);
   text(`tension ${pool.key}`.toUpperCase(), x + 12, y + h * 0.5);

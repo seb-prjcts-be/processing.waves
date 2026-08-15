@@ -347,7 +347,7 @@ function mountSeamlessClosing(host) {
       const sweep  = ring.period * LOBES;
       const radius = Math.min(p.width, p.height) * 0.28;
       const wobble = Math.min(p.width, p.height) * 0.10;
-      const col = p.lerpColor(p.color(60, 200, 255), p.color(255, 80, 120), ring.mix);
+      const col = p.lerpColor(p.color(60, 200, 255), p.color(255, 80, 120), ring['mix']);
       p.push();
       p.translate(p.width / 2, p.height / 2);
       p.noFill();
