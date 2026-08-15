@@ -8,9 +8,9 @@ Java port of [p5.waves](https://github.com/seb-prjcts-be/p5.waves) v3.6.0 for Pr
 
 Behind that one promise lives a curated set of 35 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos. Each one is a tiny formula tuned to drive motion, color, shape, or pattern in a Processing sketch. The library hands you all of them through a single `Waves.wave(x, ...)` call, plus the controls to crossfade between them, auto-cycle on a tempo, or push any of them into wild mode.
 
-processing.waves is the Java sibling of p5.waves, originally built in JavaScript for the browser side of generative coding. The port carries the same vocabulary across to Processing 4: same names, same indices, same numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you. The challenge of the port was less about translating syntax and more about making the *output* of two implementations match bit-for-bit, despite signed-versus-unsigned int quirks and floating-point traps. FNV-1a hashing, the mulberry32 PRNG, and a double-precision internal math layer carry that weight.
+processing.waves is the Java sibling of p5.waves, originally built in JavaScript for the browser side of generative coding. The port carries the same vocabulary across to Processing 4: same names, same indices, and closely matching numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you. The challenge of the port was less about translating syntax and more about making the two implementations agree within Processing's documented float tolerance, despite signed-versus-unsigned int quirks and floating-point traps. FNV-1a hashing, the mulberry32 PRNG, and a double-precision internal math layer carry that weight.
 
-To prove the port works the repo ships a numerical validator that runs the JS reference via Node and compares its outputs against the Java port across 49 cases covering representative waves, every option path, and the group pools. Current status: 49 / 49 pass. Visually identical to JS, sub-pixel numerical match where deterministic. See the [site](https://seb-prjcts-be.github.io/processing.waves/) for live previews of every wave and every bundled sketch.
+To prove the port works the repo ships a numerical validator that runs the JS reference via Node and compares its outputs against the Java port across 55 cases covering representative waves, every option path, and the group pools. Current status: 55 / 55 pass. Visually identical to JS, sub-pixel numerical match where deterministic. See the [site](https://seb-prjcts-be.github.io/processing.waves/) for live previews of every wave and every bundled sketch.
 
 ## Install
 
@@ -136,11 +136,11 @@ The `tests/` folder validates that processing.waves produces the same output as 
 ./tests/run.ps1
 ```
 
-Current status: **49 / 49 pass**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
+Current status: **55 / 55 pass**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
 
 ## Port notes (Java vs JS)
 
-- The JS `new Function(algoString)` runtime evaluator is replaced by hand-translated Java lambdas, one per wave. The string-eval feature was never exposed via the public API, so no functional difference.
+- p5.waves carries each formula as display metadata plus a precompiled function. Java uses hand-translated lambdas, one per wave. Neither implementation evaluates formula strings at runtime, so there is no public API difference.
 - Internal math runs in `double` (matching JS Numbers) but the public API returns `float` (Processing convention). Visually identical to JS, with sub-pixel numerical match where deterministic.
 - FNV-1a seed and mulberry32 PRNG are ported 1:1. `seedFrom()` returns the unsigned uint32 as a `long` so subsequent float math matches JS's unsigned-Number semantics.
 - Shift mode uses `Math.random()` for per-session entropy; outputs are non-deterministic across runs (same as JS).

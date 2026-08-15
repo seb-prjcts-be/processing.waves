@@ -43,14 +43,14 @@
     </ul>
 
     <h2>Trust, then verify</h2>
-    <p>To prove the port works, the repo ships a numerical validator. It runs the JS reference (loaded via Node), captures 49 input/output pairs across the wave registry and every code path, then runs the Java port over the same inputs and asserts equality within tolerance.</p>
+    <p>To prove the port works, the repo ships a numerical validator. It runs the JS reference (loaded via Node), captures 55 input/output pairs across the wave registry and every code path, then runs the Java port over the same inputs and asserts equality within tolerance.</p>
     <table class="opts-table">
       <thead><tr><th>Metric</th><th>Value</th></tr></thead>
       <tbody>
         <tr><td>Cases</td><td>49 (representative waves, every option path, and the group pools)</td></tr>
         <tr><td>Stable-mode tolerance</td><td>1e-3</td></tr>
         <tr><td>Wild-mode tolerance</td><td>0.5</td></tr>
-        <tr><td>Current status</td><td>49 / 49 pass</td></tr>
+        <tr><td>Current status</td><td>55 / 55 pass</td></tr>
       </tbody>
     </table>
     <p>Wild mode's looser tolerance is intentional: noise modulation amplifies tiny float-vs-double differences. The wave envelope still matches across the languages; only the per-sample chaos detail diverges within the noise budget. Visually you cannot tell them apart.</p>
@@ -68,7 +68,7 @@
     <h2>How it differs from its parent</h2>
     <ul class="step-list">
       <li><p><strong>Fluent builder instead of object literal.</strong> Java doesn't have JS-style options objects, so <code>WaveOpts</code> uses chained setters: <code>new WaveOpts().wave("triangle").amplitude(80)</code>.</p></li>
-      <li><p><strong>No runtime string evaluator.</strong> JS p5.waves uses <code>new Function(algoString)</code> internally to compile each wave's formula. Java replaces this with hand-written lambdas, one per wave. The string-eval feature was never exposed via the public API, so there's no surface-level difference.</p></li>
+      <li><p><strong>No runtime string evaluator.</strong> JS p5.waves carries each formula as display metadata plus a precompiled function. Java uses hand-written lambdas, one per wave. Neither implementation evaluates formula strings at runtime, so there is no surface-level difference.</p></li>
       <li><p><strong>Pure math, no browser glue.</strong> No DOM, no canvas wrappers, no event handlers. The library plugs into Processing's draw loop like any other math utility.</p></li>
     </ul>
 
@@ -97,7 +97,7 @@
   </main>
 
   <footer>
-    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.5.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
+    <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.6.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
     <p class="footer-sub">MIT License &middot; v1.6.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 

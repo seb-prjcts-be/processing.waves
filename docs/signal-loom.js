@@ -216,12 +216,12 @@
       threadS.sample(0.42, t);
       var rw = Math.min(bw, 420), rh = 26;
       var rx = bx, ryy = by + bh + 18;
-      var mix = threadS.shifting ? threadS.mix : pulse.sample(0.5, t);
+      var morphMix = threadS.shifting ? threadS.mix : pulse.sample(0.5, t);
       p.fill(INK);
       p.rect(rx, ryy, rw, rh);
       p.fill(pool.color);
-      p.rect(rx, ryy, rw * p.constrain(mix, 0, 1), rh);
-      p.fill(mix > 0.55 ? INK : PAPER);
+      p.rect(rx, ryy, rw * p.constrain(morphMix, 0, 1), rh);
+      p.fill(morphMix > 0.55 ? INK : PAPER);
       p.textFont('Consolas');
       p.textSize(10);
       p.textAlign(p.LEFT, p.CENTER);
@@ -559,15 +559,15 @@
       s.sample(0.42, t);
       var x = 22, y = p.height * 0.4;
       var w = p.width - 44, h = 30;
-      var mix = s.shifting ? s.mix : pulse.sample(0.5, t);
+      var morphMix = s.shifting ? s.mix : pulse.sample(0.5, t);
       p.background(PAPER);
 
       p.noStroke();
       p.fill(INK);
       p.rect(x, y, w, h);
       p.fill(pool.color);
-      p.rect(x, y, w * p.constrain(mix, 0, 1), h);
-      p.fill(mix > 0.55 ? INK : PAPER);
+      p.rect(x, y, w * p.constrain(morphMix, 0, 1), h);
+      p.fill(morphMix > 0.55 ? INK : PAPER);
       p.textSize(10);
       p.textAlign(p.LEFT, p.CENTER);
       p.text(('tension ' + pool.key).toUpperCase(), x + 10, y + h * 0.5);

@@ -3,8 +3,8 @@
    ------------------------------------------------------------
    Live previews on this site are rendered by p5.js + the
    original p5.waves JS library (loaded from CDN). The Java
-   port (processing.waves) produces numerically identical
-   output, verified by a 49-case validator in /tests.
+   port (processing.waves) matches within the validator tolerances
+   across 55 cases in /tests.
 
    Every preview is lazy-mounted via IntersectionObserver:
    the p5 instance is created only when its container scrolls
@@ -445,7 +445,7 @@ function mountRandomWalker(host) {
     let t = 0;
     let trail;
 
-    function step() {
+    function advanceWalkers() {
       trail.noStroke();
       trail.fill(15, 15, 15, 8);
       trail.rect(0, 0, trail.width, trail.height);
@@ -485,10 +485,10 @@ function mountRandomWalker(host) {
       }
       // Pre-bake ~10 seconds of motion so the trail is already rich
       // when the visitor first sees the canvas.
-      for (let f = 0; f < 600; f++) step();
+      for (let f = 0; f < 600; f++) advanceWalkers();
     };
     p.draw = () => {
-      step();
+      advanceWalkers();
       p.image(trail, 0, 0);
       p.noStroke(); p.fill(255, 255, 255, 120);
       p.textSize(10); p.textAlign(p.LEFT);
