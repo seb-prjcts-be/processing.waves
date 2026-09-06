@@ -1,0 +1,38 @@
+name: Numerical parity
+on:
+  push:
+    branches: [main, 'codex/processing-parity']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  parity:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Generate p5 reference expectations
+        run: |
+          node tests/generate_js.cjs
+          node tests/generate_regressions.cjs
+      - name: Compile current source and tests
+        run: javac --release 17 -d tests/bin src/waves/*.java tests/Validator.java tests/RegressionParity.java
+      - name: Existing numerical cases
+        run: java -cp tests/bin Validator tests
+      - name: API regression parity
+        run: java -cp tests/bin waves.RegressionParity tests
+      - name: Build tested library
+        run: |
+          javac --release 17 -d build/library src/waves/*.java
+          jar cf library/waves.jar -C build/library .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: waves-tested
+          path: library/waves.jar
