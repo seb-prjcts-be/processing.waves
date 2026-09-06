@@ -130,17 +130,22 @@ Requires JDK 17+ and Processing 4.
 
 ## Numerical validation
 
-The `tests/` folder validates that processing.waves produces the same output as the JS p5.waves reference for a fixed set of inputs.
+The `tests/` folder compares freshly compiled Java source with the checked-in p5.waves reference. It covers the original numerical cases plus every wave, group membership, non-finite input, sampler option snapshots, morph mixing and shift option defaults. It does not rely on a previously built `library/waves.jar`.
 
 ```
 ./tests/run.ps1
 ```
 
-Current status: **55 / 55 pass**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
+The original suite contains **55 cases**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
+
+The Numerical parity GitHub Actions workflow runs both suites and uploads the freshly built `waves-tested` JAR artifact. The committed JAR and published releases are separate build outputs; source changes do not update those downloads automatically.
 
 ## Port notes (Java vs JS)
 
 - p5.waves carries each formula as display metadata plus a precompiled function. Java uses hand-translated lambdas, one per wave. Neither implementation evaluates formula strings at runtime, so there is no public API difference.
+- Samplers capture their options at creation, including array values. To apply changed options, create a new sampler, as in p5.waves.
+- Non-finite coordinates and numeric options use the p5 defaults (for example, coordinate/time/phase 0, amplitude 100 and frequency 1); invalid morph mix falls back to the sampler's initial mix.
+- The public API intentionally retains float input/output and integer seeds for Processing compatibility. This fix does not promise bit-identical JavaScript results or add fractional seeds.
 - Internal math runs in `double` (matching JS Numbers) but the public API returns `float` (Processing convention). Visually identical to JS, with sub-pixel numerical match where deterministic.
 - FNV-1a seed and mulberry32 PRNG are ported 1:1. `seedFrom()` returns the unsigned uint32 as a `long` so subsequent float math matches JS's unsigned-Number semantics.
 - Shift mode uses `Math.random()` for per-session entropy; outputs are non-deterministic across runs (same as JS).
