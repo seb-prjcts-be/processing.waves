@@ -45,6 +45,11 @@ for filename in ["waves.zip","waves.txt","waves.pdex"]:
 if len(sys.argv) < 2:
     sys.exit(0)
 cli = str(Path(sys.argv[1]).resolve())
+# The Debian package's embedded JDK tools need executable bits when extracted
+# without running its installer. This changes only the disposable CI copy.
+for tool in Path(cli).parents[1].glob("lib/app/resources/jdk/bin/*"):
+    if tool.is_file():
+        tool.chmod(tool.stat().st_mode | 0o111)
 config = Path(os.environ["XDG_CONFIG_HOME"]) / "processing"
 config.mkdir(parents=True, exist_ok=True)
 (config/"preferences.txt").write_text("sketchbook.path.four=" + str(sketchbook) + "\n")
@@ -79,18 +84,7 @@ for name in ["basic_demo", "ghost_delay", "color_field"]:
     replacement = 'void draw() {\n  if (frameCount == 6) { println("WAVES_RUNTIME_OK"); exit(); return; }'
     assert "void draw() {" in source
     pde.write_text(source.replace("void draw() {",replacement,1), encoding="utf-8")
-    output_dir = root/"build/runtime-bin"/name
-    run(command(target,output_dir,"--build"))
-    install = Path(cli).parents[1]
-    java_candidates = sorted(p for p in install.rglob("java")
-                             if p.is_file() and p.parent.name == "bin")
-    assert java_candidates, "No bundled Java runtime found"
-    jars = sorted(install.rglob("*.jar"))
-    classpath = os.pathsep.join(map(str,[output_dir,installed/"library/waves.jar",*jars]))
-    # Run Processing's generated sketch with its shipped Java runtime. Avoid
-    # the CLI debugger transport, which can stall in virtual-display CI.
-    output = run(["xvfb-run","-a",str(java_candidates[0]),
-                  "-Djava.awt.headless=false","-cp",classpath,name], timeout=60)
+    output = run(command(target,root/"build/runtime-bin"/name,"--run"), timeout=60)
     assert "WAVES_RUNTIME_OK" in output
     assert not re.search(r"Exception|NoClassDefFoundError|NoSuchMethodError",output), output
     print("RAN " + name + ": 5 frames", flush=True)
