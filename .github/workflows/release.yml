@@ -18,9 +18,10 @@ permissions:
   contents: read
 concurrency:
   group: release-${{ github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 jobs:
   package:
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -48,6 +49,7 @@ jobs:
           CLI=$(find "$PWD/build/processing" -type f -ipath '*/bin/processing' -print -quit)
           test -n "$CLI"
           python3 tests/release_check.py "$CLI"
+          curl --fail --silent --show-error --output build/homepage.html https://seb-prjcts-be.github.io/processing.waves/
       - uses: actions/upload-artifact@v4
         with:
           name: waves-release

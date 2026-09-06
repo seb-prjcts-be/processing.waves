@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import signal
 import subprocess
 import sys
 import zipfile
@@ -51,10 +52,19 @@ def command(sketch, output, action):
     return ["xvfb-run","-a",cli,"cli","--sketch="+str(sketch),
             "--output="+str(output),"--force",action]
 def run(cmd, timeout=180):
-    result = subprocess.run(cmd, text=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, timeout=timeout)
-    print(result.stdout, flush=True)
-    assert result.returncode == 0, "Processing command failed: " + repr(cmd)
-    return result.stdout
+    print("RUN " + repr(cmd), flush=True)
+    process = subprocess.Popen(cmd, text=True, stdout=subprocess.PIPE,
+                               stderr=subprocess.STDOUT, start_new_session=True)
+    try:
+        output, _ = process.communicate(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        output, _ = process.communicate()
+        print(output, flush=True)
+        raise AssertionError("Processing timed out: " + repr(cmd))
+    print(output, flush=True)
+    assert process.returncode == 0, "Processing command failed: " + repr(cmd)
+    return output
 for sketch in sorted((installed/"examples").iterdir()):
     if sketch.is_dir():
         run(command(sketch, root/"build/sketches"/sketch.name, "--build"))
