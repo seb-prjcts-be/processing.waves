@@ -40,12 +40,12 @@ jobs:
           curl --fail --location --retry 3 -o build/processing.deb https://github.com/processing/processing4/releases/download/processing-1434-4.5.6/processing-4.5.6-linux-x64.deb
           echo '76991c08ad5f5e4312566f397cb6196482e932bcfefe08f7a909fb9e57864d4c  build/processing.deb' | sha256sum --check
           dpkg-deb --extract build/processing.deb build/processing
-          find build/processing -type f -path '*/bin/processing'
+          find build/processing -type f -ipath '*/bin/processing'
       - name: Install package, compile examples and run sketches
         env:
           XDG_CONFIG_HOME: ${{ github.workspace }}/build/config
         run: |
-          CLI=$(find "$PWD/build/processing" -type f -path '*/bin/processing' -print -quit)
+          CLI=$(find "$PWD/build/processing" -type f -ipath '*/bin/processing' -print -quit)
           test -n "$CLI"
           python3 tests/release_check.py "$CLI"
       - uses: actions/upload-artifact@v4
