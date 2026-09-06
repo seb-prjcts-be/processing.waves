@@ -1,0 +1,83 @@
+name: Release package
+on:
+  push:
+    branches: [main, 'codex/release-1.6.1']
+    paths:
+      - 'library.properties'
+      - 'release.ps1'
+      - 'tests/release_check.py'
+      - '.github/workflows/release.yml'
+  pull_request:
+    paths:
+      - 'library.properties'
+      - 'release.ps1'
+      - 'tests/release_check.py'
+      - '.github/workflows/release.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  package:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build and validate library
+        shell: pwsh
+        run: ./release.ps1
+      - name: Download verified Processing 4.5.6
+        run: |
+          mkdir -p build/processing build/config
+          curl --fail --location --retry 3 -o build/processing.deb https://github.com/processing/processing4/releases/download/processing-1434-4.5.6/processing-4.5.6-linux-x64.deb
+          echo '76991c08ad5f5e4312566f397cb6196482e932bcfefe08f7a909fb9e57864d4c  build/processing.deb' | sha256sum --check
+          dpkg-deb --extract build/processing.deb build/processing
+          find build/processing -type f -ipath '*/bin/processing'
+      - name: Install package, compile examples and run sketches
+        env:
+          XDG_CONFIG_HOME: ${{ github.workspace }}/build/config
+        run: |
+          CLI=$(find "$PWD/build/processing" -type f -ipath '*/bin/processing' -print -quit)
+          test -n "$CLI"
+          python3 tests/release_check.py "$CLI"
+          curl --fail --silent --show-error --output build/homepage.html https://seb-prjcts-be.github.io/processing.waves/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: waves-release
+          path: |
+            dist/waves.zip
+            dist/waves.txt
+            dist/waves.pdex
+  publish:
+    needs: package
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: waves-release
+          path: dist
+      - name: Publish validated version without replacing existing releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION=$(sed -n 's/^prettyVersion *= *//p' dist/waves.txt | tr -d '\r')
+          TAG="v$VERSION"
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; leaving it unchanged."
+            exit 0
+          fi
+          gh release create "$TAG" dist/waves.zip dist/waves.txt dist/waves.pdex --target "$GITHUB_SHA" --title "waves $VERSION" --notes-file "docs/releases/$VERSION.md" --draft
+          gh release edit "$TAG" --draft=false --latest

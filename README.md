@@ -31,7 +31,7 @@ cd processing.waves
 
 `build.ps1` reads `sketchbook.path.four` from Processing's preferences and copies the library where Processing expects it. Drop `-Install` to just build the jar into `library/`.
 
-> **Platform support**: tested on Windows. The compiled jar is pure Java with no native dependencies, so it should run on macOS and Linux without changes — but neither has been tested yet. If you hit a platform-specific issue, please [open an issue](https://github.com/seb-prjcts-be/processing.waves/issues).
+> **Platform support**: release validation runs on Ubuntu 24.04 with Processing 4.5.6: all 14 packaged examples compile and three examples render under a virtual display. Windows was tested historically; this release does not claim a fresh Windows or macOS runtime test. The library has no native dependencies.
 >
 > A future release will be available via Processing 4's Contribution Manager.
 
@@ -138,7 +138,7 @@ The `tests/` folder compares freshly compiled Java source with the checked-in p5
 
 The original suite contains **55 cases**. Tolerance `1e-3` for stable mode, `0.5` for wild mode (small float vs double differences amplify through wild mode's noise modulation).
 
-The Numerical parity GitHub Actions workflow runs both suites and uploads the freshly built `waves-tested` JAR artifact. The committed JAR and published releases are separate build outputs; source changes do not update those downloads automatically.
+The Numerical parity workflow runs both suites. The Release package workflow builds and checks `waves.zip`, `waves.txt` and `waves.pdex`, including generated API reference, then tests the extracted library with Processing 4.5.6. A version change merged to `main` publishes the validated package; existing releases are never overwritten. Use the [latest release](https://github.com/seb-prjcts-be/processing.waves/releases/latest), not the historical committed JAR.
 
 ## Port notes (Java vs JS)
 
@@ -155,3 +155,9 @@ More detail: <https://seb-prjcts-be.github.io/processing.waves/about.html>.
 ## License
 
 [MIT](LICENSE). Original p5.waves: [seb-prjcts-be/p5.waves](https://github.com/seb-prjcts-be/p5.waves).
+
+## Release packaging
+
+Run `./release.ps1` with PowerShell 7, JDK 17+ and Node.js. The script runs both numerical suites and writes the three distribution files to `dist/`. `python3 tests/release_check.py` validates their contents. CI additionally installs the package in a clean sketchbook and compiles/runs examples using the real Processing CLI.
+
+Increment both `version` (integer update counter) and `prettyVersion` in `library.properties`, and add matching notes under `docs/releases/`. The publication job uses the exact tested commit and never replaces an existing release.
