@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 /**
  * Java/Processing port of p5.waves v3.6.0 (tracks upstream main).
@@ -187,7 +188,49 @@ public class Waves {
   static double clamp(double v, double lo, double hi) { return v < lo ? lo : (v > hi ? hi : v); }
   static double lerp(double a, double b, double t)    { return a + (b - a) * t; }
   static double fade(double t)                        { return t * t * t * (t * (t * 6 - 15) + 10); }
-  static double toUnit(float v) { return v < 0 ? 0 : (v > 1 ? 1 : v); }
+  static double toNumber(double v, double fallback) {
+    return Double.isFinite(v) ? v : fallback;
+  }
+  static double toUnit(double v) { return toUnit(v, 0); }
+  static double toUnit(double v, double fallback) {
+    return clamp(toNumber(v, fallback), 0, 1);
+  }
+  static String normalizeMode(String mode) {
+    return mode != null && "wild".equals(mode.trim().toLowerCase(Locale.ROOT))
+      ? "wild" : "stable";
+  }
+  static double[] readRange(float[] range) {
+    return range != null && range.length >= 2
+      ? new double[]{toNumber(range[0], -1), toNumber(range[1], 1)} : null;
+  }
+
+  // Match createSampler's captured options: later builder changes must not
+  // partially change a sampler whose waves, seeds and stats are already cached.
+  static WaveOpts snapshotOptions(WaveOpts source) {
+    WaveOpts src = source == null ? new WaveOpts() : source;
+    WaveOpts copy = new WaveOpts();
+    copy.wave = src.wave instanceof Object[] ? ((Object[])src.wave).clone() : src.wave;
+    copy.seed = src.seed;
+    copy.t = (float)toNumber(src.t, 0);
+    copy.amplitude = (float)toNumber(src.amplitude, 100);
+    copy.frequency = (float)toNumber(src.frequency, 1);
+    copy.phase = (float)toNumber(src.phase, 0);
+    copy.mode = normalizeMode(src.mode);
+    copy.unpredictability = (float)toUnit(src.unpredictability);
+    copy.range = src.range == null ? null : src.range.clone();
+    copy.mix = (float)toUnit(src.mix, 0.5);
+    copy.shift = src.shift;
+    copy.shiftInterval = (float)toNumber(src.shiftInterval, 3);
+    copy.shiftDuration = (float)toNumber(src.shiftDuration, 1);
+    copy.group = src.group instanceof Object[] ? ((Object[])src.group).clone() : src.group;
+    return copy;
+  }
+
+  static double evaluate(WaveFn fn, double x, double t, long seed, EvalCtx ctx) {
+    ctx.reset(seed, x);
+    double value = fn.eval(x, t, ctx);
+    return Double.isFinite(value) ? value : 0;
+  }
 
   // ----- Seeding (FNV-1a 32-bit, returns unsigned uint32 as long) -----
   // Storing as long matches JS where the seed is unsigned uint32 stored as
@@ -455,11 +498,9 @@ public class Waves {
   // ----- Shared eval kernel -----
   static double evalKernel(WaveFn fn, double y, double t, double frequency,
                            double phase, long seed, String mode, double u, EvalCtx ctx) {
-    double x = (y + t) * frequency + phase;
+    double x = (toNumber(y, 0) + toNumber(t, 0)) * frequency + phase;
     if ("wild".equals(mode) && u > 0) return evaluateWild(fn, x, t, seed, u, ctx);
-    ctx.reset(seed, x);
-    double v = fn.eval(x, t, ctx);
-    return Double.isFinite(v) ? v : 0;
+    return evaluate(fn, x, t, seed, ctx);
   }
 
   // ============================================================
@@ -470,8 +511,7 @@ public class Waves {
     int idx = pickWaveIndex(0);
     long iSeed = seedFrom(0);
     EvalCtx ctx = new EvalCtx();
-    ctx.reset(iSeed, y);
-    double raw = WAVES[idx].fn.eval(y, 0, ctx);
+    double raw = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed, ctx);
     return (float)(normalizeVal(raw, getStats(idx, iSeed)) * 100.0);
   }
 
@@ -479,8 +519,7 @@ public class Waves {
     long iSeed = seedFrom(seed);
     int idx    = pickWaveIndex(seed);
     EvalCtx ctx = new EvalCtx();
-    ctx.reset(iSeed, y);
-    double raw = WAVES[idx].fn.eval(y, 0, ctx);
+    double raw = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed, ctx);
     return (float)(normalizeVal(raw, getStats(idx, iSeed)) * 100.0);
   }
 
@@ -489,21 +528,21 @@ public class Waves {
     int idx = r >= 0 ? r : pickWaveIndex(0);
     long iSeed = seedFrom(0);
     EvalCtx ctx = new EvalCtx();
-    ctx.reset(iSeed, y);
-    double raw = WAVES[idx].fn.eval(y, 0, ctx);
+    double raw = evaluate(WAVES[idx].fn, toNumber(y, 0), 0, iSeed, ctx);
     return (float)(normalizeVal(raw, getStats(idx, iSeed)) * 100.0);
   }
 
   public static float wave(float y, WaveOpts o) {
+    if (o == null) return wave(y);
     int seed = o.seed;
-    double t = o.t, amplitude = o.amplitude, frequency = o.frequency, phase = o.phase;
-    String mode = "wild".equals(o.mode) ? "wild" : "stable";
+    double t = toNumber(o.t, 0), amplitude = toNumber(o.amplitude, 100);
+    double frequency = toNumber(o.frequency, 1), phase = toNumber(o.phase, 0);
+    String mode = normalizeMode(o.mode);
     double u = toUnit(o.unpredictability);
-    double[] range = o.range == null ? null
-                   : new double[]{ o.range[0], o.range[1] };
+    double[] range = readRange(o.range);
     boolean shift = o.shift;
-    double shiftInterval = Math.max(0, o.shiftInterval);
-    double shiftDuration = Math.max(1e-6, o.shiftDuration);
+    double shiftInterval = Math.max(0, toNumber(o.shiftInterval, 3));
+    double shiftDuration = Math.max(1e-6, toNumber(o.shiftDuration, 1));
     List<Integer> pool = resolveGroup(o.group);
     long internalSeed = seedFrom(seed);
     EvalCtx ctx = new EvalCtx();
@@ -542,8 +581,8 @@ public class Waves {
 
     if (o.wave instanceof Object[]) {
       Object[] arr = (Object[]) o.wave;
-      double mix = toUnit(o.mix);
-      int rA = resolveWave(arr[0]);
+      double mix = toUnit(o.mix, 0.5);
+      int rA = arr.length > 0 ? resolveWave(arr[0]) : -1;
       int rB = arr.length > 1 ? resolveWave(arr[1]) : rA;
       int idxA = rA >= 0 ? rA : pickWaveIndexIn(seed, pool);
       int idxB = rB >= 0 ? rB : pickWaveIndexIn(seed, pool);
@@ -607,7 +646,7 @@ public class Waves {
     double lastMix = 0;
 
     WaveSampler(WaveOpts opts) {
-      this.o = opts;
+      this.o = snapshotOptions(opts);
       int seed = o.seed;
       this.internalSeed = seedFrom(seed);
       this.pool = resolveGroup(o.group);
@@ -615,7 +654,7 @@ public class Waves {
       this.isMorph = (o.wave instanceof Object[]) && ((Object[])o.wave).length >= 2;
       this.mixDefault = isMorph ? toUnit(o.mix) : 0;
       this.shift = o.shift;
-      this.range = o.range == null ? null : new double[]{ o.range[0], o.range[1] };
+      this.range = readRange(o.range);
 
       if (isMorph) {
         Object[] arr = (Object[]) o.wave;
@@ -663,7 +702,8 @@ public class Waves {
 
     public float sample(float y) { return sample(y, o.t); }
     public float sample(float y, float t) {
-      String mode = "wild".equals(o.mode) ? "wild" : "stable";
+      t = (float)toNumber(t, 0);
+      String mode = normalizeMode(o.mode);
       double u = toUnit(o.unpredictability);
 
       if (shift) {
@@ -709,11 +749,11 @@ public class Waves {
 
     public float sampleMorph(float y, float t, float mix) {
       if (fnB == null) return sample(y, t);
-      String mode = "wild".equals(o.mode) ? "wild" : "stable";
+      String mode = normalizeMode(o.mode);
       double u = toUnit(o.unpredictability);
       double val  = evalKernel(fn,  y, t, o.frequency, o.phase, internalSeed, mode, u, ctx);
       double valB = evalKernel(fnB, y, t, o.frequency, o.phase, internalSeed, mode, u, ctx);
-      double mixD = toUnit(mix);
+      double mixD = toUnit(mix, mixDefault);
       if (range != null) {
         double a = mapToRange(val,  statsA, range);
         double b = mapToRange(valB, statsB, range);

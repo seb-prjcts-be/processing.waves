@@ -1,27 +1,23 @@
 #!/usr/bin/env pwsh
-# Run the numerical validation harness:
-#   1. Node generates tests/expected.tsv from p5.waves.js
-#   2. Java validator compares against the local processing.waves library
-
+# Compare freshly compiled source with the checked-in p5.waves reference.
 $ErrorActionPreference = 'Stop'
 $here = $PSScriptRoot
-Set-Location (Split-Path $here -Parent)
+Push-Location (Split-Path $here -Parent)
+try {
+  & node (Join-Path $here 'generate_js.cjs')
+  if ($LASTEXITCODE -ne 0) { throw 'Reference generation failed' }
+  & node (Join-Path $here 'generate_regressions.cjs')
+  if ($LASTEXITCODE -ne 0) { throw 'Regression reference generation failed' }
 
-# 1. Generate JS expected
-Write-Host "[1/3] Running Node generator..."
-& node "$here\generate_js.cjs"
-if ($LASTEXITCODE -ne 0) { throw "node generate_js.cjs failed" }
+  $bin = Join-Path $here 'bin'
+  New-Item -ItemType Directory -Force -Path $bin | Out-Null
+  & javac --release 17 -d $bin src/waves/WaveOpts.java src/waves/Waves.java tests/Validator.java tests/RegressionParity.java
+  if ($LASTEXITCODE -ne 0) { throw 'Compilation failed' }
 
-# 2. Compile validator
-Write-Host "[2/3] Compiling Validator.java..."
-$jar = "library\waves.jar"
-$bin = "$here\bin"
-Remove-Item -Recurse -Force $bin -ErrorAction SilentlyContinue
-New-Item -ItemType Directory -Force -Path $bin | Out-Null
-& javac --release 17 -cp $jar -d $bin "$here\Validator.java"
-if ($LASTEXITCODE -ne 0) { throw "javac failed" }
-
-# 3. Run validator
-Write-Host "[3/3] Running Validator..."
-& java -cp "$jar;$bin" Validator $here
-exit $LASTEXITCODE
+  & java -cp $bin Validator $here
+  if ($LASTEXITCODE -ne 0) { throw 'Numerical validation failed' }
+  & java -cp $bin waves.RegressionParity $here
+  if ($LASTEXITCODE -ne 0) { throw 'Regression validation failed' }
+} finally {
+  Pop-Location
+}
