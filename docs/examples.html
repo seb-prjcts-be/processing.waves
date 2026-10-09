@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Examples &mdash; processing.waves</title>
+  <title>Examples - processing.waves</title>
   <meta name="description" content="Processing sketches that ship with processing.waves. Copy the code into Processing 4 to run.">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>
@@ -33,14 +33,14 @@
       <div class="hero-text">
         <div class="hero-badge">Processing 4 library</div>
         <h1><span class="accent">Examples</span></h1>
-        <p class="hero-sub">35 wave shapes. One function call.<br>Pass a number in, get a number back. Use it for anything.</p>
+        <p class="hero-sub">Copy a Processing sketch and change its wave, seed or sampling settings to see what happens.</p>
       </div>
     </div>
   </section>
 
   <div class="ex-page-header">
-    <p>Fourteen sketches ship with the library; thirteen are previewed below. Each demonstrates a different facet: shift, morph, wild, samplers in tandem, samplers as velocity, range-mapped fields, parameter play, manual time, colour fields, periodic closure, shift-proof closing rings, phase portraits, 3D volumes. Open them all from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source below.</p>
-    <p style="font-size:.85rem;font-style:italic;color:var(--text-muted);">Live demos on this page are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to get the same result.</p>
+    <p>Fourteen sketches ship with the library; thirteen are previewed below. They show shifting waves, morphing, wild mode, fields and closed curves. Open them from <code>Processing 4 &gt; File &gt; Examples &gt; Contributed Libraries &gt; waves</code>, or copy the source.</p>
+    <p style="font-size:.85rem;font-style:italic;color:var(--text-muted);">Live demos on this page are rendered in the browser by <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> (JS). The Java code shown is what you paste into Processing to run the Java version.</p>
   </div>
 
   <main class="ex-list">
@@ -177,7 +177,7 @@ void draw() {
         <h2>seamless_closing</h2>
         <span class="ex-tag">shift &middot; group: "closing" &middot; period</span>
       </div>
-      <p class="lead">A ring sampled with shift normally tears its seam open the moment it lands on a new wave &mdash; every formula has its own period. The <code>"closing"</code> pool fixes that: all 19 waves in it share one base period, so a sweep of <code>ring.period() * LOBES</code> closes through every morph. The loop keeps changing shape and never shows a seam.</p>
+      <p class="lead">A shifting ring uses the <code>"closing"</code> pool. Its 19 waves share a base period, so the sketch reads <code>ring.period() * LOBES</code> for its sweep. The periods are measured approximations.</p>
       <div class="ex-canvas-live" data-example="seamless_closing"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/seamless_closing/seamless_closing.pde" target="_blank">View on GitHub &rarr;</a>
@@ -253,7 +253,7 @@ void draw() {
         <h2>ghost_delay</h2>
         <span class="ex-tag">shift &middot; group: "ghost" &middot; period</span>
       </div>
-      <p class="lead">One 1D wave, read against a delayed copy of itself. Plot <code>sample(u)</code> against <code>sample(u + tau)</code> and a single scalar wave closes into a loop ring &mdash; its phase portrait. The <code>"ghost"</code> pool is six closing waves hand-picked to stay clean under that pairing, and <code>shift</code> keeps morphing between them, so the loop family never settles. The strip along the bottom is that one wave; the dots are the two read points.</p>
+      <p class="lead">One 1D wave, read against a delayed copy of itself. Plot <code>sample(u)</code> against <code>sample(u + tau)</code> and a single scalar wave closes into a loop ring; its phase portrait. The <code>"ghost"</code> pool is six closing waves hand-picked to stay clean under that pairing, and <code>shift</code> keeps morphing between them, so the loop changes over time. The strip along the bottom is that one wave; the dots are the two read points.</p>
       <div class="ex-canvas-live" data-example="ghost_delay"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/ghost_delay/ghost_delay.pde" target="_blank">View on GitHub &rarr;</a>
@@ -473,7 +473,7 @@ void draw() {
         <h2>random_walker</h2>
         <span class="ex-tag">wave as velocity &middot; trails &middot; PGraphics</span>
       </div>
-      <p class="lead">No angles, no steps. Wave output IS the velocity. Five trails ride two shift-samplers as raw displacement. When the formulas shift, the movement character transforms entirely. Trails draw onto a <code>PGraphics</code> with low-alpha fade.</p>
+      <p class="lead">Two shift-samplers supply the horizontal and vertical displacement for five trails. The trails draw onto a <code>PGraphics</code> layer with a low-alpha fade.</p>
       <div class="ex-canvas-live" data-example="random_walker"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/random_walker/random_walker.pde" target="_blank">View on GitHub &rarr;</a>
@@ -680,7 +680,7 @@ void draw() {
         <h2>wild_mode</h2>
         <span class="ex-tag">wild mode &middot; unpredictability &middot; interactive</span>
       </div>
-      <p class="lead">A grid of circles split down the middle. Left half: the wave as written. Right half: the same wave in wild mode. Mouse X is the unpredictability dial &mdash; drag right and feel the chaos build.</p>
+      <p class="lead">A grid of circles split down the middle. Left half: the wave as written. Right half: the same wave in wild mode. Mouse X is the unpredictability dial; drag right and feel the chaos build.</p>
       <div class="ex-canvas-live" data-example="wild_mode"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wild_mode/wild_mode.pde" target="_blank">View on GitHub &rarr;</a>
@@ -753,7 +753,7 @@ void draw() {
         <h2>time_strata</h2>
         <span class="ex-tag">manual time &middot; scrub &middot; HSB ribbons</span>
       </div>
-      <p class="lead">Time is a plain number you pass in &mdash; the library never calls a clock. Sixteen filled ribbons, each frozen at its own moment in a 24-second window. Mouse X scrubs through the whole window like reading geological strata.</p>
+      <p class="lead">Time is a plain number you pass in; the library never calls a clock. Sixteen filled ribbons, each frozen at its own moment in a 24-second window. Mouse X scrubs through the whole window like reading geological strata.</p>
       <div class="ex-canvas-live" data-example="time_strata"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/time_strata/time_strata.pde" target="_blank">View on GitHub &rarr;</a>
@@ -822,7 +822,7 @@ void draw() {
         <h2>color_field</h2>
         <span class="ex-tag">six samplers &middot; groups &middot; colour</span>
       </div>
-      <p class="lead">A wave-driven take on <code>random(155) + 100</code>. Three slow base samplers set a per-channel floor; three faster field samplers add 0&ndash;100 on top, per cell. Every channel drifts inside a moving 100-wide window &mdash; static, but organised.</p>
+      <p class="lead">A wave-driven take on <code>random(155) + 100</code>. Three slow base samplers set a per-channel floor; three faster field samplers add 0&ndash;100 on top, per cell. Every channel drifts inside a moving 100-wide window; static, but organised.</p>
       <div class="ex-canvas-live" data-example="color_field"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/color_field/color_field.pde" target="_blank">View on GitHub &rarr;</a>
@@ -913,7 +913,7 @@ void draw() {
         <h2>spiky_lissajous</h2>
         <span class="ex-tag">periodicity &middot; closed path &middot; interactive</span>
       </div>
-      <p class="lead">A classic 3:5 Lissajous curve, but <code>sin()</code> is replaced by a spiky wave formula. The pen traces one period-exact cycle and lands back on the start marker &mdash; proof that <code>wave(0) == wave(A &times; period)</code>, so even sawtooth paths close. Click the canvas to cycle waves.</p>
+      <p class="lead">A 3:5 Lissajous curve uses a spiky wave in place of <code>sin()</code>. The pen traces a cycle using the measured period and returns to the start marker. Click the canvas to cycle waves.</p>
       <div class="ex-canvas-live" data-example="spiky_lissajous"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/spiky_lissajous/spiky_lissajous.pde" target="_blank">View on GitHub &rarr;</a>
@@ -1026,7 +1026,7 @@ void mousePressed() {
         <h2>wave_volume_3d</h2>
         <span class="ex-tag">P3D &middot; three samplers &middot; volume</span>
       </div>
-      <p class="lead">A 16&times;16&times;16 point volume in P3D. Three desynchronised shift-samplers &mdash; one per axis &mdash; make the glowing surface breathe, drift sideways, and pulse in depth. The volume turns on its own; drag to rotate by hand.</p>
+      <p class="lead">A 16&times;16&times;16 point volume in P3D. Three desynchronised shift-samplers; one per axis; make the glowing surface breathe, drift sideways, and pulse in depth. The volume turns on its own; drag to rotate by hand.</p>
       <div class="ex-canvas-live" data-example="wave_volume_3d"></div>
       <div class="ex-links">
         <a href="https://github.com/seb-prjcts-be/processing.waves/blob/main/examples/wave_volume_3d/wave_volume_3d.pde" target="_blank">View on GitHub &rarr;</a>
@@ -1120,7 +1120,7 @@ void mouseDragged() {
 
   <footer>
     <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.6.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.6.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p class="footer-sub">MIT License &middot; v1.6.1 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
   <script src="sketch.js?v=1.6.0"></script>

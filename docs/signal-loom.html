@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Signal Loom &mdash; curation engine for processing.waves</title>
-  <meta name="description" content="Signal Loom &mdash; a full curation built from processing.waves. One machine, two runtimes: Processing is the instruction, p5 is the live rehearsal.">
+  <title>Signal Loom - curation engine for processing.waves</title>
+  <meta name="description" content="A Processing sketch that uses wave samplers to draw a loom, with browser previews and code for each part.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -27,7 +27,7 @@
   <div class="ex-page-header">
     <div class="section-tag" style="margin-bottom:0.6rem">Curation engine · processing.waves</div>
     <h1>Signal Loom <span class="accent">Guide</span></h1>
-    <p>One machine, two runtimes. <strong>The instruction is Processing</strong> — each copyable block is <strong>verbatim from <code>SignalLoom.pde</code></strong> — whole functions and classes, plus two labelled fragments; the complete runnable sketch is the <a href="downloads/SignalLoom_processing.zip" download>download</a>. <strong>The working part is simulated online with p5</strong> — every preview is a live p5.waves sketch running the <strong>identical sampler settings</strong> (the Processing sketch runs ~10% slower by design via <code>TIME_SCALE</code>), so you can watch the decision before you compile it.</p>
+    <p>Download the <a href="downloads/SignalLoom_processing.zip" download>Signal Loom sketch</a> and open it in Processing 4 with processing.waves installed. The code blocks below come from <code>SignalLoom.pde</code>. Browser previews use p5.js and p5.waves with the same sampler settings; <code>TIME_SCALE</code> makes the Processing sketch run about 10% slower.</p>
     <div class="guide-quicklinks">
       <a class="guide-chip" href="#overview">Overview</a>
       <a class="guide-chip" href="#pool-curation">Pools</a>
@@ -44,8 +44,8 @@
   <section id="overview" class="section">
     <div class="section-header">
       <div class="section-tag">system / assembly</div>
-      <h2>From One Wave To A <span class="accent">Loom</span></h2>
-      <p class="section-desc">Signal Loom is not a list of effects. Pools become tension, samplers move the shuttle, and the pattern card turns phase into woven output — the same five stations in Processing and in the browser.</p>
+      <h2>Loom <span class="accent">structure</span></h2>
+      <p class="section-desc">Signal Loom uses wave samplers to draw threads, move horizontal rows and choose cells in a pattern card. The Processing sketch and browser previews use the same five parts.</p>
     </div>
     <div class="guide-wide-shell">
       <div class="origin-label">Live assembly preview · warp + weft + pattern card + readout (p5)</div>
@@ -61,23 +61,23 @@
       <div class="block-card">
         <code>start</code>
         <strong>One source, five stations</strong>
-        <p>SOURCE, TENSION, SHUTTLE, PATTERN, OUTPUT. Every layer answers one question: what job does this wave behaviour perform in the loom?</p>
+        <p>The sketch connects a source, tension settings, a shuttle, a pattern card and an output drawing.</p>
       </div>
       <div class="block-card">
         <code>build</code>
-        <strong>Processing is the instruction</strong>
-        <p>The <code>.pde</code> sketch is the deliverable. <code>setup()</code> sizes the canvas, <code>rebuildSystem()</code> builds the samplers, <code>draw()</code> stacks the modules in order.</p>
+        <strong>Processing sketch</strong>
+        <p><code>setup()</code> sizes the canvas, <code>rebuildSystem()</code> creates the samplers and <code>draw()</code> draws the modules in order.</p>
       </div>
       <div class="block-card">
         <code>end product</code>
-        <strong>p5 is the rehearsal</strong>
-        <p>The browser runs the identical wave logic via p5.waves so the loom is legible before Processing 4 ever compiles it.</p>
+        <strong>Browser preview</strong>
+        <p>The browser preview uses p5.waves. Run the downloaded sketch to see the Java version in Processing 4.</p>
       </div>
     </div>
     <div class="ex-preview guide-example-shell">
       <div class="runtime-row">
         <span class="runtime-tag is-processing">Processing · instruction</span>
-        <span class="runtime-note">SignalLoom.pde — paste into Processing 4 + waves library</span>
+        <span class="runtime-note">SignalLoom.pde; paste into Processing 4 + waves library</span>
       </div>
       <pre class="ex-code-block"><code class="language-clike" id="code-system">import waves.*;
 
@@ -134,14 +134,14 @@ void draw() {
   <section id="pool-curation" class="section section-dark">
     <div class="section-header">
       <div class="section-tag">01 / pool curation</div>
-      <h2>Curate The <span class="accent">Tension</span></h2>
-      <p class="section-desc">This is the editorial backbone. Four named pools — <code>gentle</code>, <code>harsh</code>, <code>all</code>, and a hand-picked <code>curated</code> array — each become one tension voice with its own colour.</p>
+      <h2>Choose the <span class="accent">pools</span></h2>
+      <p class="section-desc">Four pools, <code>gentle</code>, <code>harsh</code>, <code>all</code> and a selected array of wave names, each have a colour and sampler.</p>
     </div>
     <div class="blocks-grid guide-blocks">
       <div class="block-card">
         <code>start</code>
         <strong>Name the voices</strong>
-        <p><code>gentle</code> stays readable, <code>harsh</code> ruptures with <code>wild</code> mode, <code>all</code> stays broad, the array is taste.</p>
+        <p>The gentle pool uses smoother waves, the harsh pool adds wild mode, all uses the full set, and the array restricts the selection to chosen names.</p>
       </div>
       <div class="block-card">
         <code>build</code>
@@ -162,7 +162,7 @@ void draw() {
       <div id="guide-pools" class="ex-canvas"></div>
       <div class="guide-inline-strip">
         <div>preview: <span>pool -&gt; one tension voice</span></div>
-        <div>result: <span>variation with authorship</span></div>
+        <div>result: <span>pool variation</span></div>
       </div>
       <div class="runtime-row">
         <span class="runtime-tag is-processing">Processing · instruction</span>
@@ -208,7 +208,7 @@ int activeIndex(float t) {
   <section id="warp-threads" class="section">
     <div class="section-header">
       <div class="section-tag">02 / warp threads</div>
-      <h2>Hang The <span class="accent">Warp</span></h2>
+      <h2>Draw the <span class="accent">warp</span></h2>
       <p class="section-desc">The warp is the vertical structure of the loom. One thread per pool, each bent by <code>Waves.wave()</code> plus a slow sampler drift. The active pool is thick and opaque; the rest hang back.</p>
     </div>
     <div class="blocks-grid guide-blocks">
@@ -288,7 +288,7 @@ int activeIndex(float t) {
   <section id="weft-passes" class="section section-dark">
     <div class="section-header">
       <div class="section-tag">03 / weft passes</div>
-      <h2>Throw The <span class="accent">Shuttle</span></h2>
+      <h2>Draw the <span class="accent">weft</span></h2>
       <p class="section-desc">The weft is the horizontal pass. The pattern card decides which cells are lit; <code>motionSampler</code> lifts each row and <code>pulseSampler</code> sets the weight of every lit segment.</p>
     </div>
     <div class="blocks-grid guide-blocks">
@@ -305,7 +305,7 @@ int activeIndex(float t) {
       <div class="block-card">
         <code>end product</code>
         <strong>Woven passes</strong>
-        <p>Lit segments in the pool colour, ground in faint ink — the card becomes a physical-looking weave.</p>
+        <p>Lit segments in the pool colour, ground in faint ink; the card becomes a physical-looking weave.</p>
       </div>
     </div>
     <div class="ex-preview guide-example-shell">
@@ -363,8 +363,8 @@ int activeIndex(float t) {
   <section id="pattern-card" class="section">
     <div class="section-header">
       <div class="section-tag">04 / punch card</div>
-      <h2>Punch The <span class="accent">Card</span></h2>
-      <p class="section-desc">The pattern card is the loom's proof panel. Two fixed samplers — a <code>smooth solid sine</code> for rows and a <code>ramp up sine</code> for columns — are summed and thresholded with <code>rv + cv &gt; 0</code>.</p>
+      <h2>Pattern <span class="accent">card</span></h2>
+      <p class="section-desc">The pattern card is the loom's proof panel. Two fixed samplers; a <code>smooth solid sine</code> for rows and a <code>ramp up sine</code> for columns; are summed and thresholded with <code>rv + cv &gt; 0</code>.</p>
     </div>
     <div class="blocks-grid guide-blocks">
       <div class="block-card">
@@ -380,7 +380,7 @@ int activeIndex(float t) {
       <div class="block-card">
         <code>end product</code>
         <strong>Binary punch card</strong>
-        <p>Lit cells in the pool colour, off cells in a checker — a rational readout beside the expressive loom.</p>
+        <p>Lit cells in the pool colour, off cells in a checker; a rational readout beside the expressive loom.</p>
       </div>
     </div>
     <div class="ex-preview guide-example-shell">
@@ -443,8 +443,8 @@ int activeIndex(float t) {
   <section id="kinetic-title" class="section section-dark">
     <div class="section-header">
       <div class="section-tag">05 / kinetic typography</div>
-      <h2>Make The Title <span class="accent">Breathe</span></h2>
-      <p class="section-desc">The word stays typographic first, live second. Each letter is lifted by <code>motionSampler</code> at its own sample position; letters 7 and 8 (the L–O of LOOM) take an accent colour from <code>colorSampler</code>.</p>
+      <h2>Move the <span class="accent">letters</span></h2>
+      <p class="section-desc">Each letter is lifted by <code>motionSampler</code> at a different sample position. Letters 7 and 8, the L and O of LOOM, take their accent colour from <code>colorSampler</code>.</p>
     </div>
     <div class="blocks-grid guide-blocks">
       <div class="block-card">
@@ -520,8 +520,8 @@ int activeIndex(float t) {
   <section id="machine-readout" class="section">
     <div class="section-header">
       <div class="section-tag">06 / tension meter</div>
-      <h2>Expose The <span class="accent">Tension</span></h2>
-      <p class="section-desc">The readout turns the loom into an instrument. The bar fill is the sampler's <code>mix()</code> during a shift; the labels expose the current and target wave name of the active pool.</p>
+      <h2>Wave <span class="accent">readout</span></h2>
+      <p class="section-desc">The bar shows the sampler's <code>mix()</code> value during a shift. Labels show the active pool's current and target wave names.</p>
     </div>
     <div class="blocks-grid guide-blocks">
       <div class="block-card">
@@ -537,7 +537,7 @@ int activeIndex(float t) {
       <div class="block-card">
         <code>end product</code>
         <strong>Readable instrument</strong>
-        <p>The loom explains itself without becoming a dashboard — the logic is present, but still graphic.</p>
+        <p>The readout shows which waves are being blended as the drawing changes.</p>
       </div>
     </div>
     <div class="ex-preview guide-example-shell">
@@ -594,8 +594,8 @@ int activeIndex(float t) {
   <section id="glyph-field" class="section section-dark">
     <div class="section-header">
       <div class="section-tag">07 / ambient language</div>
-      <h2>Let Vocabulary <span class="accent">Drift</span></h2>
-      <p class="section-desc">Loom words become marginalia. <code>pulseSampler</code> gates whether a word appears, <code>motionSampler</code> drifts it — context behind the hero statement, never filler on top.</p>
+      <h2>Moving <span class="accent">labels</span></h2>
+      <p class="section-desc"><code>pulseSampler</code> decides when a word appears; <code>motionSampler</code> moves it beside the drawing.</p>
     </div>
     <div class="blocks-grid guide-blocks">
       <div class="block-card">
@@ -606,12 +606,12 @@ int activeIndex(float t) {
       <div class="block-card">
         <code>build</code>
         <strong>Pulse gates, motion drifts</strong>
-        <p>Below <code>0.38</code> the word is invisible this frame; above it, <code>motionSampler</code> is read twice — once for x, once for y (offset <code>t + 2</code>).</p>
+        <p>Below <code>0.38</code> the word is invisible this frame; above it, <code>motionSampler</code> is read twice: once for x, once for y (offset <code>t + 2</code>).</p>
       </div>
       <div class="block-card">
         <code>end product</code>
         <strong>Context without clutter</strong>
-        <p>Ghost labels that flicker with the same pulse driving the weave — atmosphere from the same engine.</p>
+        <p>Ghost labels that flicker with the same pulse driving the weave; atmosphere from the same engine.</p>
       </div>
     </div>
     <div class="ex-preview guide-example-shell">
@@ -665,10 +665,10 @@ void drawGlyphField(float t) {
     <div class="section-header">
       <div class="section-tag">full composition / live loom</div>
       <h2>The Full <span class="accent">Loom</span></h2>
-      <p class="section-desc">Every module above, running together. This frame is the p5.waves loom; the Processing blocks above are its sibling — same structure, each using the strengths of its runtime.</p>
+      <p class="section-desc">The browser preview below combines the modules using p5.waves. The downloaded Processing sketch combines their Java counterparts.</p>
     </div>
     <div class="guide-poster-stage">
-      <iframe class="guide-poster-frame" src="signal-loom-poster.html" title="Signal Loom — full p5.waves loom" loading="lazy"></iframe>
+      <iframe class="guide-poster-frame" src="signal-loom-poster.html" title="Signal Loom; full p5.waves loom" loading="lazy"></iframe>
     </div>
     <div class="guide-poster-links">
       <a class="ex-full-link" href="signal-loom-poster.html" target="_blank">-&gt; open full loom</a>
@@ -679,8 +679,8 @@ void drawGlyphField(float t) {
   </section>
 
   <footer>
-    <p>The instruction is <a href="guide.html">Processing</a> · the working preview is <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a></p>
-    <p class="footer-sub">Signal Loom · processing.waves / p5.waves · siblings, not clones · <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p>Processing sketch: <a href="guide.html">Processing</a> · browser preview: <a href="https://p5js.org" target="_blank">p5.js</a> + <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a></p>
+    <p class="footer-sub">Signal Loom · processing.waves / p5.waves · Java sketch and browser preview · <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/p5@2.2.2/lib/p5.js"></script>

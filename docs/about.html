@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>About &mdash; processing.waves</title>
-  <meta name="description" content="Why a Java port of p5.waves? How it was built, validated, and what's different.">
+  <title>About - processing.waves</title>
+  <meta name="description" content="The Java port of p5.waves, its numerical tests, API differences and contributors.">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -26,44 +26,44 @@
 
   <main class="guide-wrap">
     <h1>About</h1>
-    <p class="guide-intro">Pass a number in, get a number back. Behind that one promise lives a curated set of 35 wave shapes: smooth sines and sharp sawteeth, gentle bumps and noise-flecked chaos, each one a tiny formula tuned to drive motion, color, shape, or pattern in a sketch.</p>
+    <p class="guide-intro">Pass a number in, get a number back. processing.waves provides 35 wave formulas for motion, colour, shape or pattern in a Processing sketch.</p>
 
-    <h2>A Java twin</h2>
-    <p><strong>processing.waves</strong> is the Java sibling of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a>, a p5.js library originally built for the browser side of generative coding. The Java port carries the same vocabulary across to Processing 4: same names, same indices, same numerical output. If you sketch in p5.js today and in Processing tomorrow, you bring the same building blocks with you.</p>
-    <p>Processing 4 has been a home for creative coders for two decades. It runs offline, exports to native apps, and handles pixel-by-pixel work without browser overhead. Artists, educators and students live there. Until now, the wave vocabulary from p5.waves stopped at the JavaScript boundary; this port hands those users the same set of shapes, behaving the same way, in the language they already use.</p>
+    <h2>The Java port</h2>
+    <p><strong>processing.waves</strong> is the Java port of <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> for Processing 4. It keeps the wave names and indices. Java results are checked against the JavaScript reference within the tolerances below.</p>
+    <p>Use the waves in Processing's <code>draw()</code> loop, passing time from your sketch. The library has no native dependencies.</p>
 
-    <h2>The challenge of a faithful port</h2>
-    <p>Porting between two languages with similar surface syntax is usually a chore: rename, retype, recompile. Making the <em>output</em> of two implementations match is something else entirely. Floating-point math is full of subtle traps: signed vs unsigned 32-bit ints, hash functions that wrap differently across languages, pseudo-random sequences that drift apart by the fifth decimal. processing.waves takes those traps seriously:</p>
+    <h2>Matching Java and JavaScript</h2>
+    <p>The port needs the hash, pseudo-random generator and formulas to agree across Java and JavaScript. These are the implementation choices behind that comparison:</p>
     <ul class="step-list">
       <li><p><strong>FNV-1a 32-bit hash</strong>, returning the unsigned uint32 as a Java <code>long</code> so the subsequent float math matches JS's unsigned-Number semantics.</p></li>
       <li><p><strong>mulberry32 PRNG</strong>, ported bit-for-bit. A given seed produces the same sequence on both sides of the language border.</p></li>
-      <li><p><strong>double-precision internal math</strong>, narrowed to <code>float</code> only at the public API boundary, matching JS Numbers exactly where it counts and meeting the Processing convention everywhere else.</p></li>
+      <li><p><strong>double-precision internal math</strong>, narrowed to <code>float</code> only at the public API boundary, preserving double precision for intermediate calculations and returning Processing float values.</p></li>
     </ul>
 
-    <h2>Trust, then verify</h2>
-    <p>To prove the port works, the repo ships a numerical validator. It runs the JS reference (loaded via Node), captures 55 input/output pairs across the wave registry and every code path, then runs the Java port over the same inputs and asserts equality within tolerance.</p>
+    <h2>Numerical validation</h2>
+    <p>The numerical validator runs the JavaScript reference through Node and compares the Java output for 55 cases. A second suite runs 720 regression checks, covering every wave, group membership, non-finite input and sampler options.</p>
     <table class="opts-table">
       <thead><tr><th>Metric</th><th>Value</th></tr></thead>
       <tbody>
-        <tr><td>Cases</td><td>49 (representative waves, every option path, and the group pools)</td></tr>
+        <tr><td>Cases</td><td>55 (representative waves, option paths and group pools)</td></tr>
         <tr><td>Stable-mode tolerance</td><td>1e-3</td></tr>
         <tr><td>Wild-mode tolerance</td><td>0.5</td></tr>
-        <tr><td>Current status</td><td>55 / 55 pass</td></tr>
+        <tr><td>Recorded release status (1.6.1)</td><td>55 / 55 cases and 720 / 720 regression checks pass</td></tr>
       </tbody>
     </table>
-    <p>Wild mode's looser tolerance is intentional: noise modulation amplifies tiny float-vs-double differences. The wave envelope still matches across the languages; only the per-sample chaos detail diverges within the noise budget. Visually you cannot tell them apart.</p>
+    <p>Wild mode allows a larger tolerance because noise modulation amplifies differences between <code>float</code> and <code>double</code>. These are numerical comparisons, rather than a guarantee that all renderings will look identical.</p>
 
     <h2>35 shapes, four pools</h2>
     <p>Every wave has a character, and the library groups them so you can lean into the one you want:</p>
     <ul class="step-list">
-      <li><p><strong>Gentle</strong>: calm and bounded. Sines, cosines and modulos, plus the sharp-but-periodic shapes like <code>square</code> and <code>pulse</code> &mdash; hard edges, dependable rhythm.</p></li>
-      <li><p><strong>Harsh</strong>: breaks rhythm. Tangent-spiked or noise-driven, but also the ones that simply refuse to stay calm &mdash; <code>bald patch</code> accelerates without bound, <code>half sine</code> keeps changing its stride.</p></li>
+      <li><p><strong>Gentle</strong>: calm and bounded. Sines, cosines and modulos, plus the sharp-but-periodic shapes like <code>square</code> and <code>pulse</code>; hard edges, dependable rhythm.</p></li>
+      <li><p><strong>Harsh</strong>: breaks rhythm. Tangent-spiked or noise-driven, but also the ones that simply refuse to stay calm; <code>bald patch</code> accelerates without bound, <code>half sine</code> keeps changing its stride.</p></li>
       <li><p><strong>Closing</strong>: the set whose period divides 2&pi;&middot;n cleanly. A shape drawn over a full cycle joins back to itself without a seam, which is what you want when you sweep a wave around a circle.</p></li>
-      <li><p><strong>Ghost</strong>: six closing waves hand-picked to stay clean when a wave is plotted against a delayed copy of itself &mdash; that pairing draws the wave's phase portrait as a closed loop.</p></li>
+      <li><p><strong>Ghost</strong>: six closing waves hand-picked to stay clean when a wave is plotted against a delayed copy of itself; that pairing draws the wave's phase portrait as a closed loop.</p></li>
     </ul>
-    <p>You don't have to pick by hand. Ask the library for "a gentle one" and let a seed decide. Ask for a specific name. Ask for two names and crossfade between them with <code>mix</code>. Flip <code>shift</code> on and watch the library cycle through random formulas at a tempo you set. All from one function call.</p>
+    <p>Choose a wave by name, let a seed choose from a group, blend two waves with <code>mix</code>, or enable <code>shift</code> to move between formulas at the interval you set.</p>
 
-    <h2>How it differs from its parent</h2>
+    <h2>Java API</h2>
     <ul class="step-list">
       <li><p><strong>Fluent builder instead of object literal.</strong> Java doesn't have JS-style options objects, so <code>WaveOpts</code> uses chained setters: <code>new WaveOpts().wave("triangle").amplitude(80)</code>.</p></li>
       <li><p><strong>No runtime string evaluator.</strong> JS p5.waves carries each formula as display metadata plus a precompiled function. Java uses hand-written lambdas, one per wave. Neither implementation evaluates formula strings at runtime, so there is no surface-level difference.</p></li>
@@ -78,25 +78,25 @@
 
     <h3>Maker</h3>
     <ul class="step-list">
-      <li><p><a href="https://prjcts.be" target="_blank">Sebastien Vanblaere &mdash; prjcts.be</a></p></li>
+      <li><p><a href="https://prjcts.be" target="_blank">Sebastien Vanblaere, prjcts.be</a></p></li>
     </ul>
 
     <h3>Contributors (wave formula dataset)</h3>
     <ul class="step-list">
-      <li><p><a href="https://twitter.com/GenerativePunk" target="_blank">tw@GenerativePunk</a> &mdash; original dataset contributor</p></li>
-      <li><p><a href="https://github.com/ffd8" target="_blank">gh@ffd8 (Ted Davis)</a> &mdash; original dataset contributor, Oscillation Sandbox</p></li>
+      <li><p><a href="https://twitter.com/GenerativePunk" target="_blank">tw@GenerativePunk</a>: original dataset contributor</p></li>
+      <li><p><a href="https://github.com/ffd8" target="_blank">gh@ffd8 (Ted Davis)</a>: original dataset contributor, Oscillation Sandbox</p></li>
     </ul>
 
     <h3>References</h3>
     <ul class="step-list">
-      <li><p><a href="https://titanwolf.org" target="_blank">titanwolf.org</a> &mdash; pulse / rectangular wave formulas</p></li>
-      <li><p>p5.js editor &mdash; jeremydouglass triangle sketch</p></li>
+      <li><p><a href="https://titanwolf.org" target="_blank">titanwolf.org</a>; pulse / rectangular wave formulas</p></li>
+      <li><p>p5.js editor; jeremydouglass triangle sketch</p></li>
     </ul>
   </main>
 
   <footer>
     <p>Built on <a href="https://github.com/seb-prjcts-be/p5.waves" target="_blank">p5.waves</a> v3.6.0 &middot; <a href="https://processing.org" target="_blank">Processing 4</a></p>
-    <p class="footer-sub">MIT License &middot; v1.6.0 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
+    <p class="footer-sub">MIT License &middot; v1.6.1 &middot; <a href="https://github.com/seb-prjcts-be/processing.waves" target="_blank">GitHub</a></p>
   </footer>
 
 </body>
